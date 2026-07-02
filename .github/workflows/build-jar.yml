@@ -1,0 +1,46 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
+
+name: Build Java JAR with Gradle
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-jar:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Fetch code from the repository
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # 2. Setup the Java Development Kit (JDK) environment
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle' # Automatically caches Gradle dependencies to speed up future runs
+
+    # 3. Ensure the Gradle wrapper has executable permissions
+    - name: Grant Execute Permission for Gradle Wrapper
+      run: chmod +x gradlew
+
+    # 4. Compile and package the project into a .jar file
+    - name: Build JAR with Gradle
+      run: ./gradlew assemble
+
+    # 5. Extract the compiled .jar file and save it as a downloadable GitHub artifact
+    - name: Upload JAR Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: java-app-jar
+        path: build/libs/*.jar
