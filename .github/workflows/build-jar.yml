@@ -8,7 +8,7 @@
 name: Build Java JAR with Gradle
 
 on:
-  workflowdispatch:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
   pull_request:
