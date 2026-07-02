@@ -11,7 +11,7 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar# =========================================================================
+# =========================================================================
 # Gradle Build and Cache Files
 # =========================================================================
 .gradle/
@@ -19,11 +19,6 @@ build/
 /*/build/
 .gradletasknamecache
 gradle-app.setting
-
-# Crucial: Do NOT ignore the Gradle Wrapper files. 
-# They are required to build the project without installing Gradle locally.
-!gradle-wrapper.jar
-!gradle-wrapper.properties
 
 # =========================================================================
 # Java / JVM Output
@@ -40,6 +35,11 @@ gradle-app.setting
 *.rar
 hs_err_pid*
 replay_pid*
+
+# Crucial: Do NOT ignore the Gradle Wrapper files.
+# They are required to build the project without installing Gradle locally.
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 
 # =========================================================================
 # IntelliJ IDEA
