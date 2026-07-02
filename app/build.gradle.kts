@@ -16,11 +16,27 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+
+    // Add Sonatype snapshots repo for TamboUI
+    maven {
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
 }
 
 dependencies {
+    implementation(platform("dev.tamboui:tamboui-bom:0.5.0-SNAPSHOT"))
 
-    
+    // For Toolkit DSL (recommended)
+    implementation("dev.tamboui:tamboui-toolkit")
+
+    // JLine backend (required)
+    implementation("dev.tamboui:tamboui-jline3-backend")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")    
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
