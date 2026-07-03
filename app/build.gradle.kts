@@ -11,6 +11,7 @@ plugins {
     application
     java
     `maven-publish`
+    id("com.gradleup.shadow") version "9.0.0"
 }
 
 
@@ -56,6 +57,21 @@ application {
     mainClass = "com.example.Main"
 }
 
+tasks.jar {
+    manifest {
+        attributes[
+            "Main-Class"
+        ] = application.mainClass.get()
+    }
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("all")
+    manifest {
+        attributes["Main-Class"] = application.mainClass.get()
+    }
+}
+
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
 }
@@ -69,6 +85,7 @@ publishing {
     publications {
         create<MavenPublication>("gpr") {
             from(components["java"])
+            artifact(tasks.shadowJar)
             groupId = project.group.toString()
             artifactId = "whiz"
             version = project.version.toString()
