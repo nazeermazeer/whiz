@@ -55,7 +55,7 @@ public class Parser {
 
             
         } catch (IOException err) {
-            text = "could not read file";
+            System.out.println("Cannot read file");
         }
 
         // System.out.println(text);
