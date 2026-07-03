@@ -56,6 +56,14 @@ application {
     mainClass = "com.example.Main"
 }
 
+tasks.jar {
+    manifest {
+        attributes[
+            "Main-Class"
+        ] = application.mainClass.get()
+    }
+}
+
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
 }
