@@ -41,11 +41,17 @@ jobs:
 
     # 4. Compile and package the project into a .jar file
     - name: Build JAR with Gradle
-      run: ./gradlew assemble
+      run: ./gradlew clean build
+
+    - name: List generated artifacts
+      run: find . -path "*/build/libs/*.jar"
 
     # 5. Extract the compiled .jar file and save it as a downloadable GitHub artifact
     - name: Upload JAR Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: java-app-jar
-        path: app/build/libs/*.jar
+        name: whiz-jar
+        path: |
+          **/build/libs/*.jar
+        if-no-files-found: error
+        retention-days: 30
