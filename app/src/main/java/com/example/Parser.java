@@ -27,7 +27,6 @@ public class Parser {
 
             Elements dls = doc.select("dl");
             Element dl;
-            // Element dl = doc.selectFirst("dl");
 
             List<Definition> jsonvalues = new ArrayList<>();
 
@@ -38,18 +37,14 @@ public class Parser {
                 if (dl != null) {
                     for (Element element : dl.children()) {
                         if (element.tagName().equals("dt")) {
-                            // System.out.println("Term: " + element.text());
                             terms.add(element.text());
                         } else if (element.tagName().equals("dd")) {
-                            // System.out.println("Description: " + element.text());
                             def = element.text();
                         }
                     }
                 }
                 jsonvalues.add(new Definition(terms, def));
             }
-
-            // System.out.println(jsonvalues);
 
             String jsonstr = mapper.writeValueAsString(jsonvalues);
             System.out.println(jsonstr); 
