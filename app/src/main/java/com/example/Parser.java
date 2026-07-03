@@ -47,6 +47,10 @@ public class Parser {
             }
 
             String jsonstr = mapper.writeValueAsString(jsonvalues);
+
+            File outputfile = new File("app/src/main/java/com/example/functions.json");
+            mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, jsonvalues);
+
             System.out.println(jsonstr); 
 
 
