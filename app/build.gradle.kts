@@ -39,7 +39,11 @@ dependencies {
     implementation("dev.tamboui:tamboui-jline3-backend")
 
     testImplementation("org.junit.jupiter:junit-jupiter:6.1.1")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")    
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")  
+
+    // Jsoup implementation
+    implementation("org.jsoup:jsoup:1.22.1")
+  
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
