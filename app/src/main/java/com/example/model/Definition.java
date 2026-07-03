@@ -10,6 +10,7 @@ public class Definition {
 
     public Definition(List<String> terms, String def) {
         this.term = terms;
+        this.definition = def;
     }
 
     public void setTerm(List<String> newterm){
