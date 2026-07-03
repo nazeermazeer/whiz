@@ -7,6 +7,13 @@ import java.io.File;
 import java.io.IOException;
 import org.jsoup.select.Elements;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.example.model.Definition;
+
+
 
 public class Parser {
     public static void main(String[] args) {
@@ -16,21 +23,39 @@ public class Parser {
             Document doc = Jsoup.parse(html, "UTF-8");
             text = doc.body().text();
 
+            ObjectMapper mapper = new ObjectMapper();
+
             Elements dls = doc.select("dl");
             Element dl;
+            // Element dl = doc.selectFirst("dl");
+
+            List<Definition> jsonvalues = new ArrayList<>();
+
             for (int i = 0; i < dls.size(); i++) {
                 dl = dls.get(i);
+                List<String> terms = new ArrayList<>();
+                String def = "";
                 if (dl != null) {
-                    // Loop through all <dt> and <dd> tags in order
                     for (Element element : dl.children()) {
                         if (element.tagName().equals("dt")) {
-                            System.out.println("Term: " + element.text());
+                            // System.out.println("Term: " + element.text());
+                            terms.add(element.text());
                         } else if (element.tagName().equals("dd")) {
-                            System.out.println("Description: " + element.text());
+                            // System.out.println("Description: " + element.text());
+                            def = element.text();
                         }
                     }
                 }
+                jsonvalues.add(new Definition(terms, def));
             }
+
+            // System.out.println(jsonvalues);
+
+            String jsonstr = mapper.writeValueAsString(jsonvalues);
+            System.out.println(jsonstr); 
+
+
+            
         } catch (IOException err) {
             text = "could not read file";
         }

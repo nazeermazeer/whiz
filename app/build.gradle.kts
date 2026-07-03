@@ -43,6 +43,9 @@ dependencies {
 
     // Jsoup implementation
     implementation("org.jsoup:jsoup:1.22.1")
+
+    // Jackson JSON Processing Library implementation
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.0")
   
 }
 
