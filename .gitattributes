@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Prevent repo stats from showing 99% HTML in this codebase
+*.html linguist-detectable=false
