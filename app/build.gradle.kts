@@ -8,10 +8,12 @@
  */
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
     application
-    id ("java")
+    java
+    `maven-publish`
 }
+
+
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -48,17 +50,27 @@ java {
 
 
 application {
-    // Define the main class for the application.
     mainClass = "com.example.Main"
-    
-    tasks.named<JavaExec>("run") {
+}
 
-        standardInput = System.`in`
-
-    }
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
 }
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/nazeermazeer/whiz")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
