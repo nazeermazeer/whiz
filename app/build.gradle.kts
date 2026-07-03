@@ -48,6 +48,9 @@ java {
     }
 }
 
+group = "io.github.nazeermazeer"
+version = "1.0.0"
+
 
 application {
     mainClass = "com.example.Main"
@@ -63,6 +66,14 @@ tasks.named<Test>("test") {
 }
 
 publishing {
+    publications {
+        create<MavenPublication>("gpr") {
+            from(components["java"])
+            groupId = project.group.toString()
+            artifactId = "whiz"
+            version = project.version.toString()
+        }
+    }
     repositories {
         maven {
             name = "GitHubPackages"

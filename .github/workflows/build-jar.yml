@@ -11,6 +11,7 @@ on:
   workflow_dispatch:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "main" ]
 
@@ -28,12 +29,15 @@ jobs:
       uses: actions/checkout@v5
 
     # 2. Setup the Java Development Kit (JDK) environment
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@v5
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
         cache: 'gradle' # Automatically caches Gradle dependencies to speed up future runs
+        server-id: GitHubPackages
+        server-username: GITHUB_ACTOR
+        server-password: GITHUB_TOKEN
 
     # 3. Ensure the Gradle wrapper has executable permissions
     - name: Grant Execute Permission for Gradle Wrapper
@@ -42,6 +46,13 @@ jobs:
     # 4. Compile and package the project into a .jar file
     - name: Build JAR with Gradle
       run: ./gradlew clean build
+
+    - name: Publish package to GitHub Packages
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: ./gradlew publish
+      env:
+        GITHUB_ACTOR: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: List generated artifacts
       run: find . -path "*/build/libs/*.jar"
