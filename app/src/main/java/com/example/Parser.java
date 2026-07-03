@@ -17,11 +17,10 @@ import com.example.model.Definition;
 
 public class Parser {
     public static void main(String[] args) {
-        String text;
         try {
             File html = new File("app/src/main/java/com/example/functions.html");
             Document doc = Jsoup.parse(html, "UTF-8");
-            text = doc.body().text();
+            String text = doc.body().text();
 
             ObjectMapper mapper = new ObjectMapper();
 
