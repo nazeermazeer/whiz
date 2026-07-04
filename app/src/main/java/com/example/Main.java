@@ -6,9 +6,13 @@ import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.jsoup.nodes.Document;
+import org.jsoup.Jsoup;
 
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
@@ -33,9 +37,12 @@ public class Main extends ToolkitApp {
 
 
     public static String getText() {
+        File html = new File("app/src/main/java/com/example/functions.html");
         String text;
+
         try {
-            text = Files.readString(PATH);
+            Document doc = Jsoup.parse(html, "UTF-8");
+            text = doc.body().text();
         } catch (IOException err) {
             text = "could not read file";
         } 
