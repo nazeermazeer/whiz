@@ -1,58 +1,103 @@
 package com.example;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.StoredFields;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.ByteBuffersDirectory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Path;
+import java.util.List;
+import com.example.model.Definition;
 
-public class NestedJsonExtractor {
+public class Indexer {
 
-    public static void main(String[] args) {
-        // Path to your nested JSON file
-        File jsonFile = new File("app/src/main/java/com/example/functions.json");
-        Map<String, String> glossary = new HashMap<>();
+    public static void main(String[] args) throws Exception {
 
-        try {
-            JsonFactory factory = new ObjectMapper().getFactory();
-            try (JsonParser parser = factory.createParser(jsonFile)) {
-                extractTerms(parser, glossary);
+        // Read JSON
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Definition> entries = mapper.readValue(
+                Path.of("app/src/main/java/com/example/functions.json").toFile(),
+                new TypeReference<List<Definition>>() {}
+        );
+
+        // Create Lucene index
+        ByteBuffersDirectory directory = new ByteBuffersDirectory();
+        StandardAnalyzer analyzer = new StandardAnalyzer();
+
+        try (IndexWriter writer = new IndexWriter(
+                directory,
+                new IndexWriterConfig(analyzer))) {
+
+            for (Definition def : entries) {
+
+                Document doc = new Document();
+
+                // Add every term
+                for (String term : def.getTerm()) {
+                    doc.add(new TextField(
+                            "term",
+                            term,
+                            Field.Store.YES
+                    ));
+                }
+
+                // Add definition
+                doc.add(new TextField(
+                        "definition",
+                        def.getDefinition(),
+                        Field.Store.YES
+                ));
+
+                writer.addDocument(doc);
             }
 
-            // Print the indexed results
-            glossary.forEach((term, definition) -> 
-                System.out.println("Term: " + term + " | Definition: " + definition)
-            );
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            writer.commit();
         }
-    }
 
-    private static void extractTerms(JsonParser parser, Map<String, String> glossary) throws IOException {
-        String currentTerm = null;
+        // Search
+        try (DirectoryReader reader = DirectoryReader.open(directory)) {
 
-        while (parser.nextToken() != null) {
-            JsonToken currentToken = parser.getCurrentToken();
+            IndexSearcher searcher = new IndexSearcher(reader);
 
-            if (currentToken == JsonToken.FIELD_NAME) {
-                String fieldName = parser.getCurrentName();
+            MultiFieldQueryParser parser =
+                    new MultiFieldQueryParser(
+                            new String[]{"term", "definition"},
+                            analyzer
+                    );
 
-                if ("term".equals(fieldName)) {
-                    parser.nextToken();
-                    currentTerm = parser.getText();
-                } else if ("definition".equals(fieldName) && currentTerm != null) {
-                    parser.nextToken();
-                    glossary.put(currentTerm, parser.getText());
-                    currentTerm = null; // Reset for the next pair
+            Query query = parser.parse("abs");
+
+            TopDocs results = searcher.search(query, 10);
+
+            StoredFields storedFields = reader.storedFields();
+
+            for (ScoreDoc hit : results.scoreDocs) {
+
+                Document doc = storedFields.document(hit.doc);
+
+                System.out.println("Terms:");
+
+                for (String term : doc.getValues("term")) {
+                    System.out.println("  - " + term);
                 }
-            } else if (currentToken == JsonToken.START_OBJECT || currentToken == JsonToken.START_ARRAY) {
-                // Recursively pass the parser into nested objects/arrays
-                extractTerms(parser, glossary);
+
+                System.out.println("Definition:");
+                System.out.println("  " + doc.get("definition"));
+
+                System.out.println("-------------------------");
             }
         }
     }
