@@ -18,7 +18,7 @@ import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 
 public class Main extends ToolkitApp {
-    private static final Path PATH = Path.of("app/src/main/java/com/example/functions.txt");
+    private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
     private static final String TEXT = getText();
 
 
