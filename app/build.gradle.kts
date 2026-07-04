@@ -47,7 +47,17 @@ dependencies {
     // Jackson JSON Processing Library implementation
     implementation("com.fasterxml.jackson.core:jackson-databind:2.22.0")
   
+
+    // Core Lucene library
+    implementation("org.apache.lucene:lucene-core:9.12.2")
+
+    // Analyzers for common languages and token filters
+    implementation("org.apache.lucene:lucene-analysis-common:9.12.2")
+
+    // Query parser
+    implementation("org.apache.lucene:lucene-queryparser:9.12.2")
 }
+
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
@@ -86,6 +96,11 @@ tasks.named<JavaExec>("run") {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+// Ensure Java vector incubator module is run
+tasks.run {
+    jvmArgs("--add-modules=jdk.incubator.vector")
 }
 
 publishing {
