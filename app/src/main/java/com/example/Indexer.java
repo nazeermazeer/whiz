@@ -46,7 +46,7 @@ public class Indexer {
                 Document doc = new Document();
 
                 // Add every term
-                for (String term : def.getTerm()) {
+                for (String term : def.getSignature()) {
                     doc.add(new TextField(
                             "term",
                             term,
