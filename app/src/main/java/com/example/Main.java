@@ -15,6 +15,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.Jsoup;
 
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 
 import dev.tamboui.toolkit.app.ToolkitApp;
@@ -32,23 +35,20 @@ public class Main extends ToolkitApp {
 
     @Override
     protected Element render() {
-        return panel(panel(document), panel(searchbar));
+        return panel(PATH.getFileName().toString(), panel(document).borderType(BorderType.NONE), panel(searchbar));
     }
 
     private final MarkupTextAreaElement document = markupTextArea(TEXT)
             .wrapWord()
-            .title(PATH.getFileName().toString())
-            .rounded()
             .scrollbar(ScrollBarPolicy.AS_NEEDED)
+            .borderType(BorderType.NONE)
             .id("document")
             .focusable();
 
-    private final Element searchbar = panel("Search Example",
+    private final Element searchbar = 
             textInput(searchState)
-                .placeholder("Type to search..."),
-                spacer(),
-            text("Searching for: ")
-        )            .rounded();
+                .placeholder("Type to search...")
+                    ;
 
 
     public static String getText() {
