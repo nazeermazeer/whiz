@@ -27,11 +27,12 @@ import java.awt.Color;
 public class Main extends ToolkitApp {
     private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
     private static final String TEXT = getText();
+    private final TextInputState searchState = new TextInputState();
 
 
     @Override
     protected Element render() {
-        return document;
+        return panel(panel(document), panel(searchbar));
     }
 
     private final MarkupTextAreaElement document = markupTextArea(TEXT)
@@ -41,6 +42,12 @@ public class Main extends ToolkitApp {
             .scrollbar(ScrollBarPolicy.AS_NEEDED)
             .id("document")
             .focusable();
+
+    private final Element searchbar = panel("Search Example",
+            textInput(searchState)
+                .placeholder("Type to search..."),
+                spacer(),
+            text("Searching for: "));
 
 
     public static String getText() {
@@ -66,10 +73,9 @@ public class Main extends ToolkitApp {
 
 
 
-// public class Main extends ToolkitApp {
-
+// 
 //     // 1. Maintain the state of your search bar input
-//     private final TextInputState searchState = new TextInputState();
+
 
 //     @Override
 //     protected Element render() {
