@@ -34,6 +34,11 @@ public class Parser {
                 List<String> terms = new ArrayList<>();
                 String def = "";
                 String id = "";
+                String type = "";
+                if (dl.attr("class").equals("py function"))
+                    type = "function";
+                else if (dl.attr("class").equals("py class"))
+                    type = "class";
                 if (dl != null) {
                     for (Element element : dl.children()) {
                         if (element.tagName().equals("dt")) {
@@ -44,7 +49,7 @@ public class Parser {
                         }
                     }
                 }
-                jsonvalues.add(new Definition(id, terms, def));
+                jsonvalues.add(new Definition(type, id, terms, def));
             }
 
             String jsonstr = mapper.writeValueAsString(jsonvalues);
