@@ -33,16 +33,18 @@ public class Parser {
                 dl = dls.get(i);
                 List<String> terms = new ArrayList<>();
                 String def = "";
+                String id = "";
                 if (dl != null) {
                     for (Element element : dl.children()) {
                         if (element.tagName().equals("dt")) {
+                            id = element.attr("id");
                             terms.add(element.text());
                         } else if (element.tagName().equals("dd")) {
                             def = element.text();
                         }
                     }
                 }
-                jsonvalues.add(new Definition(terms, def));
+                jsonvalues.add(new Definition(id, terms, def));
             }
 
             String jsonstr = mapper.writeValueAsString(jsonvalues);
