@@ -47,7 +47,8 @@ public class Main extends ToolkitApp {
             textInput(searchState)
                 .placeholder("Type to search..."),
                 spacer(),
-            text("Searching for: "));
+            text("Searching for: ")
+        )            .rounded();
 
 
     public static String getText() {
