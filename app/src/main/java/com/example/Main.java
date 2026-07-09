@@ -17,6 +17,13 @@ import org.jsoup.Jsoup;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 
+import dev.tamboui.toolkit.app.ToolkitApp;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.widgets.input.TextInput;
+import dev.tamboui.widgets.input.TextInputState;
+import java.awt.Color;
+
+
 public class Main extends ToolkitApp {
     private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
     private static final String TEXT = getText();
@@ -55,3 +62,28 @@ public class Main extends ToolkitApp {
         new Main().run();
     }
 }
+
+
+
+
+// public class Main extends ToolkitApp {
+
+//     // 1. Maintain the state of your search bar input
+//     private final TextInputState searchState = new TextInputState();
+
+//     @Override
+//     protected Element render() {
+//         return panel("Search Example",
+//             // 2. Render the text input with a placeholder
+//             textInput(searchState)
+//                 .placeholder("Type to search..."),
+            
+//             // 3. Display the current search term dynamically
+//             spacer(),
+//             text("Searching for: "));
+//     }
+
+//     public static void main(String[] args) throws Exception {
+//         new Main().run();
+//     }
+// }
