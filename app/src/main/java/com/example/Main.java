@@ -1,6 +1,8 @@
 package com.example;
 
 import static dev.tamboui.toolkit.Toolkit.*;
+
+import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Style;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
@@ -36,6 +38,8 @@ public class Main extends ToolkitApp {
     @Override
     protected Element render() {
         return panel(PATH.getFileName().toString(), panel(document).borderType(BorderType.NONE), panel(searchbar));
+        // return column(panel(document).borderType(BorderType.NONE).length(10), spacer(), panel(searchbar));
+
     }
 
     private final MarkupTextAreaElement document = markupTextArea(TEXT)
