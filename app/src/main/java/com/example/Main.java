@@ -20,9 +20,6 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
 import java.io.BufferedReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.ArrayList;
 import java.security.SecureRandom;
 import java.util.List;
@@ -59,7 +56,7 @@ public class Main extends ToolkitApp {
             Document doc = Jsoup.parse(html, "UTF-8");
             text = doc.body().text();
         } catch (IOException err) {
-            text = "rubbish is not rubbishing";
+            text = "could not read file";
         } 
 
         return text;
@@ -75,7 +72,7 @@ public class Main extends ToolkitApp {
                 entries.add(line);
             }
         } catch (IOException err) {
-            throw new RuntimeException("Silly guy. I told you not to delete the file and you deleted it anyway?", err);
+            entries.add("rubbish is not rubbishing");
         }
 
         int randomIndex = myrandom.nextInt(entries.size());
