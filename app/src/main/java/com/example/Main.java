@@ -6,6 +6,7 @@ import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -17,6 +18,14 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 
 import dev.tamboui.widgets.input.TextInputState;
+
+import java.io.BufferedReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.List;
 
 
 public class Main extends ToolkitApp {
@@ -39,7 +48,7 @@ public class Main extends ToolkitApp {
 
     private final Element searchbar = 
             textInput(searchState)
-                .placeholder("Type to search...");
+                .placeholder(this.getRubbishText());
 
 
     public static String getText() {
@@ -54,6 +63,26 @@ public class Main extends ToolkitApp {
         } 
 
         return text;
+    }
+
+    public String getRubbishText() {
+        Random myrandom = new Random();
+        List<String> entries = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("app/src/main/java/com/example/rubbish.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                entries.add(line);
+            }
+        } catch (IOException err) {
+            entries.add("rubbish.txt went wrong");
+        }
+
+        int randomIndex = myrandom.nextInt(entries.size());
+        String line = entries.get(randomIndex);
+    
+
+        return line;
     }
 
 
