@@ -6,37 +6,49 @@ public class Definition {
     private String location;
     private String type;
     private String id;
+    private String anchor;
+    private String parent;
     private List<String> signature;
     private String definition;
 
     public Definition() {}
 
-    public Definition(String newlocation, String newtype, String newid, List<String> signatures, String def) {
-        this.location = newlocation;
-        this.type = newtype;
-        this.id = newid;
+    public Definition(String location, String type, String id, String anchor, String parent, List<String> signatures, String def) {
+        this.location = location;
+        this.type = type;
+        this.id = id;
+        this.parent = parent;
+        this.anchor = anchor;
         this.signature = signatures;
         this.definition = def;
     }
 
-    public void setLocation(String newlocation) {
-        this.location = newlocation;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public void setType(String newType){
-        this.type = newType;
+    public void setType(String type){
+        this.type = type;
     }
 
-    public void setId(String newid) {
-        this.id = newid;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setSignature(List<String> newsignature){
-        this.signature = newsignature;
+    public void setAnchor(String anchor) {
+        this.anchor = anchor;
     }
 
-    public void setDefinition(String newdef){
-        this.definition = newdef;
+    public void setParent(String parent) {
+        this.parent = parent;
+    }
+
+    public void setSignature(List<String> signature){
+        this.signature = signature;
+    }
+
+    public void setDefinition(String def){
+        this.definition = def;
     }
 
     public String getLocation(){
@@ -44,11 +56,19 @@ public class Definition {
     }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
     public String getId() {
-        return id;
+        return this.id;
+    }
+
+    public String getAnchor() {
+        return this.anchor;
+    }
+
+    public String getParent() {
+        return this.parent;
     }
 
     public List<String> getSignature(){
