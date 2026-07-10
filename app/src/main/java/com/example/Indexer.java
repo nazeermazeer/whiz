@@ -19,6 +19,7 @@ import org.apache.lucene.store.ByteBuffersDirectory;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Scanner;
 import com.example.model.Definition;
 
 public class Indexer {
@@ -68,6 +69,10 @@ public class Indexer {
         }
 
         // Search
+        Scanner myscanner = new Scanner(System.in);
+        System.out.println("Enter a search query:");
+        String search = myscanner.nextLine();
+
         try (DirectoryReader reader = DirectoryReader.open(directory)) {
 
             IndexSearcher searcher = new IndexSearcher(reader);
@@ -78,7 +83,7 @@ public class Indexer {
                             analyzer
                     );
 
-            Query query = parser.parse("abs");
+            Query query = parser.parse(search);
 
             TopDocs results = searcher.search(query, 10);
 
@@ -100,5 +105,7 @@ public class Indexer {
                 System.out.println("-------------------------");
             }
         }
+
+        myscanner.close();
     }
 }
