@@ -109,11 +109,6 @@
   "signature" : [ "eval(source, /, globals=None, locals=None)¶" ],
   "definition" : "Parameters: source (str | code object) – A Python expression. globals (dict | None) – The global namespace (default: None). locals (mapping | None) – The local namespace (default: None). Returns: The result of the evaluated expression. Raises: Syntax errors are reported as exceptions. Warning This function executes arbitrary code. Calling it with untrusted user-supplied input will lead to security vulnerabilities. The source argument is parsed and evaluated as a Python expression (technically speaking, a condition list) using the globals and locals mappings as global and local namespace. If the globals dictionary is present and does not contain a value for the key __builtins__, a reference to the dictionary of the built-in module builtins is inserted under that key before source is parsed. Overriding __builtins__ can be used to restrict or change the available names, but this is not a security mechanism: the executed code can still access all builtins. If the locals mapping is omitted it defaults to the globals dictionary. If both mappings are omitted, the source is executed with the globals and locals in the environment where eval() is called. Note, eval() will only have access to the nested scopes (non-locals) in the enclosing environment if they are already referenced in the scope that is calling eval() (e.g. via a nonlocal statement). Example: >>> x = 1\n>>> eval('x+1')\n2\n This function can also be used to execute arbitrary code objects (such as those created by compile()). In this case, pass a code object instead of a string. If the code object has been compiled with 'exec' as the mode argument, eval()'s return value will be None. Hints: dynamic execution of statements is supported by the exec() function. The globals() and locals() functions return the current global and local dictionary, respectively, which may be useful to pass around for use by eval() or exec(). If the given source is a string, then leading and trailing spaces and tabs are stripped. See ast.literal_eval() for a function to evaluate strings with expressions containing only literals. Raises an auditing event exec with the code object as the argument. Code compilation events may also be raised. Changed in version 3.13: The globals and locals arguments can now be passed as keywords. Changed in version 3.13: The semantics of the default locals namespace have been adjusted as described for the locals() builtin."
 }, {
-  "type" : "",
-  "id" : "",
-  "signature" : [ "Parameters:", "Returns:", "Raises:" ],
-  "definition" : "Syntax errors are reported as exceptions."
-}, {
   "type" : "function",
   "id" : "exec",
   "signature" : [ "exec(source, /, globals=None, locals=None, *, closure=None)¶" ],
@@ -289,11 +284,6 @@
   "signature" : [ "@deleter¶" ],
   "definition" : "A property object has getter, setter, and deleter methods usable as decorators that create a copy of the property with the corresponding accessor function set to the decorated function. This is best explained with an example: class C:\n    def __init__(self):\n        self._x = None\n\n    @property\n    def x(self):\n        \"\"\"I'm the 'x' property.\"\"\"\n        return self._x\n\n    @x.setter\n    def x(self, value):\n        self._x = value\n\n    @x.deleter\n    def x(self):\n        del self._x\n This code is exactly equivalent to the first example. Be sure to give the additional functions the same name as the original property (x in this case.) The returned property object also has the attributes fget, fset, and fdel corresponding to the constructor arguments."
 }, {
-  "type" : "",
-  "id" : "property.__name__",
-  "signature" : [ "__name__¶" ],
-  "definition" : "Attribute holding the name of the property. The name of the property can be changed at runtime. Added in version 3.13."
-}, {
   "type" : "class",
   "id" : "func-range",
   "signature" : [ "class range(stop, /)", "class range(start, stop, step=1, /)" ],
@@ -328,11 +318,6 @@
   "id" : "slice",
   "signature" : [ "class slice(stop, /)¶", "class slice(start, stop, step=None, /)" ],
   "definition" : "Return a slice object representing the set of indices specified by range(start, stop, step). The start and step arguments default to None. Slice objects are also generated when slicing syntax is used. For example: a[start:stop:step] or a[start:stop, i]. See itertools.islice() for an alternate version that returns an iterator. start¶ stop¶ step¶ These read-only attributes are set to the argument values (or their default). They have no other explicit functionality; however, they are used by NumPy and other third-party packages. Changed in version 3.12: Slice objects are now hashable (provided start, stop, and step are hashable)."
-}, {
-  "type" : "",
-  "id" : "slice.start",
-  "signature" : [ "start¶", "stop¶", "step¶" ],
-  "definition" : "These read-only attributes are set to the argument values (or their default). They have no other explicit functionality; however, they are used by NumPy and other third-party packages."
 }, {
   "type" : "function",
   "id" : "sorted",
