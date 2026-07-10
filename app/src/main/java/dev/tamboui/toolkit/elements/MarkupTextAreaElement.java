@@ -472,34 +472,34 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
         // Get lines from parsed text
         List<Line> parsedLines = parsedText.lines();
 
-        // Render border/block if needed
+        // All of this is commented out because i hate borders
         Rect contentArea = area;
-        if (title != null || borderType != null || focusedBorderColor != null) {
-            boolean isFocused = elementId != null && context.isFocused(elementId);
-            Color effectiveBorderColor = isFocused && focusedBorderColor != null
-                    ? focusedBorderColor
-                    : borderColor;
+        // if (title != null || borderType != null || focusedBorderColor != null) {
+        //     boolean isFocused = elementId != null && context.isFocused(elementId);
+        //     Color effectiveBorderColor = isFocused && focusedBorderColor != null
+        //             ? focusedBorderColor
+        //             : borderColor;
 
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
-                    .styleResolver(styleResolver(context));
-            if (title != null) {
-                blockBuilder.title(Title.from(title));
-            }
-            if (borderType != null) {
-                blockBuilder.borderType(borderType);
-            }
-            if (effectiveBorderColor != null) {
-                blockBuilder.borderColor(effectiveBorderColor);
-            }
-            Block block = blockBuilder.build();
-            block.render(area, frame.buffer());
-            contentArea = block.inner(area);
-        }
+        //     Block.Builder blockBuilder = Block.builder()
+        //             .borders(Borders.ALL)
+        //             .styleResolver(styleResolver(context));
+        //     if (title != null) {
+        //         blockBuilder.title(Title.from(title));
+        //     }
+        //     if (borderType != null) {
+        //         blockBuilder.borderType(borderType);
+        //     }
+        //     if (effectiveBorderColor != null) {
+        //         blockBuilder.borderColor(effectiveBorderColor);
+        //     }
+        //     Block block = blockBuilder.build();
+        //     block.render(area, frame.buffer());
+        //     contentArea = block.inner(area);
+        // }
 
-        if (contentArea.isEmpty()) {
-            return;
-        }
+        // if (contentArea.isEmpty()) {
+        //     return;
+        // }
 
         // Determine if we should show scrollbar using visual rows after wrapping.
         int initialLineNumberWidth = showLineNumbers
