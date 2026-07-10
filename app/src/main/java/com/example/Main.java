@@ -1,39 +1,46 @@
 package com.example;
 
 import static dev.tamboui.toolkit.Toolkit.*;
-import dev.tamboui.style.Style;
+
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.widgets.paragraph.Paragraph;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.Jsoup;
 
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
+
+import dev.tamboui.widgets.input.TextInputState;
+
 
 public class Main extends ToolkitApp {
     private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
     private static final String TEXT = getText();
+    private final TextInputState searchState = new TextInputState();
 
 
     @Override
     protected Element render() {
-        return document;
+        return panel(PATH.getFileName().toString(), panel(document).borderType(BorderType.NONE), panel(searchbar)).borderType(BorderType.NONE);
     }
 
     private final MarkupTextAreaElement document = markupTextArea(TEXT)
             .wrapWord()
-            .title(PATH.getFileName().toString())
-            .rounded()
             .scrollbar(ScrollBarPolicy.AS_NEEDED)
+            .borderType(BorderType.NONE)
             .id("document")
             .focusable();
+
+    private final Element searchbar = 
+            textInput(searchState)
+                .placeholder("Type to search...")
+                    ;
 
 
     public static String getText() {
@@ -55,3 +62,4 @@ public class Main extends ToolkitApp {
         new Main().run();
     }
 }
+

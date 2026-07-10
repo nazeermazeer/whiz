@@ -27,10 +27,7 @@ import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.tui.event.MouseEventKind;
-import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.block.Borders;
-import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
@@ -472,34 +469,11 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
         // Get lines from parsed text
         List<Line> parsedLines = parsedText.lines();
 
-        // Render border/block if needed
+        // lol normally the border rendering code would go here
+        // but i am boring so the codebase has now been deprived
+        // of it this is all you get
         Rect contentArea = area;
-        if (title != null || borderType != null || focusedBorderColor != null) {
-            boolean isFocused = elementId != null && context.isFocused(elementId);
-            Color effectiveBorderColor = isFocused && focusedBorderColor != null
-                    ? focusedBorderColor
-                    : borderColor;
-
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
-                    .styleResolver(styleResolver(context));
-            if (title != null) {
-                blockBuilder.title(Title.from(title));
-            }
-            if (borderType != null) {
-                blockBuilder.borderType(borderType);
-            }
-            if (effectiveBorderColor != null) {
-                blockBuilder.borderColor(effectiveBorderColor);
-            }
-            Block block = blockBuilder.build();
-            block.render(area, frame.buffer());
-            contentArea = block.inner(area);
-        }
-
-        if (contentArea.isEmpty()) {
-            return;
-        }
+        
 
         // Determine if we should show scrollbar using visual rows after wrapping.
         int initialLineNumberWidth = showLineNumbers
