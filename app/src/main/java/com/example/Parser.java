@@ -35,14 +35,17 @@ public class Parser {
                 String def = "";
                 String id = "";
                 String type = "";
-                if (dl.attr("class").equals("py function"))
+                if (dl.attr("class").equals("py function")) 
                     type = "function";
-                else if (dl.attr("class").equals("py class"))
+                else if (dl.attr("class").equals("py class")) {
                     type = "class";
+                    id = dl.attr("id");
+                }
                 if (dl != null) {
                     for (Element element : dl.children()) {
                         if (element.tagName().equals("dt")) {
-                            id = element.attr("id");
+                            if (id.equals(""))
+                                id = element.attr("id");
                             terms.add(element.text());
                         } else if (element.tagName().equals("dd")) {
                             def = element.text();
