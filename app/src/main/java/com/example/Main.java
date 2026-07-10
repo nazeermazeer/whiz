@@ -28,8 +28,6 @@ public class Main extends ToolkitApp {
     @Override
     protected Element render() {
         return panel(PATH.getFileName().toString(), panel(document).borderType(BorderType.NONE), panel(searchbar)).borderType(BorderType.NONE);
-        // return column(panel(document).borderType(BorderType.NONE).length(10), spacer(), panel(searchbar));
-
     }
 
     private final MarkupTextAreaElement document = markupTextArea(TEXT)
