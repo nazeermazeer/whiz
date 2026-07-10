@@ -30,7 +30,7 @@ public class Indexer {
         ObjectMapper mapper = new ObjectMapper();
 
         List<Definition> entries = mapper.readValue(
-                Path.of("app/src/main/java/com/example/functions.json").toFile(),
+                Path.of("app/src/main/java/com/example/entries.json").toFile(),
                 new TypeReference<List<Definition>>() {}
         );
 
