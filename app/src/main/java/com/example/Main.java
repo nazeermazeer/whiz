@@ -24,7 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.ArrayList;
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.List;
 
 
@@ -59,14 +59,14 @@ public class Main extends ToolkitApp {
             Document doc = Jsoup.parse(html, "UTF-8");
             text = doc.body().text();
         } catch (IOException err) {
-            text = "rubbish is not rubbishingq";
+            text = "rubbish is not rubbishing";
         } 
 
         return text;
     }
 
     public String getRubbishText() {
-        Random myrandom = new Random();
+        SecureRandom myrandom = new SecureRandom();
         List<String> entries = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("app/src/main/java/com/example/rubbish.txt"))) {
