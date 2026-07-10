@@ -39,22 +39,24 @@ public class Parser {
                     dl = dls.get(i);
                     List<String> terms = new ArrayList<>();
                     String def = "";
-                    String id = "";
+                    String id = "python:";
                     String type = "";
+                    Boolean typeindl = true;
+
                     if (dl.attr("class").equals("py function")) 
                         type = "function";
                     else if (dl.attr("class").equals("py class")) {
                         type = "class";
-                        id = dl.attr("id");
+                        id += dl.attr("id");
+                        typeindl = false;
                     } else if (dl.attr("class").equals("py method")) {
                         type = "method";
-                        id = dl.attr("id");
                     }
                     if (dl != null) {
                         for (Element element : dl.children()) {
                             if (element.tagName().equals("dt")) {
-                                if (id.equals(""))
-                                    id = element.attr("id");
+                                if (typeindl)
+                                    id += element.attr("id");
                                 terms.add(element.text());
                             } else if (element.tagName().equals("dd")) {
                                 def = element.text();
