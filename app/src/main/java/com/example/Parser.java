@@ -42,28 +42,25 @@ public class Parser {
                     dl = dls.get(i);
                     List<String> terms = new ArrayList<>();
                     String def = "";
-                    String id = "python:";
                     String type = "";
                     String anchor = "";
                     String parent = "";
-                    Boolean typeindl = true;
 
                     if (dl.attr("class").equals("py function")) 
                         type = "function";
                     else if (dl.attr("class").equals("py class")) {
                         type = "class";
-                        id += dl.attr("id");
-                        anchor = dl.attr("id");
-                        typeindl = false;
                     } else if (dl.attr("class").equals("py method")) {
                         type = "method";
                     }
 
+                    anchor = dl.attr("id");
+
+
                     if (dl != null) {
                         for (Element element : dl.children()) {
                             if (element.tagName().equals("dt")) {
-                                if (typeindl || (anchor.isEmpty())) {
-                                    id += element.attr("id");
+                                if (anchor.isEmpty()) {
                                     anchor = element.attr("id");
                                 }
                                 terms.add(element.text());
@@ -79,8 +76,8 @@ public class Parser {
                         parent = null;
                     }
 
-                    if (!id.equals("") && !type.equals(""))
-                        jsonvalues.add(new Definition(html.getName(), type, id, anchor, parent, terms, def));
+                    if (!anchor.equals("") && !type.equals(""))
+                        jsonvalues.add(new Definition(html.getName(), type, ("python:" + anchor), anchor, parent, terms, def));
                 }
             } catch (IOException err) {
             System.out.println("Cannot read file");
