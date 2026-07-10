@@ -70,6 +70,7 @@ public class Indexer {
 
         // Search
         Scanner myscanner = new Scanner(System.in);
+        System.out.println("Enter a search query:");
         String search = myscanner.nextLine();
 
         try (DirectoryReader reader = DirectoryReader.open(directory)) {
