@@ -3,6 +3,7 @@ package com.example.model;
 import java.util.List;
 
 public class Definition {
+    private String location;
     private String type;
     private String id;
     private List<String> signature;
@@ -10,11 +11,16 @@ public class Definition {
 
     public Definition() {}
 
-    public Definition(String newtype, String newid, List<String> signatures, String def) {
+    public Definition(String newlocation, String newtype, String newid, List<String> signatures, String def) {
+        this.location = newlocation;
         this.type = newtype;
         this.id = newid;
         this.signature = signatures;
         this.definition = def;
+    }
+
+    public void setLocation(String newlocation) {
+        this.location = newlocation;
     }
 
     public void setType(String newType){
@@ -31,6 +37,10 @@ public class Definition {
 
     public void setDefinition(String newdef){
         this.definition = newdef;
+    }
+
+    public String getLocation(){
+        return this.location;
     }
 
     public String getType() {
