@@ -53,12 +53,12 @@ public class Parser {
                     }
                 }
                 if (!id.equals("") && !type.equals(""))
-                    jsonvalues.add(new Definition(type, id, terms, def));
+                    jsonvalues.add(new Definition("functions", type, id, terms, def));
             }
 
             String jsonstr = mapper.writeValueAsString(jsonvalues);
 
-            File outputfile = new File("app/src/main/java/com/example/functions.json");
+            File outputfile = new File("app/src/main/java/com/example/entries.json");
             mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, jsonvalues);
 
             System.out.println(jsonstr); 
