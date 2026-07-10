@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import org.jsoup.select.Elements;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
@@ -46,6 +45,9 @@ public class Parser {
                         type = "function";
                     else if (dl.attr("class").equals("py class")) {
                         type = "class";
+                        id = dl.attr("id");
+                    } else if (dl.attr("class").equals("py method")) {
+                        type = "method";
                         id = dl.attr("id");
                     }
                     if (dl != null) {
