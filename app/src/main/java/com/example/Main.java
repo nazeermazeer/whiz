@@ -2,31 +2,21 @@ package com.example;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.style.Style;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.widgets.paragraph.Paragraph;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.Jsoup;
 
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
-import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 
-import dev.tamboui.toolkit.app.ToolkitApp;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.widgets.input.TextInput;
 import dev.tamboui.widgets.input.TextInputState;
-import java.awt.Color;
 
 
 public class Main extends ToolkitApp {
@@ -75,26 +65,3 @@ public class Main extends ToolkitApp {
     }
 }
 
-
-
-
-// 
-//     // 1. Maintain the state of your search bar input
-
-
-//     @Override
-//     protected Element render() {
-//         return panel("Search Example",
-//             // 2. Render the text input with a placeholder
-//             textInput(searchState)
-//                 .placeholder("Type to search..."),
-            
-//             // 3. Display the current search term dynamically
-//             spacer(),
-//             text("Searching for: "));
-//     }
-
-//     public static void main(String[] args) throws Exception {
-//         new Main().run();
-//     }
-// }
