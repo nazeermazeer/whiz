@@ -3,6 +3,9 @@ package com.example;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
+import static dev.tamboui.toolkit.Toolkit.text;
+
 import java.io.File;
 import java.io.IOException;
 import org.jsoup.select.Elements;
@@ -41,6 +44,8 @@ public class Parser {
                     String def = "";
                     String id = "python:";
                     String type = "";
+                    String anchor = "";
+                    String parent = "";
                     Boolean typeindl = true;
 
                     if (dl.attr("class").equals("py function")) 
@@ -48,23 +53,34 @@ public class Parser {
                     else if (dl.attr("class").equals("py class")) {
                         type = "class";
                         id += dl.attr("id");
+                        anchor = dl.attr("id");
                         typeindl = false;
                     } else if (dl.attr("class").equals("py method")) {
                         type = "method";
                     }
+
                     if (dl != null) {
                         for (Element element : dl.children()) {
                             if (element.tagName().equals("dt")) {
-                                if (typeindl)
+                                if (typeindl || (anchor.isEmpty())) {
                                     id += element.attr("id");
+                                    anchor = element.attr("id");
+                                }
                                 terms.add(element.text());
                             } else if (element.tagName().equals("dd")) {
                                 def = element.text();
                             }
                         }
                     }
+
+                    try {
+                        parent = anchor.substring(0, anchor.indexOf("."));
+                    } catch (StringIndexOutOfBoundsException err) {
+                        parent = null;
+                    }
+
                     if (!id.equals("") && !type.equals(""))
-                        jsonvalues.add(new Definition(html.getName(), type, id, terms, def));
+                        jsonvalues.add(new Definition(html.getName(), type, id, anchor, parent, terms, def));
                 }
             } catch (IOException err) {
             System.out.println("Cannot read file");
