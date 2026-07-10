@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import org.jsoup.select.Elements;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
@@ -17,58 +18,66 @@ import com.example.model.Definition;
 
 public class Parser {
     public static void main(String[] args) {
-        try {
-            File html = new File("app/src/main/java/com/example/functions.html");
-            Document doc = Jsoup.parse(html, "UTF-8");
-            String text = doc.body().text();
+        ObjectMapper mapper = new ObjectMapper();
+        List<Definition> jsonvalues = new ArrayList<>();
 
-            ObjectMapper mapper = new ObjectMapper();
-
-            Elements dls = doc.select("dl");
-            Element dl;
-
-            List<Definition> jsonvalues = new ArrayList<>();
-
-            for (int i = 0; i < dls.size(); i++) {
-                dl = dls.get(i);
-                List<String> terms = new ArrayList<>();
-                String def = "";
-                String id = "";
-                String type = "";
-                if (dl.attr("class").equals("py function")) 
-                    type = "function";
-                else if (dl.attr("class").equals("py class")) {
-                    type = "class";
-                    id = dl.attr("id");
+        for (int file = 1; file <= 2; file++) {
+            try {
+                File html;
+                if (file == 1) {
+                    html = new File("app/src/main/java/com/example/functions.html");
+                } else {
+                    html = new File("app/src/main/java/com/example/stdtypes.html");
                 }
-                if (dl != null) {
-                    for (Element element : dl.children()) {
-                        if (element.tagName().equals("dt")) {
-                            if (id.equals(""))
-                                id = element.attr("id");
-                            terms.add(element.text());
-                        } else if (element.tagName().equals("dd")) {
-                            def = element.text();
+                Document doc = Jsoup.parse(html, "UTF-8");
+
+
+                Elements dls = doc.select("dl");
+                Element dl;
+
+
+                for (int i = 0; i < dls.size(); i++) {
+                    dl = dls.get(i);
+                    List<String> terms = new ArrayList<>();
+                    String def = "";
+                    String id = "";
+                    String type = "";
+                    if (dl.attr("class").equals("py function")) 
+                        type = "function";
+                    else if (dl.attr("class").equals("py class")) {
+                        type = "class";
+                        id = dl.attr("id");
+                    }
+                    if (dl != null) {
+                        for (Element element : dl.children()) {
+                            if (element.tagName().equals("dt")) {
+                                if (id.equals(""))
+                                    id = element.attr("id");
+                                terms.add(element.text());
+                            } else if (element.tagName().equals("dd")) {
+                                def = element.text();
+                            }
                         }
                     }
+                    if (!id.equals("") && !type.equals(""))
+                        jsonvalues.add(new Definition(html.getName(), type, id, terms, def));
                 }
-                if (!id.equals("") && !type.equals(""))
-                    jsonvalues.add(new Definition("functions", type, id, terms, def));
+            } catch (IOException err) {
+            System.out.println("Cannot read file");
             }
-
-            String jsonstr = mapper.writeValueAsString(jsonvalues);
+        }
+        try{
 
             File outputfile = new File("app/src/main/java/com/example/entries.json");
             mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, jsonvalues);
 
-            System.out.println(jsonstr); 
-
+        
+        } catch (IOException err) {
+            System.out.println("cannot read file");
+        } 
 
             
-        } catch (IOException err) {
-            System.out.println("Cannot read file");
-        }
+        } 
 
-        // System.out.println(text);
     }
-}
+
