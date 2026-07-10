@@ -52,7 +52,8 @@ public class Parser {
                         }
                     }
                 }
-                jsonvalues.add(new Definition(type, id, terms, def));
+                if (!id.equals("") && !type.equals(""))
+                    jsonvalues.add(new Definition(type, id, terms, def));
             }
 
             String jsonstr = mapper.writeValueAsString(jsonvalues);
