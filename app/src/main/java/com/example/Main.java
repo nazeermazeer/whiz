@@ -59,7 +59,7 @@ public class Main extends ToolkitApp {
             Document doc = Jsoup.parse(html, "UTF-8");
             text = doc.body().text();
         } catch (IOException err) {
-            text = "could not read file";
+            text = "rubbish is not rubbishingq";
         } 
 
         return text;
@@ -75,7 +75,7 @@ public class Main extends ToolkitApp {
                 entries.add(line);
             }
         } catch (IOException err) {
-            entries.add("rubbish.txt went wrong");
+            throw new RuntimeException("Silly guy. I told you not to delete the file and you deleted it anyway?", err);
         }
 
         int randomIndex = myrandom.nextInt(entries.size());
