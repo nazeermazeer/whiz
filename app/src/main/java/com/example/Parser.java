@@ -60,7 +60,7 @@ public class Parser {
                     if (dl != null) {
                         for (Element element : dl.children()) {
                             if (element.tagName().equals("dt")) {
-                                if (anchor.isEmpty()) {
+                                if (!element.attr("id").isBlank()) {
                                     anchor = element.attr("id");
                                 }
                                 terms.add(element.text());
