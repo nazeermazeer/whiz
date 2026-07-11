@@ -45,6 +45,7 @@ public class Parser {
                     String type = "";
                     String anchor = "";
                     String parent = "";
+                    List<String> keywords = new ArrayList<>();
 
                     if (dl.attr("class").equals("py function")) 
                         type = "function";
@@ -76,8 +77,13 @@ public class Parser {
                         parent = null;
                     }
 
+                    if (parent != null)
+                        keywords.add(anchor);
+                    keywords.add(anchor.substring(anchor.lastIndexOf(".") + 1));
+                    keywords.add(anchor.substring(anchor.lastIndexOf(".") + 1) + "()");
+
                     if (!anchor.equals("") && !type.equals(""))
-                        jsonvalues.add(new Definition(html.getName(), type, ("python:" + anchor), anchor, parent, terms, def));
+                        jsonvalues.add(new Definition(html.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def));
                 }
             } catch (IOException err) {
             System.out.println("Cannot read file");

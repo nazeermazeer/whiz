@@ -8,17 +8,19 @@ public class Definition {
     private String id;
     private String anchor;
     private String parent;
+    private List<String> keywords;
     private List<String> signature;
     private String definition;
 
     public Definition() {}
 
-    public Definition(String location, String type, String id, String anchor, String parent, List<String> signatures, String def) {
+    public Definition(String location, String type, String id, String anchor, String parent, List<String> keywords, List<String> signatures, String def) {
         this.location = location;
         this.type = type;
         this.id = id;
-        this.parent = parent;
         this.anchor = anchor;
+        this.parent = parent;
+        this.keywords = keywords;
         this.signature = signatures;
         this.definition = def;
     }
@@ -41,6 +43,10 @@ public class Definition {
 
     public void setParent(String parent) {
         this.parent = parent;
+    }
+
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
     }
 
     public void setSignature(List<String> signature){
@@ -69,6 +75,10 @@ public class Definition {
 
     public String getParent() {
         return this.parent;
+    }
+
+    public List<String> getKeywords() {
+        return this.keywords;
     }
 
     public List<String> getSignature(){
