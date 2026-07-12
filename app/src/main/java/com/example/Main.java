@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.security.SecureRandom;
 import java.util.List;
 
+import de.vandermeer.asciitable.AsciiTable;
 
 public class Main extends ToolkitApp {
     private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
@@ -74,79 +75,27 @@ public class Main extends ToolkitApp {
     }
 
     public static String getTableText(org.jsoup.nodes.Element table) {
-        Elements labels = table.select("tr");
-        String[] headers = new String[labels.size()];
-        int numheader = 0;
+        AsciiTable at = new AsciiTable();
 
-        for (org.jsoup.nodes.Element label : labels) {
-            String header = label.wholeText();
-            headers[numheader] = header;
-            numheader++;
+        Elements ths = table.select("ths");
+        if (!ths.isEmpty()) {
+            String[] headers = ths.stream().map(org.jsoup.nodes.Element::text).toArray(String[]::new);
+            at.addRule();
+            at.addRow((Object[]) headers);
         }
 
-
-
-        Elements rows = table.select("tbody > tr");
-        List<List<String>> rowitems = new ArrayList<>();
-        String rowstr = "| ";
-        int[] columnlens = new int[headers.length];
-        String borders = "";
-
-        for (int i = 0; i < columnlens.length; i++) {
-            columnlens[i] = headers[i].length();
-        }
-
+        Elements rows = table.select("tr");
         for (org.jsoup.nodes.Element row : rows) {
-            Elements cells = row.select("td");
-
-            if (columnlens == null) {
-                columnlens = new int[cells.size()];
+            Elements tds = row.select("td");
+            if (!tds.isEmpty()) {
+                String[] cellData = tds.stream().map(org.jsoup.nodes.Element::text).toArray(String[]::new);
+                at.addRule();
+                at.addRow((Object[]) cellData);
             }
-            
-            for (int i = 0; i < cells.size(); i++) {
-                String text = cells.get(i).text();
-                int length = text.length();
-                
-                if (length > columnlens[i]) {
-                    columnlens[i] = length;
-                }
-            }
-
         }
 
-        borders = "\n|";
-        for (int len : columnlens) {
-            borders += "-".repeat(len + 2) + "|";
-        }
-        borders += "\n| ";
-
-        for (org.jsoup.nodes.Element row : rows) {
-            Elements columns = row.select("td");
-            List<String> columnitems = new ArrayList<>();
-            String columnstr = "";
-            int index = 0;
-            
-            for (org.jsoup.nodes.Element column : columns) {
-                columnitems.add(column.wholeText());
-                // columnstr += column.wholeText() + " | ";
-                StringBuilder sb = new StringBuilder(column.wholeText());
-                while (sb.length() < columnlens[index]) {
-                    sb.append(" ");
-                }
-                sb.append(" | "); 
-                columnstr += sb.toString();
-                index++;
-            }
-
-            rowitems.add(columnitems);
-            // rowstr += columnstr + "\n|-------------------------------------------------------------------------------|\n| ";
-            rowstr += columnstr + borders;
-        }
-
-        System.out.println(rowstr);
-        for (int contents : columnlens) {
-            System.out.println(contents);
-        }
+        at.addRule();
+        System.out.println(at.render());
 
 
         return "nothing to see here";
