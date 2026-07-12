@@ -54,7 +54,12 @@ public class Main extends ToolkitApp {
 
         try {
             Document doc = Jsoup.parse(html, "UTF-8");
-            text = doc.body().text();
+            doc.outputSettings().prettyPrint(false);
+
+            doc.select("br").append("\\n");
+            doc.select("p").prepend("\\n\\n");
+
+            text = doc.body().text().replace("\\n", "\n");
         } catch (IOException err) {
             text = "could not read file";
         } 
