@@ -12,6 +12,7 @@ import java.nio.file.Path;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.widgets.block.BorderType;
@@ -56,6 +57,13 @@ public class Main extends ToolkitApp {
             Document doc = Jsoup.parse(html, "UTF-8");
             doc.outputSettings().prettyPrint(false);
 
+            Elements tables = doc.select("table");
+
+            for (org.jsoup.nodes.Element table : tables) {
+                String renderedTable = getTableText(table);
+                table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
+            }
+
 
             text = doc.body().wholeText();
         } catch (IOException err) {
@@ -63,6 +71,23 @@ public class Main extends ToolkitApp {
         } 
 
         return text;
+    }
+
+    public static String getTableText(org.jsoup.nodes.Element table) {
+        Elements rows = table.select("tbody > tr");
+            for (org.jsoup.nodes.Element row : rows) {
+                Elements columns = row.select("td");
+                
+                if (columns.size() >= 2) {
+                    String language = columns.get(0).text();
+                    String framework = columns.get(1).text();
+                    System.out.println("Language: " + language + " | Framework: " + framework);
+
+                };
+            }
+
+        return "nothing to see here";
+
     }
 
     public String getRubbishText() {
