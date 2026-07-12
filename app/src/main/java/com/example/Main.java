@@ -75,16 +75,27 @@ public class Main extends ToolkitApp {
 
     public static String getTableText(org.jsoup.nodes.Element table) {
         Elements rows = table.select("tbody > tr");
-            for (org.jsoup.nodes.Element row : rows) {
-                Elements columns = row.select("td");
-                
-                if (columns.size() >= 2) {
-                    String language = columns.get(0).text();
-                    String framework = columns.get(1).text();
-                    System.out.println("Language: " + language + " | Framework: " + framework);
+        List<List<String>> rowitems = new ArrayList<>();
+        String rowstr = "";
 
-                };
+        for (org.jsoup.nodes.Element row : rows) {
+            Elements columns = row.select("td");
+            List<String> columnitems = new ArrayList<>();
+            String columnstr = "";
+            
+            for (org.jsoup.nodes.Element column : columns) {
+                columnitems.add(column.wholeText());
+                System.out.println("cell: " + column.wholeText());
+                columnstr += column.wholeText() + "|";
             }
+
+            rowitems.add(columnitems);
+            rowstr += columnstr + "\n";
+        }
+
+        System.out.println(rowitems);
+        System.out.println(rowstr);
+
 
         return "nothing to see here";
 
