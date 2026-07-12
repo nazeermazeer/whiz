@@ -74,11 +74,27 @@ public class Main extends ToolkitApp {
     }
 
     public static String getTableText(org.jsoup.nodes.Element table) {
+        Elements labels = table.select("tr");
+        String[] headers = new String[labels.size()];
+        int numheader = 0;
+
+        for (org.jsoup.nodes.Element label : labels) {
+            String header = label.wholeText();
+            headers[numheader] = header;
+            numheader++;
+        }
+
+
+
         Elements rows = table.select("tbody > tr");
         List<List<String>> rowitems = new ArrayList<>();
         String rowstr = "| ";
-        int[] columnlens = null;
+        int[] columnlens = new int[headers.length];
         String borders = "";
+
+        for (int i = 0; i < columnlens.length; i++) {
+            columnlens[i] = headers[i].length();
+        }
 
         for (org.jsoup.nodes.Element row : rows) {
             Elements cells = row.select("td");
