@@ -45,7 +45,7 @@ public class Main extends ToolkitApp {
 
     private final Element searchbar = 
             textInput(searchState)
-                .placeholder(this.getRubbishText());
+                .placeholder(this.getRubbishText() + "...");
 
 
     public static String getText() {
