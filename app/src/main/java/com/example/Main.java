@@ -78,6 +78,7 @@ public class Main extends ToolkitApp {
         List<List<String>> rowitems = new ArrayList<>();
         String rowstr = "| ";
         int[] columnlens = null;
+        String borders = "";
 
         for (org.jsoup.nodes.Element row : rows) {
             Elements cells = row.select("td");
@@ -97,6 +98,12 @@ public class Main extends ToolkitApp {
 
         }
 
+        borders = "\n|";
+        for (int len : columnlens) {
+            borders += "-".repeat(len + 2) + "|";
+        }
+        borders += "\n| ";
+
         for (org.jsoup.nodes.Element row : rows) {
             Elements columns = row.select("td");
             List<String> columnitems = new ArrayList<>();
@@ -108,7 +115,8 @@ public class Main extends ToolkitApp {
             }
 
             rowitems.add(columnitems);
-            rowstr += columnstr + "\n|-------------------------------------------------------------------------------|\n| ";
+            // rowstr += columnstr + "\n|-------------------------------------------------------------------------------|\n| ";
+            rowstr += columnstr + borders;
         }
 
         System.out.println(rowstr);
