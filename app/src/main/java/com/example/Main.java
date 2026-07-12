@@ -108,10 +108,18 @@ public class Main extends ToolkitApp {
             Elements columns = row.select("td");
             List<String> columnitems = new ArrayList<>();
             String columnstr = "";
+            int index = 0;
             
             for (org.jsoup.nodes.Element column : columns) {
                 columnitems.add(column.wholeText());
-                columnstr += column.wholeText() + " | ";
+                // columnstr += column.wholeText() + " | ";
+                StringBuilder sb = new StringBuilder(column.wholeText());
+                while (sb.length() < columnlens[index]) {
+                    sb.append(" ");
+                }
+                sb.append(" | "); 
+                columnstr += sb.toString();
+                index++;
             }
 
             rowitems.add(columnitems);
