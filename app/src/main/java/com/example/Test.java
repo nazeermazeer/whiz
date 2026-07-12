@@ -1,4 +1,4 @@
-// // package com.example;
+package com.example;
 
 // import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -139,3 +139,51 @@
 //     }
 // }
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class Test {
+    public static void main(String[] args) {
+        String html = "<table>" +
+                      "<tr><th>Name</th><th>City</th></tr>" +
+                      "<tr><td>l</td><td>Ne</td></tr>" +
+                      "<tr><td>Li</td><td>San</td></tr>" +
+                      "</table>";
+
+        Document doc = Jsoup.parse(html);
+        Element table = doc.select("table").first();
+        
+        if (table == null) return;
+
+        Elements rows = table.select("tr");
+        int[] maxLengths = null;
+
+        for (Element row : rows) {
+            // Include both <th> and <td> for headers or data
+            Elements cells = row.select("th, td");
+            
+            if (maxLengths == null) {
+                maxLengths = new int[cells.size()];
+            }
+
+            for (int i = 0; i < cells.size(); i++) {
+                // .text() strips out HTML tags and normalizes whitespace
+                String cellText = cells.get(i).text();
+                int textLength = cellText.length();
+                
+                if (textLength > maxLengths[i]) {
+                    maxLengths[i] = textLength;
+                }
+            }
+        }
+
+        // Print the results
+        if (maxLengths != null) {
+            for (int i = 0; i < maxLengths.length; i++) {
+                System.out.println("Column " + (i + 1) + " max length: " + maxLengths[i]);
+            }
+        }
+    }
+}

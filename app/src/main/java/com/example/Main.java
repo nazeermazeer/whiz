@@ -76,7 +76,26 @@ public class Main extends ToolkitApp {
     public static String getTableText(org.jsoup.nodes.Element table) {
         Elements rows = table.select("tbody > tr");
         List<List<String>> rowitems = new ArrayList<>();
-        String rowstr = "";
+        String rowstr = "| ";
+        int[] columnlens = null;
+
+        for (org.jsoup.nodes.Element row : rows) {
+            Elements cells = row.select("td");
+
+            if (columnlens == null) {
+                columnlens = new int[cells.size()];
+            }
+            
+            for (int i = 0; i < cells.size(); i++) {
+                String text = cells.get(i).text();
+                int length = text.length();
+                
+                if (length > columnlens[i]) {
+                    columnlens[i] = length;
+                }
+            }
+
+        }
 
         for (org.jsoup.nodes.Element row : rows) {
             Elements columns = row.select("td");
@@ -85,16 +104,17 @@ public class Main extends ToolkitApp {
             
             for (org.jsoup.nodes.Element column : columns) {
                 columnitems.add(column.wholeText());
-                System.out.println("cell: " + column.wholeText());
-                columnstr += column.wholeText() + "|";
+                columnstr += column.wholeText() + " | ";
             }
 
             rowitems.add(columnitems);
-            rowstr += columnstr + "\n";
+            rowstr += columnstr + "\n|-------------------------------------------------------------------------------|\n| ";
         }
 
-        System.out.println(rowitems);
         System.out.println(rowstr);
+        for (int contents : columnlens) {
+            System.out.println(contents);
+        }
 
 
         return "nothing to see here";
