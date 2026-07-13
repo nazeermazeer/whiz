@@ -26,6 +26,7 @@ import java.security.SecureRandom;
 import java.util.List;
 
 import de.vandermeer.asciitable.AsciiTable;
+import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 
 public class Main extends ToolkitApp {
     private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
@@ -75,31 +76,57 @@ public class Main extends ToolkitApp {
     }
 
     public static String getTableText(org.jsoup.nodes.Element table) {
-        AsciiTable at = new AsciiTable();
+        List<List<String>> rows = new ArrayList<>();
+        int maxColumns = 0;
 
-        Elements ths = table.select("ths");
-        if (!ths.isEmpty()) {
-            String[] headers = ths.stream().map(org.jsoup.nodes.Element::text).toArray(String[]::new);
-            at.addRule();
-            at.addRow((Object[]) headers);
-        }
+        for (org.jsoup.nodes.Element row : table.select("tr")) {
+            List<String> cells = new ArrayList<>();
 
-        Elements rows = table.select("tr");
-        for (org.jsoup.nodes.Element row : rows) {
-            Elements tds = row.select("td");
-            if (!tds.isEmpty()) {
-                String[] cellData = tds.stream().map(org.jsoup.nodes.Element::text).toArray(String[]::new);
-                at.addRule();
-                at.addRow((Object[]) cellData);
+            for (org.jsoup.nodes.Element cell : row.select("th, td")) {
+                int colspan = 1;
+                String colspanValue = cell.attr("colspan");
+                if (!colspanValue.isBlank()) {
+                    try {
+                        colspan = Integer.parseInt(colspanValue);
+                    } catch (NumberFormatException ignored) {
+                        colspan = 1;
+                    }
+                }
+
+                String text = cell.wholeText().trim();
+                for (int i = 0; i < colspan; i++) {
+                    cells.add(i == 0 ? text : "");
+                }
+            }
+
+            if (!cells.isEmpty()) {
+                maxColumns = Math.max(maxColumns, cells.size());
+                rows.add(cells);
             }
         }
 
+        if (rows.isEmpty()) {
+            return "";
+        }
+
+        for (List<String> row : rows) {
+            while (row.size() < maxColumns) {
+                row.add("");
+            }
+        }
+
+        AsciiTable at = new AsciiTable();
+        at.setTextAlignment(TextAlignment.LEFT);
+
+        for (List<String> row : rows) {
+            at.addRule();
+            at.addRow(((Object[]) row.toArray(new String[0])));
+        }
+
         at.addRule();
+
         System.out.println(at.render());
-
-
-        return "nothing to see here";
-
+        return at.render();
     }
 
     public String getRubbishText() {
