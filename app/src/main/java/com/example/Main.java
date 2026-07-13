@@ -125,7 +125,6 @@ public class Main extends ToolkitApp {
 
         at.addRule();
 
-        System.out.println(at.render());
         return at.render();
     }
 
