@@ -56,6 +56,10 @@ dependencies {
 
     // Query parser
     implementation("org.apache.lucene:lucene-queryparser:9.12.2")
+
+    // ascii table for rendering html tables
+    implementation("de.vandermeer:asciitable:0.3.2")
+
 }
 
 
