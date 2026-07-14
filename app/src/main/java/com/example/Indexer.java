@@ -17,16 +17,27 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.ByteBuffersDirectory;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.text.ParseException;
+import java.io.File;
 import java.util.List;
 import java.util.Scanner;
 import com.example.model.Definition;
 
 public class Indexer {
+    public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
 
-    public static void main(String[] args) throws Exception {
+    public void searchTerm (String search) throws Exception {
+        List<Definition> entries = readJSON(Path.of("app/src/main/java/com/example/entries.json").toFile());
+        IndexResult result = readIndex(entries);
+        search(search, result.directory, result.analyzer);
+        
 
-        // Read JSON
+        
+    }
+
+    private List<Definition> readJSON(File filePath) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         List<Definition> entries = mapper.readValue(
@@ -34,7 +45,10 @@ public class Indexer {
                 new TypeReference<List<Definition>>() {}
         );
 
-        // Create Lucene index
+        return entries;
+    }
+
+    private IndexResult readIndex(List<Definition> entries) throws IOException {
         ByteBuffersDirectory directory = new ByteBuffersDirectory();
         StandardAnalyzer analyzer = new StandardAnalyzer();
 
@@ -68,44 +82,39 @@ public class Indexer {
             writer.commit();
         }
 
-        // Search
-        Scanner myscanner = new Scanner(System.in);
-        System.out.println("Enter a search query:");
-        String search = myscanner.nextLine();
-
-        try (DirectoryReader reader = DirectoryReader.open(directory)) {
-
-            IndexSearcher searcher = new IndexSearcher(reader);
-
-            MultiFieldQueryParser parser =
-                    new MultiFieldQueryParser(
-                            new String[]{"term", "definition"},
-                            analyzer
-                    );
-
-            Query query = parser.parse(search);
-
-            TopDocs results = searcher.search(query, 10);
-
-            StoredFields storedFields = reader.storedFields();
-
-            for (ScoreDoc hit : results.scoreDocs) {
-
-                Document doc = storedFields.document(hit.doc);
-
-                System.out.println("Terms:");
-
-                for (String term : doc.getValues("term")) {
-                    System.out.println("  - " + term);
-                }
-
-                System.out.println("Definition:");
-                System.out.println("  " + doc.get("definition"));
-
-                System.out.println("-------------------------");
-            }
-        }
-
-        myscanner.close();
+        return new IndexResult(directory, analyzer);
     }
-}
+
+    public static void main(String[] args) throws Exception {
+
+    }
+
+
+
+    public void search(String search, ByteBuffersDirectory directory, StandardAnalyzer analyzer) throws Exception {
+
+    DirectoryReader reader = DirectoryReader.open(directory);
+    IndexSearcher searcher = new IndexSearcher(reader);
+    MultiFieldQueryParser parser =
+            new MultiFieldQueryParser(
+                    new String[]{"term", "definition"},
+                    analyzer
+            );
+
+    Query query = parser.parse(search);
+    TopDocs results = searcher.search(query, 10);
+    StoredFields storedFields = reader.storedFields();
+
+    for (ScoreDoc hit : results.scoreDocs) {
+        Document doc = storedFields.document(hit.doc);
+        System.out.println("Terms:");
+        for (String term : doc.getValues("term")) {
+            System.out.println("  - " + term);
+        }
+        System.out.println("Definition:");
+        System.out.println("  " + doc.get("definition"));
+        System.out.println("-------------------------");
+        }
+    }
+
+    }
