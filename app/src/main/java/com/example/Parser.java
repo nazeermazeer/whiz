@@ -86,7 +86,7 @@ public class Parser {
                         jsonvalues.add(new Definition(html.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def));
                 }
             } catch (IOException err) {
-            System.out.println("Cannot read file");
+                System.out.println("Cannot read file");
             }
         }
         try{
