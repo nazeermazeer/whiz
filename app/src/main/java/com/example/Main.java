@@ -33,6 +33,8 @@ public class Main extends ToolkitApp {
     private static final String TEXT = getText();
     private final TextInputState searchState = new TextInputState();
 
+    private Indexer myindexer = new Indexer();
+
 
     @Override
     protected Element render() {
@@ -48,7 +50,11 @@ public class Main extends ToolkitApp {
 
     private final Element searchbar = 
             textInput(searchState)
-                .placeholder(this.getRubbishText() + "...");
+                .placeholder(this.getRubbishText() + "...")
+                .onSubmit(() -> {
+                    String submittedText = searchState.text();
+                    System.out.println(submittedText);
+                });
 
 
     public static String getText() {
