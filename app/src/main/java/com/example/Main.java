@@ -40,7 +40,16 @@ public class Main extends ToolkitApp {
 
     @Override
     protected Element render() {
-        return panel(PATH.getFileName().toString(), panel(document).borderType(BorderType.NONE), panel(searchbar)).borderType(BorderType.NONE);
+        return panel(
+            PATH.getFileName().toString(),
+            panel(
+                markupTextArea(TEXT)
+                    .wrapWord()
+                    .scrollbar(ScrollBarPolicy.AS_NEEDED)
+                    .borderType(BorderType.NONE)
+            ),
+            panel(searchbar)
+        ).borderType(BorderType.NONE);
     }
 
     private final MarkupTextAreaElement document = markupTextArea(TEXT)
@@ -63,9 +72,8 @@ public class Main extends ToolkitApp {
                         }
                     } catch (Exception err) {
                         err.printStackTrace();
-                    }   
+                    }
 
-                    System.out.println(TEXT);
                 });
 
 
