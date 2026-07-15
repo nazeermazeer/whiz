@@ -14,6 +14,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 
+import com.example.Indexer.SearchResult;
+
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
@@ -30,7 +32,7 @@ import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 
 public class Main extends ToolkitApp {
     private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
-    private static final String TEXT = getText();
+    private String TEXT = getText();
     private final TextInputState searchState = new TextInputState();
 
     private Indexer myindexer = new Indexer();
@@ -52,8 +54,18 @@ public class Main extends ToolkitApp {
             textInput(searchState)
                 .placeholder(this.getRubbishText() + "...")
                 .onSubmit(() -> {
-                    String submittedText = searchState.text();
-                    System.out.println(submittedText);
+                    String input = searchState.text();
+                    TEXT = "";
+                    try {
+                        List<SearchResult> results = myindexer.searchTerm(input);
+                        for (SearchResult result : results) {
+                            TEXT += "Term: " + result.term() + "Definition: " + result.definition();
+                        }
+                    } catch (Exception err) {
+                        err.printStackTrace();
+                    }   
+
+                    System.out.println(TEXT);
                 });
 
 
