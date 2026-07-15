@@ -28,12 +28,10 @@ public class Indexer {
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
     public record SearchResult(String[] term, String[] definition) {}
 
-    public void searchTerm (String search) throws Exception {
+    public List<SearchResult> searchTerm (String search) throws Exception {
         List<Definition> entries = readJSON(Path.of("app/src/main/java/com/example/entries.json").toFile());
         IndexResult result = readIndex(entries);
-        search(search, result.directory, result.analyzer);
-        
-
+        return search(search, result.directory, result.analyzer);
         
     }
 
