@@ -91,7 +91,7 @@ public class Indexer {
 
 
 
-    public List<SearchResult> search(String search, ByteBuffersDirectory directory, StandardAnalyzer analyzer) throws Exception {
+    private List<SearchResult> search(String search, ByteBuffersDirectory directory, StandardAnalyzer analyzer) throws Exception {
 
     List<SearchResult> searchresults = new ArrayList<>();
     DirectoryReader reader = DirectoryReader.open(directory);
