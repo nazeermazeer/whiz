@@ -47,6 +47,7 @@ public class Main extends ToolkitApp {
                     .wrapWord()
                     .scrollbar(ScrollBarPolicy.AS_NEEDED)
                     .borderType(BorderType.NONE)
+                    .focusable()
             ),
             panel(searchbar)
         ).borderType(BorderType.NONE);
