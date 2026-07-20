@@ -49,7 +49,7 @@ public class Main extends ToolkitApp {
                     .scrollbar(ScrollBarPolicy.AS_NEEDED)
                     .borderType(BorderType.NONE)
                     .focusable()
-            ),
+            ).borderType(BorderType.NONE),
             panel(searchbar)
         ).borderType(BorderType.NONE);
     }
