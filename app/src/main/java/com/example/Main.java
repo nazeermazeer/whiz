@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.*;
 
 import de.vandermeer.asciitable.AsciiTable;
@@ -198,6 +200,10 @@ public class Main extends ToolkitApp {
 
 
     public static void main(String[] args) throws Exception {
+        Logger logger = Logger.getLogger("org.apache.lucene");
+        logger.setLevel(Level.OFF);
+        logger.setUseParentHandlers(false);
+        
         new Main().run();
     }
 }
