@@ -44,7 +44,7 @@ public class Main extends ToolkitApp {
         return panel(
             PATH.getFileName().toString(),
             panel(
-                markupTextArea(TEXT)
+                document
                     .wrapWord()
                     .scrollbar(ScrollBarPolicy.AS_NEEDED)
                     .borderType(BorderType.NONE)
@@ -54,12 +54,7 @@ public class Main extends ToolkitApp {
         ).borderType(BorderType.NONE);
     }
 
-    private final MarkupTextAreaElement document = markupTextArea(TEXT)
-            .wrapWord()
-            .scrollbar(ScrollBarPolicy.AS_NEEDED)
-            .borderType(BorderType.NONE)
-            .id("document")
-            .focusable();
+    private MarkupTextAreaElement document = markupTextArea(TEXT);
 
     private final Element searchbar = 
             textInput(searchState)
@@ -75,6 +70,9 @@ public class Main extends ToolkitApp {
                     } catch (Exception err) {
                         err.printStackTrace();
                     }
+
+                    document.markup(TEXT);
+                    document.state().scrollToTop();
 
                 });
 
