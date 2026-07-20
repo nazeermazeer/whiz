@@ -4,8 +4,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import static dev.tamboui.toolkit.Toolkit.text;
-
 import java.io.File;
 import java.io.IOException;
 import org.jsoup.select.Elements;
@@ -86,7 +84,7 @@ public class Parser {
                         jsonvalues.add(new Definition(html.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def));
                 }
             } catch (IOException err) {
-            System.out.println("Cannot read file");
+                System.out.println("Cannot read file");
             }
         }
         try{

@@ -14,6 +14,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 
+import com.example.Indexer.SearchResult;
+
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
@@ -24,35 +26,76 @@ import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 
 public class Main extends ToolkitApp {
     private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
-    private static final String TEXT = getText();
-    private final TextInputState searchState = new TextInputState();
+    private String TEXT = getText(new File("app/src/main/java/com/example/functions.html"));
+    private final TextInputState searchState = new TextInputState();  
+
+    private Indexer myindexer = new Indexer();
 
 
     @Override
     protected Element render() {
-        return panel(PATH.getFileName().toString(), panel(document).borderType(BorderType.NONE), panel(searchbar)).borderType(BorderType.NONE);
+        return panel(
+            PATH.getFileName().toString(),
+            panel(
+                document
+                    .wrapWord()
+                    .scrollbar(ScrollBarPolicy.AS_NEEDED)
+                    .borderType(BorderType.NONE)
+                    .focusable()
+            ).borderType(BorderType.NONE),
+            panel(searchbar)
+        ).borderType(BorderType.NONE);
     }
 
-    private final MarkupTextAreaElement document = markupTextArea(TEXT)
-            .wrapWord()
-            .scrollbar(ScrollBarPolicy.AS_NEEDED)
-            .borderType(BorderType.NONE)
-            .id("document")
-            .focusable();
+    private MarkupTextAreaElement document = markupTextArea(TEXT);
+    String match;
 
     private final Element searchbar = 
             textInput(searchState)
-                .placeholder(this.getRubbishText() + "...");
+                .placeholder(this.getRubbishText() + "...")
+                .onSubmit(() -> {
+                    String input = searchState.text();
+                    match = "";
+                    TEXT = "";
+                    try {
+                        List<SearchResult> results = myindexer.searchTerm(input);
+                        for (SearchResult result : results) {
+                            if (match == "") { 
+                                match = result.term()[0];
+                                TEXT = getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));    
+                            }
+                        }
+                    } catch (Exception err) {
+                        throw new RuntimeException(err);
+                    }   
+
+                    document.markup(TEXT);
+                    int line = getLine(TEXT, String.join(" ", match));
+                    document.state().scrollToLine(line);
+
+                });
+
+    private static int getLine(String text, String search) {
+        String[] lines = text.split("\\R");
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].contains(search)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 
 
-    public static String getText() {
-        File html = new File("app/src/main/java/com/example/functions.html");
+    public static String getText(File html) {
         String text;
 
         try {
@@ -69,7 +112,7 @@ public class Main extends ToolkitApp {
 
             text = doc.body().wholeText();
         } catch (IOException err) {
-            text = "could not read file";
+            throw new RuntimeException(err);
         } 
 
         return text;
@@ -150,6 +193,10 @@ public class Main extends ToolkitApp {
 
 
     public static void main(String[] args) throws Exception {
+        Logger logger = Logger.getLogger("org.apache.lucene");
+        logger.setLevel(Level.OFF);
+        logger.setUseParentHandlers(false);
+
         new Main().run();
     }
 }

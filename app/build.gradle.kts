@@ -107,6 +107,10 @@ tasks.run {
     jvmArgs("--add-modules=jdk.incubator.vector")
 }
 
+tasks.withType<JavaExec>().configureEach {
+    jvmArgs("--add-modules", "jdk.incubator.vector")
+}
+
 publishing {
     publications {
         create<MavenPublication>("gpr") {
