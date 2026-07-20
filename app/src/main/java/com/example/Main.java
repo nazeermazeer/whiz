@@ -68,8 +68,8 @@ public class Main extends ToolkitApp {
                         List<SearchResult> results = myindexer.searchTerm(input);
                         for (SearchResult result : results) {
                             // TEXT += "Term: " + Arrays.toString(result.term()) + "Definition: " + Arrays.toString(result.definition());
-                            if (match != "") {
-                                match = Arrays.toString(result.definition());
+                            if (match == "") {
+                                match = result.term()[0];
                             }
                         }
                     } catch (Exception err) {
@@ -77,9 +77,22 @@ public class Main extends ToolkitApp {
                     }
 
                     // document.markup(TEXT);
-
+                    // int line = getLine(TEXT, "print(*objects, sep=' ', end='\\n', file=None, flush=False)");
+                    int line = getLine(TEXT, String.join(" ", match));
+                    document.state().scrollToLine(line);
 
                 });
+
+    private static int getLine(String text, String search) {
+        String[] lines = text.split("\\R");
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].contains(search)) {
+                return i + 1;
+            }
+        }
+
+        return 329;
+    }
 
 
     public static String getText() {
