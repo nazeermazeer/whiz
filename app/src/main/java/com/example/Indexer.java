@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
@@ -26,7 +27,7 @@ import com.example.model.Definition;
 
 public class Indexer {
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
-    public record SearchResult(String[] term, String[] definition) {}
+    public record SearchResult(String[] location, String[] term, String[] definition) {}
 
     public List<SearchResult> searchTerm (String search) throws Exception {
         List<Definition> entries = readJSON(Path.of("app/src/main/java/com/example/entries.json").toFile());
@@ -57,6 +58,8 @@ public class Indexer {
             for (Definition def : entries) {
 
                 Document doc = new Document();
+
+                doc.add(new StringField("location", def.getLocation(), Field.Store.YES));
 
                 // Add every term
                 for (String term : def.getSignature()) {
@@ -103,7 +106,7 @@ public class Indexer {
     for (ScoreDoc hit : results.scoreDocs) {
         Document doc = storedFields.document(hit.doc);
 
-        searchresults.add(new SearchResult(doc.getValues("term"), doc.getValues("definition")));
+        searchresults.add(new SearchResult(doc.getValues("location"), doc.getValues("term"), doc.getValues("definition")));
 
         }
     return searchresults;

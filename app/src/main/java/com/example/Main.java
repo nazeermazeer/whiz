@@ -34,8 +34,8 @@ import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 
 public class Main extends ToolkitApp {
     private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
-    private String TEXT = getText();
-    private final TextInputState searchState = new TextInputState();
+    private String TEXT = getText(new File("app/src/main/java/com/example/functions.html"));
+    private final TextInputState searchState = new TextInputState();  
 
     private Indexer myindexer = new Indexer();
 
@@ -56,27 +56,32 @@ public class Main extends ToolkitApp {
     }
 
     private MarkupTextAreaElement document = markupTextArea(TEXT);
-    String match = "";
+    String match;
 
     private final Element searchbar = 
             textInput(searchState)
                 .placeholder(this.getRubbishText() + "...")
                 .onSubmit(() -> {
                     String input = searchState.text();
-                    // TEXT = "";
+                    match = "";
+                    TEXT = "";
                     try {
                         List<SearchResult> results = myindexer.searchTerm(input);
                         for (SearchResult result : results) {
                             // TEXT += "Term: " + Arrays.toString(result.term()) + "Definition: " + Arrays.toString(result.definition());
-                            if (match == "") {
+                            if (match == "") { 
                                 match = result.term()[0];
+                                TEXT = getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));    
                             }
+                            // if (TEXT == "")
+                                // TEXT = getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));    
+                                // TEXT = getText(new File("app/src/main/java/com/example/functions.html")); 
                         }
                     } catch (Exception err) {
-                        err.printStackTrace();
-                    }
+                        throw new RuntimeException(err);
+                    }   
 
-                    // document.markup(TEXT);
+                    document.markup(TEXT);
                     // int line = getLine(TEXT, "print(*objects, sep=' ', end='\\n', file=None, flush=False)");
                     int line = getLine(TEXT, String.join(" ", match));
                     document.state().scrollToLine(line);
@@ -87,7 +92,7 @@ public class Main extends ToolkitApp {
         String[] lines = text.split("\\R");
         for (int i = 0; i < lines.length; i++) {
             if (lines[i].contains(search)) {
-                return i + 1;
+                return i;
             }
         }
 
@@ -95,8 +100,7 @@ public class Main extends ToolkitApp {
     }
 
 
-    public static String getText() {
-        File html = new File("app/src/main/java/com/example/functions.html");
+    public static String getText(File html) {
         String text;
 
         try {
@@ -113,7 +117,7 @@ public class Main extends ToolkitApp {
 
             text = doc.body().wholeText();
         } catch (IOException err) {
-            text = "could not read file";
+            throw new RuntimeException(err);
         } 
 
         return text;
