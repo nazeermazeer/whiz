@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.stream.*;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
@@ -55,24 +56,28 @@ public class Main extends ToolkitApp {
     }
 
     private MarkupTextAreaElement document = markupTextArea(TEXT);
+    String match = "";
 
     private final Element searchbar = 
             textInput(searchState)
                 .placeholder(this.getRubbishText() + "...")
                 .onSubmit(() -> {
                     String input = searchState.text();
-                    TEXT = "";
+                    // TEXT = "";
                     try {
                         List<SearchResult> results = myindexer.searchTerm(input);
                         for (SearchResult result : results) {
-                            TEXT += "Term: " + Arrays.toString(result.term()) + "Definition: " + Arrays.toString(result.definition());
+                            // TEXT += "Term: " + Arrays.toString(result.term()) + "Definition: " + Arrays.toString(result.definition());
+                            if (match != "") {
+                                match = Arrays.toString(result.definition());
+                            }
                         }
                     } catch (Exception err) {
                         err.printStackTrace();
                     }
 
-                    document.markup(TEXT);
-                    document.state().scrollToTop();
+                    // document.markup(TEXT);
+
 
                 });
 
