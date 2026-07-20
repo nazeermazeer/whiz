@@ -24,12 +24,10 @@ import dev.tamboui.widgets.input.TextInputState;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.*;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
@@ -70,21 +68,16 @@ public class Main extends ToolkitApp {
                     try {
                         List<SearchResult> results = myindexer.searchTerm(input);
                         for (SearchResult result : results) {
-                            // TEXT += "Term: " + Arrays.toString(result.term()) + "Definition: " + Arrays.toString(result.definition());
                             if (match == "") { 
                                 match = result.term()[0];
                                 TEXT = getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));    
                             }
-                            // if (TEXT == "")
-                                // TEXT = getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));    
-                                // TEXT = getText(new File("app/src/main/java/com/example/functions.html")); 
                         }
                     } catch (Exception err) {
                         throw new RuntimeException(err);
                     }   
 
                     document.markup(TEXT);
-                    // int line = getLine(TEXT, "print(*objects, sep=' ', end='\\n', file=None, flush=False)");
                     int line = getLine(TEXT, String.join(" ", match));
                     document.state().scrollToLine(line);
 
@@ -203,7 +196,7 @@ public class Main extends ToolkitApp {
         Logger logger = Logger.getLogger("org.apache.lucene");
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
-        
+
         new Main().run();
     }
 }

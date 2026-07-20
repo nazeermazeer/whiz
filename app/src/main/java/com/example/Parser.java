@@ -4,8 +4,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import static dev.tamboui.toolkit.Toolkit.text;
-
 import java.io.File;
 import java.io.IOException;
 import org.jsoup.select.Elements;
