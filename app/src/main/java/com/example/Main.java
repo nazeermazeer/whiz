@@ -24,6 +24,7 @@ import dev.tamboui.widgets.input.TextInputState;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.security.SecureRandom;
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class Main extends ToolkitApp {
                     try {
                         List<SearchResult> results = myindexer.searchTerm(input);
                         for (SearchResult result : results) {
-                            TEXT += "Term: " + result.term() + "Definition: " + result.definition();
+                            TEXT += "Term: " + Arrays.toString(result.term()) + "Definition: " + Arrays.toString(result.definition());
                         }
                     } catch (Exception err) {
                         err.printStackTrace();
