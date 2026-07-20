@@ -22,17 +22,18 @@ import java.util.logging.Logger;
 
 
 public class Main extends ToolkitApp {
-    private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
-    private String TEXT = Viewer.getText(new File("app/src/main/java/com/example/functions.html"));
-    private final TextInputState searchState = new TextInputState();  
+    private static final TextInputState searchState = new TextInputState();  
+    private static String title = Path.of("app/src/main/java/com/example/functions.html").getFileName().toString();
+    private static String content = Viewer.getText(new File("app/src/main/java/com/example/functions.html"));
+    private static String match;
 
     private Indexer myindexer = new Indexer();
-
+    private MarkupTextAreaElement document = markupTextArea(content);
 
     @Override
     protected Element render() {
         return panel(
-            PATH.getFileName().toString(),
+            title,
             panel(
                 document
                     .wrapWord()
@@ -44,30 +45,27 @@ public class Main extends ToolkitApp {
         ).borderType(BorderType.NONE);
     }
 
-    private MarkupTextAreaElement document = markupTextArea(TEXT);
-    String match;
-
     private final Element searchbar = 
             textInput(searchState)
                 .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
                     String input = searchState.text();
                     match = "";
-                    TEXT = "";
+                    content = "";
                     try {
                         List<SearchResult> results = myindexer.searchTerm(input);
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
-                                TEXT = Viewer.getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));    
+                                content = Viewer.getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));    
                             }
                         }
                     } catch (Exception err) {
                         throw new RuntimeException(err);
                     }   
 
-                    document.markup(TEXT);
-                    int line = Viewer.getLine(TEXT, String.join(" ", match));
+                    document.markup(content);
+                    int line = Viewer.getLine(content, String.join(" ", match));
                     document.state().scrollToLine(line);
 
                 });
