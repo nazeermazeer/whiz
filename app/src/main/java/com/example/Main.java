@@ -6,31 +6,20 @@ import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Path;
-
-import org.jsoup.nodes.Document;
-import org.jsoup.Jsoup;
-import org.jsoup.select.Elements;
 
 import com.example.Indexer.SearchResult;
 
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.common.ScrollBarPolicy;
+import dev.tamboui.widgets.common.ScrollBarPolicy; 
 
 import dev.tamboui.widgets.input.TextInputState;
 
-import java.io.BufferedReader;
-import java.util.ArrayList;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.vandermeer.asciitable.AsciiTable;
-import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 
 public class Main extends ToolkitApp {
     private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
