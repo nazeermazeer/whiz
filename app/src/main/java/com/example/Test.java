@@ -19,6 +19,13 @@ public class Test {
      * argument. If no argument is supplied, functions.html is analyzed.
      */
     public static void main(String[] args) throws Exception {
+        // HtmlUnit does not need a graphical desktop. These properties keep
+        // Java in headless mode and tell macOS not to show a Dock icon for
+        // this command-line application. They must be set before HtmlUnit or
+        // any AWT-dependent class is initialized.
+        System.setProperty("java.awt.headless", "true");
+        System.setProperty("apple.awt.UIElement", "true");
+
         // Use the first command-line argument as the input document. This can
         // be a file path, an HTTP(S) URL, or an HTML string beginning with '<'.
         String source = args.length == 0
@@ -65,10 +72,10 @@ public class Test {
 
                 System.out.printf(
                         "span[%d] %s text=%s -> color=%s, background-color=%s, display=%s%n",
-                        i,
-                        describe(span),
-                        quote(span.text()),
-                        computed[0],
+                        i, // span[3515]
+                        describe(span), // <span.n>
+                        quote(span.text()), // text="_temp"
+                        computed[0], // color = rgb
                         computed[1],
                         computed[2]);
             }
@@ -82,8 +89,25 @@ public class Test {
                 (() => {
                     const span = document.querySelectorAll('span')[%d];
                     if (!span) return 'unknown|unknown|unknown';
+
+                    // HtmlUnit can leave an explicitly inherited color as the
+                    // string "inherit". Walk up the DOM until the inherited
+                    // color is resolved to an actual RGB/RGBA value.
+                    function resolvedColor(element) {
+                        let current = element;
+                        while (current) {
+                            const color = window.getComputedStyle(current).color;
+                            if (color && color !== 'inherit') return color;
+                            current = current.parentElement;
+                        }
+
+                        // The browser default text color is black when no
+                        // ancestor supplies a color.
+                        return 'rgb(0, 0, 0)';
+                    }
+
                     const style = window.getComputedStyle(span);
-                    return style.color + '|' + style.backgroundColor + '|' + style.display;
+                    return resolvedColor(span) + '|' + style.backgroundColor + '|' + style.display;
                 })()
                 """.formatted(index);
 
