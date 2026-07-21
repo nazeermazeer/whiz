@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState();  
-    private static String title = Path.of("app/src/main/java/com/example/functions.html").getFileName().toString();
+    private static String title = "functions.html";
     private static String content = Viewer.getText(new File("app/src/main/java/com/example/functions.html"));
     private static String match;
 
@@ -57,7 +57,8 @@ public class Main extends ToolkitApp {
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
-                                content = Viewer.getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));    
+                                content = Viewer.getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));  
+                                title = String.join(" ", result.location()); 
                             }
                         }
                     } catch (Exception err) {
