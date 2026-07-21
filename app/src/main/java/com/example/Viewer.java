@@ -39,6 +39,13 @@ public class Viewer {
             doc = Jsoup.parse(html, "UTF-8");
             doc.outputSettings().prettyPrint(false);
 
+            Elements tables = doc.select("table");
+
+            for (Element table : tables) {
+                String renderedTable = getTableText(table);
+                table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
+            }
+
             text = doc.body().wholeText();
         } catch (IOException err) {
             throw new RuntimeException(err);
@@ -49,12 +56,7 @@ public class Viewer {
 
     public static Document stylizeText(Document doc) {
         Document mydoc = doc;
-        Elements tables = mydoc.select("table");
 
-        for (Element table : tables) {
-            String renderedTable = getTableText(table);
-            table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
-        }
 
         Elements ems = mydoc.select("em");
         for (int i = ems.size() - 1; i >= 0; i--) {
