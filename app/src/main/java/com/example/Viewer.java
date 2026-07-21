@@ -31,27 +31,40 @@ public class Viewer {
     }
 
 
-    public static String getText(File html) {
+    public static Document getText(File html) {
         String text;
+        Document doc;
 
         try {
-            Document doc = Jsoup.parse(html, "UTF-8");
+            doc = Jsoup.parse(html, "UTF-8");
             doc.outputSettings().prettyPrint(false);
-
-            Elements tables = doc.select("table");
-
-            for (Element table : tables) {
-                String renderedTable = getTableText(table);
-                table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
-            }
-
 
             text = doc.body().wholeText();
         } catch (IOException err) {
             throw new RuntimeException(err);
         } 
 
-        return text;
+        return doc;
+    }
+
+    public static Document stylizeText(Document doc) {
+        Document mydoc = doc;
+        Elements tables = mydoc.select("table");
+
+        for (Element table : tables) {
+            String renderedTable = getTableText(table);
+            table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
+        }
+
+        Elements ems = mydoc.select("em");
+        for (int i = ems.size() - 1; i >= 0; i--) {
+            Element e = ems.get(i);
+            e.before(new TextNode("[i]"));
+            e.after(new TextNode("[/i]"));
+            e.unwrap();
+        }
+
+        return mydoc;
     }
 
     private static String getTableText(Element table) {
