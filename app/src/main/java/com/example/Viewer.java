@@ -23,6 +23,7 @@ import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 
 public class Viewer {
     public record Style(String color, String bgcolor, String display) {}
+    private static volatile List<Style> cachedStyles;
 
     public static int getLine(String text, String search) {
         String[] lines = text.split("\\R");
@@ -90,13 +91,20 @@ public class Viewer {
             webClient.getOptions().setJavaScriptEnabled(true);
             webClient.getOptions().setThrowExceptionOnScriptError(false);
 
-            File file = new File("app/src/main/java/com/example/functions.html").getCanonicalFile();
+            File file = new File("app/src/main/java/com/example/stdtypes.html").getCanonicalFile();
             HtmlPage page = webClient.getPage(file.toURI().toURL());
 
             Elements spans = mydoc.select("span");
+            // Resolve every span in one browser-script call. Calling
+            // executeJavaScript once per span reparses the script and
+            // searches the whole HtmlUnit document repeatedly.
+            List<Style> styles = getCachedStyles(page);
+
             for (int i = 0; i < spans.size(); i++) {
                 Element span = spans.get(i);
-                Style style = getStyle(page, i);
+                Style style = i < styles.size()
+                        ? styles.get(i)
+                        : new Style("rgb(0, 0, 0)", "transparent", "inline");
 
                 span.before(new TextNode("[" + style.color + "]"));
                 span.after(new TextNode("[/" + style.color + "]"));   
@@ -111,28 +119,58 @@ public class Viewer {
         return mydoc;
     }
 
-    private static Style getStyle(HtmlPage page, int index) {
-        // Run browser JavaScript so the result includes styles from external
+    private static List<Style> getCachedStyles(HtmlPage page) {
+        // The viewer currently renders functions.html every time, so its CSS
+        // result is reusable. Avoid rebuilding the browser style information
+        // each time a search result is displayed.
+        List<Style> styles = cachedStyles;
+        if (styles == null) {
+            synchronized (Viewer.class) {
+                styles = cachedStyles;
+                if (styles == null) {
+                    styles = List.copyOf(getStyles(page));
+                    cachedStyles = styles;
+                }
+            }
+        }
+        return styles;
+    }
+
+    private static List<Style> getStyles(HtmlPage page) {
+        // Run one browser script so the result includes styles from external
         // stylesheets, inherited colors, class selectors, and inline styles.
+        // The result order matches Jsoup's document.select("span") order.
         String script = """
                 (() => {
-                    const span = document.querySelectorAll('span')[%d];
-                    if (!span) return 'unknown|unknown|unknown';
+                    const spans = document.querySelectorAll('span');
+                    const separator = String.fromCharCode(31);
+                    const inheritedColors = new WeakMap();
 
                     // HtmlUnit can leave an explicitly inherited color as the
                     // string "inherit". Walk up the DOM until the inherited
                     // color is resolved to an actual RGB/RGBA value.
                     function resolvedColor(element) {
+                        if (inheritedColors.has(element)) {
+                            return inheritedColors.get(element);
+                        }
+
                         let current = element;
+                        let color;
                         while (current) {
-                            const color = window.getComputedStyle(current).color;
-                            if (color && color !== 'inherit') return rgbOnly(color);
+                            color = window.getComputedStyle(current).color;
+                            if (color && color !== 'inherit') {
+                                color = rgbOnly(color);
+                                inheritedColors.set(element, color);
+                                return color;
+                            }
                             current = current.parentElement;
                         }
 
                         // The browser default text color is black when no
                         // ancestor supplies a color.
-                        return 'rgb(0, 0, 0)';
+                        color = 'rgb(0, 0, 0)';
+                        inheritedColors.set(element, color);
+                        return color;
                     }
 
                     // Keep the output format consistent by removing the
@@ -144,19 +182,30 @@ public class Viewer {
                         );
                     }
 
-                    const style = window.getComputedStyle(span);
-                    return resolvedColor(span) + '|' + rgbOnly(style.backgroundColor) + '|' + style.display;
+                    return Array.from(spans, span => {
+                        const style = window.getComputedStyle(span);
+                        return resolvedColor(span) + separator
+                            + rgbOnly(style.backgroundColor) + separator
+                            + style.display;
+                    }).join(separator + separator);
                 })()
-                """.formatted(index);
+                """;
 
         ScriptResult result = page.executeJavaScript(script);
-        // Return the three values as one string to avoid having to convert a
-        // JavaScript array/object returned by HtmlUnit.
+        // HtmlUnit returns the JavaScript string as one value. Split it back
+        // into the three fields stored by the Style record.
         String value = String.valueOf(result.getJavaScriptResult());
-        String[] values = value.split("\\|", -1);
-        if (values.length == 3)
-            return new Style(values[0], values[1], values[2]);
-        return new Style(value, "unknown", "unkown");
+        String[] values = value.split("\u001f\u001f", -1);
+        List<Style> styles = new ArrayList<>(values.length);
+
+        for (String styleValue : values) {
+            String[] fields = styleValue.split("\u001f", -1);
+            if (fields.length == 3) {
+                styles.add(new Style(fields[0], fields[1], fields[2]));
+            }
+        }
+
+        return styles;
 
     }
     
