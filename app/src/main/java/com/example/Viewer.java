@@ -11,6 +11,8 @@ import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
@@ -38,7 +40,7 @@ public class Viewer {
 
             Elements tables = doc.select("table");
 
-            for (org.jsoup.nodes.Element table : tables) {
+            for (Element table : tables) {
                 String renderedTable = getTableText(table);
                 table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
             }
@@ -52,14 +54,14 @@ public class Viewer {
         return text;
     }
 
-    private static String getTableText(org.jsoup.nodes.Element table) {
+    private static String getTableText(Element table) {
         List<List<String>> rows = new ArrayList<>();
         int maxColumns = 0;
 
-        for (org.jsoup.nodes.Element row : table.select("tr")) {
+        for (Element row : table.select("tr")) {
             List<String> cells = new ArrayList<>();
 
-            for (org.jsoup.nodes.Element cell : row.select("th, td")) {
+            for (Element cell : row.select("th, td")) {
                 int colspan = 1;
                 String colspanValue = cell.attr("colspan");
                 if (!colspanValue.isBlank()) {
