@@ -6,7 +6,6 @@ import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 
 import java.io.File;
-import java.nio.file.Path;
 
 import com.example.Indexer.SearchResult;
 
