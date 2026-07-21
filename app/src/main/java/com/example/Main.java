@@ -74,6 +74,9 @@ public class Main extends ToolkitApp {
                 });
 
     public static void main(String[] args) throws Exception {
+        System.setProperty("java.awt.headless", "true");
+        System.setProperty("apple.awt.UIElement", "true");
+
         Logger logger = Logger.getLogger("org.apache.lucene");
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
@@ -81,4 +84,3 @@ public class Main extends ToolkitApp {
         new Main().run();
     }
 }
-
