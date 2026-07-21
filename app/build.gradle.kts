@@ -60,6 +60,8 @@ dependencies {
     // ascii table for rendering html tables
     implementation("de.vandermeer:asciitable:0.3.2")
 
+    // css parsing
+    implementation("org.htmlunit:htmlunit:4.13.0")
 }
 
 
