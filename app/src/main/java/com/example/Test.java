@@ -97,7 +97,7 @@ public class Test {
                         let current = element;
                         while (current) {
                             const color = window.getComputedStyle(current).color;
-                            if (color && color !== 'inherit') return color;
+                            if (color && color !== 'inherit') return rgbOnly(color);
                             current = current.parentElement;
                         }
 
@@ -106,8 +106,17 @@ public class Test {
                         return 'rgb(0, 0, 0)';
                     }
 
+                    // Keep the output format consistent by removing the
+                    // alpha channel from rgba(...) values.
+                    function rgbOnly(color) {
+                        return color.replace(
+                            /^rgba\\(\\s*([^,]+),\\s*([^,]+),\\s*([^,]+),\\s*[^)]+\\)$/i,
+                            'rgb($1, $2, $3)'
+                        );
+                    }
+
                     const style = window.getComputedStyle(span);
-                    return resolvedColor(span) + '|' + style.backgroundColor + '|' + style.display;
+                    return resolvedColor(span) + '|' + rgbOnly(style.backgroundColor) + '|' + style.display;
                 })()
                 """.formatted(index);
 

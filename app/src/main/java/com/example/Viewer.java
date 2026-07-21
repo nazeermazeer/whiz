@@ -90,14 +90,15 @@ public class Viewer {
             webClient.getOptions().setJavaScriptEnabled(true);
             webClient.getOptions().setThrowExceptionOnScriptError(false);
 
-            HtmlPage page = webClient.loadHtmlCodeIntoCurrentWindow("app/src/main/java/com/example/functions.html");
+            File file = new File("app/src/main/java/com/example/functions.html").getCanonicalFile();
+            HtmlPage page = webClient.getPage(file.toURI().toURL());
 
             Elements spans = mydoc.select("span");
             for (int i = 0; i < spans.size(); i++) {
                 Element span = spans.get(i);
                 Style style = getStyle(page, i);
 
-                span.before(new TextNode("[rgb(255,0,0)]"));
+                span.before(new TextNode("[" + style.color + "]"));
                 span.after(new TextNode("[/]"));   
                 span.unwrap();
             }
@@ -125,7 +126,7 @@ public class Viewer {
                         let current = element;
                         while (current) {
                             const color = window.getComputedStyle(current).color;
-                            if (color && color !== 'inherit') return color;
+                            if (color && color !== 'inherit') return rgbOnly(color);
                             current = current.parentElement;
                         }
 
@@ -134,8 +135,17 @@ public class Viewer {
                         return 'rgb(0, 0, 0)';
                     }
 
+                    // Keep the output format consistent by removing the
+                    // alpha channel from rgba(...) values.
+                    function rgbOnly(color) {
+                        return color.replace(
+                            /^rgba\\(\\s*([^,]+),\\s*([^,]+),\\s*([^,]+),\\s*[^)]+\\)$/i,
+                            'rgb($1, $2, $3)'
+                        );
+                    }
+
                     const style = window.getComputedStyle(span);
-                    return resolvedColor(span) + '|' + style.backgroundColor + '|' + style.display;
+                    return resolvedColor(span) + '|' + rgbOnly(style.backgroundColor) + '|' + style.display;
                 })()
                 """.formatted(index);
 
@@ -144,7 +154,10 @@ public class Viewer {
         // JavaScript array/object returned by HtmlUnit.
         String value = String.valueOf(result.getJavaScriptResult());
         String[] values = value.split("\\|", -1);
-        return new Style(values[0], values[1], values[2]);
+        if (values.length == 3)
+            return new Style(values[0], values[1], values[2]);
+        return new Style(value, "unknown", "unkown");
+
     }
     
     private static String getTableText(Element table) {
