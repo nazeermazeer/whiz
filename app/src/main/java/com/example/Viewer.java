@@ -99,7 +99,7 @@ public class Viewer {
                 Style style = getStyle(page, i);
 
                 span.before(new TextNode("[" + style.color + "]"));
-                span.after(new TextNode("[/]"));   
+                span.after(new TextNode("[/" + style.color + "]"));   
                 span.unwrap();
             }
 
