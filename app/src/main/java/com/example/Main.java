@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jsoup.nodes.Document;
+
 
 public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState();  
@@ -50,6 +52,7 @@ public class Main extends ToolkitApp {
                 .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
                     String input = searchState.text();
+                    Document doc = null;
                     match = "";
                     content = "";
                     try {
@@ -57,17 +60,17 @@ public class Main extends ToolkitApp {
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
-                                content = Viewer.getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location()))).body().wholeText();  
-                                title = String.join(" ", result.location()); 
+                                doc = Viewer.getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));  
+                                title = String.join(" ", result.location());
                             }
                         }
                     } catch (Exception err) {
                         throw new RuntimeException(err);
                     }   
 
-                    document.markup(content);
-                    int line = Viewer.getLine(content, String.join(" ", match));
-                    document.state().scrollToLine(line);
+                    int line = Viewer.getLine(doc.body().wholeText(), String.join(" ", match));
+                    document.markup(Viewer.stylizeText(doc).body().wholeText());
+                    document.state().scrollToLine(line);    
 
                 });
 
