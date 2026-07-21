@@ -25,7 +25,7 @@ import org.jsoup.nodes.Document;
 public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState();  
     private static String title = "functions.html";
-    private static String content = Viewer.getText(new File("app/src/main/java/com/example/functions.html")).body().wholeText();
+    private static String content = Viewer.stylizeText(Viewer.getText(new File("app/src/main/java/com/example/functions.html"))).body().wholeText();
     private static String match;
 
     private Indexer myindexer = new Indexer();

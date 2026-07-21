@@ -59,8 +59,24 @@ public class Viewer {
         Elements ems = mydoc.select("em");
         for (int i = ems.size() - 1; i >= 0; i--) {
             Element e = ems.get(i);
-            e.before(new TextNode("[i]"));
-            e.after(new TextNode("[/i]"));
+            e.before(new TextNode("[italic]"));
+            e.after(new TextNode("[/italic]"));
+            e.unwrap();
+        }
+
+        Elements bs = mydoc.select("b");
+        for (int i = bs.size() - 1; i >= 0; i--) {
+            Element e = bs.get(i);  
+            e.before(new TextNode("[bold]"));
+            e.after(new TextNode("[/bold]"));   
+            e.unwrap();
+        }
+
+        Elements strongs = mydoc.select("strong");
+        for (int i = strongs.size() - 1; i >= 0; i--) {
+            Element e = strongs.get(i);
+            e.before(new TextNode("[bold]"));
+            e.after(new TextNode("[/bold]"));   
             e.unwrap();
         }
 
