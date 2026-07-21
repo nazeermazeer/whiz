@@ -32,7 +32,6 @@ public class Viewer {
 
 
     public static Document getText(File html) {
-        String text;
         Document doc;
 
         try {
@@ -46,7 +45,6 @@ public class Viewer {
                 table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
             }
 
-            text = doc.body().wholeText();
         } catch (IOException err) {
             throw new RuntimeException(err);
         } 
