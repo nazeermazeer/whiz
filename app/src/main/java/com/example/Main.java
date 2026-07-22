@@ -28,7 +28,6 @@ public class Main extends ToolkitApp {
     private static String content = Viewer.stylizeText(Viewer.getText(new File("app/src/main/java/com/example/functions.html"))).body().wholeText();
     private static String match;
 
-    private Indexer myindexer = new Indexer();
     private MarkupTextAreaElement document = markupTextArea(content);
 
     @Override
@@ -55,7 +54,7 @@ public class Main extends ToolkitApp {
                     match = "";
                     content = "";
                     try {
-                        List<SearchResult> results = myindexer.searchTerm(input);
+                        List<SearchResult> results = Indexer.searchTerm(input);
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
