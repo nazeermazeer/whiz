@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +94,7 @@ public class Viewer {
             webClient.getOptions().setJavaScriptEnabled(true);
             webClient.getOptions().setThrowExceptionOnScriptError(false);
 
-            File file = new File("app/src/main/java/com/example/stdtypes.html").getCanonicalFile();
+            File file = new File("app/src/main/java/com/example/functions.html").getCanonicalFile();
             HtmlPage page = webClient.getPage(file.toURI().toURL());
 
             Elements spans = mydoc.select("span");
@@ -119,7 +122,7 @@ public class Viewer {
         return mydoc;
     }
 
-    private static List<Style> getCachedStyles(HtmlPage page) {
+    private static List<Style> getCachedStyles(HtmlPage page) throws IOException {
         // The viewer currently renders functions.html every time, so its CSS
         // result is reusable. Avoid rebuilding the browser style information
         // each time a search result is displayed.
@@ -136,60 +139,13 @@ public class Viewer {
         return styles;
     }
 
-    private static List<Style> getStyles(HtmlPage page) {
+    private static List<Style> getStyles(HtmlPage page) throws IOException {
         // Run one browser script so the result includes styles from external
         // stylesheets, inherited colors, class selectors, and inline styles.
         // The result order matches Jsoup's document.select("span") order.
-        String script = """
-                (() => {
-                    const spans = document.querySelectorAll('span');
-                    const separator = String.fromCharCode(31);
-                    const inheritedColors = new WeakMap();
 
-                    // HtmlUnit can leave an explicitly inherited color as the
-                    // string "inherit". Walk up the DOM until the inherited
-                    // color is resolved to an actual RGB/RGBA value.
-                    function resolvedColor(element) {
-                        if (inheritedColors.has(element)) {
-                            return inheritedColors.get(element);
-                        }
+        String script = Files.readString(Path.of("app/src/main/java/com/example/colorizer.js"));
 
-                        let current = element;
-                        let color;
-                        while (current) {
-                            color = window.getComputedStyle(current).color;
-                            if (color && color !== 'inherit') {
-                                color = rgbOnly(color);
-                                inheritedColors.set(element, color);
-                                return color;
-                            }
-                            current = current.parentElement;
-                        }
-
-                        // The browser default text color is black when no
-                        // ancestor supplies a color.
-                        color = 'rgb(0, 0, 0)';
-                        inheritedColors.set(element, color);
-                        return color;
-                    }
-
-                    // Keep the output format consistent by removing the
-                    // alpha channel from rgba(...) values.
-                    function rgbOnly(color) {
-                        return color.replace(
-                            /^rgba\\(\\s*([^,]+),\\s*([^,]+),\\s*([^,]+),\\s*[^)]+\\)$/i,
-                            'rgb($1, $2, $3)'
-                        );
-                    }
-
-                    return Array.from(spans, span => {
-                        const style = window.getComputedStyle(span);
-                        return resolvedColor(span) + separator
-                            + rgbOnly(style.backgroundColor) + separator
-                            + style.display;
-                    }).join(separator + separator);
-                })()
-                """;
 
         ScriptResult result = page.executeJavaScript(script);
         // HtmlUnit returns the JavaScript string as one value. Split it back
