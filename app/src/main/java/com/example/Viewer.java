@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +93,7 @@ public class Viewer {
             webClient.getOptions().setJavaScriptEnabled(true);
             webClient.getOptions().setThrowExceptionOnScriptError(false);
 
-            File file = new File("app/src/main/java/com/example/functions.html").getCanonicalFile();
+            File file = new File("app/src/main/java/com/example/functions.html");
             HtmlPage page = webClient.getPage(file.toURI().toURL());
 
             Elements spans = mydoc.select("span");
