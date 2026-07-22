@@ -10,12 +10,15 @@ import java.io.File;
 import com.example.Indexer.SearchResult;
 
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.common.ScrollBarPolicy; 
 
 import dev.tamboui.widgets.input.TextInputState;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +26,8 @@ import org.jsoup.nodes.Document;
 
 
 public class Main extends ToolkitApp {
-    private static final TextInputState searchState = new TextInputState();  
+    private static final TextInputState searchState = new TextInputState(); 
+    private final Map<String, Runnable> actions = new HashMap<>(); 
     private static String title = "functions.html";
     private static String content = Viewer.stylizeText(Viewer.getText(new File("app/src/main/java/com/example/functions.html"))).body().wholeText();
     private static String match;
@@ -31,12 +35,21 @@ public class Main extends ToolkitApp {
     private MarkupTextAreaElement document = markupTextArea(content);
 
     @Override
+    protected TuiConfig configure() {
+        return TuiConfig.builder()
+                .mouseCapture(true)
+                .build();
+    }
+
+    @Override
     protected Element render() {
         return panel(
             title,
             panel(
                 document
-                    .wrapWord()
+                    // Action hit-testing currently uses logical rows, so do
+                    // not wrap lines until visual-row hit-testing is added.
+                    .clip()
                     .scrollbar(ScrollBarPolicy.AS_NEEDED)
                     .borderType(BorderType.NONE)
                     .focusable()
@@ -71,6 +84,19 @@ public class Main extends ToolkitApp {
                     document.state().scrollToLine(line);    
 
                 });
+    
+    private void registerActions() {
+        actions.put("#abs", () ->
+            document.state().scrollToLine(Viewer.getLine(content, "abs(")));
+
+        actions.put("#aiter", () ->
+            document.state().scrollToLine(Viewer.getLine(content, "aiter(")));
+
+        actions.put("#iter", () ->
+            document.state().scrollToLine(Viewer.getLine(content, "iter(")));
+
+        actions.forEach(document::action);
+    }
 
     public static void main(String[] args) throws Exception {
         System.setProperty("java.awt.headless", "true");
@@ -80,6 +106,9 @@ public class Main extends ToolkitApp {
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
 
-        new Main().run();
+        Main main = new Main();
+        main.registerActions();
+
+        main.run();
     }
 }

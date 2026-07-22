@@ -8,7 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.htmlunit.ScriptResult;
 import org.htmlunit.WebClient;
@@ -86,6 +88,14 @@ public class Viewer {
             strong.before(new TextNode("[bold]"));
             strong.after(new TextNode("[/bold]"));   
             strong.unwrap();
+        }
+
+        Elements as = mydoc.select("a");
+        for (int i = 0; i < as.size(); i++) {
+            Element a = as.get(i);
+            a.before(new TextNode("[action=" + a.attr("href") + "]"));
+            a.after(new TextNode("[/action]"));   
+            a.unwrap();
         }
 
         try (WebClient webClient = new WebClient()) {
