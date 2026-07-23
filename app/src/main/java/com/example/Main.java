@@ -37,7 +37,7 @@ public class Main extends ToolkitApp {
     private String TEXT = getText(new File("app/src/main/java/com/example/functions.html"));
     private final TextInputState searchState = new TextInputState();  
 
-    private Indexer indexer = new Indexer();
+    public Indexer indexer = new Indexer();
 
     @Override
     protected Element render() {
@@ -195,6 +195,8 @@ public class Main extends ToolkitApp {
         Logger logger = Logger.getLogger("org.apache.lucene");
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
+
+        indexer.indexEntries();
 
         new Main().run();
     }
