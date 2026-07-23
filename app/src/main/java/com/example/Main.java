@@ -16,9 +16,7 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 
 import dev.tamboui.widgets.input.TextInputState;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
