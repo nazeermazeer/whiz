@@ -27,12 +27,13 @@ import org.jsoup.nodes.Document;
 
 public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState(); 
-    private final Map<String, Runnable> actions = new HashMap<>(); 
     private static String title = "functions.html";
-    private static String content = Viewer.stylizeText(Viewer.getText(new File("app/src/main/java/com/example/functions.html"))).body().wholeText();
+    private static Document vieweddoc = Viewer.stylizeText(Viewer.getText(new File("app/src/main/java/com/example/functions.html")));
+    private static String content = vieweddoc.body().wholeText();
     private static String match;
 
-    private MarkupTextAreaElement document = markupTextArea(content);
+    private Viewer viewer = new Viewer();
+    private MarkupTextAreaElement browser = viewer.registerActions(markupTextArea(content), vieweddoc);
 
     @Override
     protected TuiConfig configure() {
@@ -46,13 +47,11 @@ public class Main extends ToolkitApp {
         return panel(
             title,
             panel(
-                document
-                    // Action hit-testing currently uses logical rows, so do
-                    // not wrap lines until visual-row hit-testing is added.
-                    .clip()
+                browser
                     .scrollbar(ScrollBarPolicy.AS_NEEDED)
                     .borderType(BorderType.NONE)
                     .focusable()
+                    .wrapWord()
             ).borderType(BorderType.NONE),
             panel(searchbar)
         ).borderType(BorderType.NONE);
@@ -80,23 +79,10 @@ public class Main extends ToolkitApp {
                     }   
 
                     int line = Viewer.getLine(doc.body().wholeText(), String.join(" ", match));
-                    document.markup(Viewer.stylizeText(doc).body().wholeText());
-                    document.state().scrollToLine(line);    
+                    browser.markup(Viewer.stylizeText(doc).body().wholeText());
+                    browser.state().scrollToLine(line);
 
                 });
-    
-    private void registerActions() {
-        actions.put("#abs", () ->
-            document.state().scrollToLine(Viewer.getLine(content, "abs(")));
-
-        actions.put("#aiter", () ->
-            document.state().scrollToLine(Viewer.getLine(content, "aiter(")));
-
-        actions.put("#iter", () ->
-            document.state().scrollToLine(Viewer.getLine(content, "iter(")));
-
-        actions.forEach(document::action);
-    }
 
     public static void main(String[] args) throws Exception {
         System.setProperty("java.awt.headless", "true");
@@ -107,7 +93,6 @@ public class Main extends ToolkitApp {
         logger.setUseParentHandlers(false);
 
         Main main = new Main();
-        main.registerActions();
 
         main.run();
     }
