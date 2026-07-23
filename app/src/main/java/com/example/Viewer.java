@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ObjectUtils.Null;
 import org.htmlunit.ScriptResult;
 import org.htmlunit.WebClient;
 import org.htmlunit.html.HtmlPage;
@@ -238,7 +239,12 @@ public class Viewer {
         while (matcher.find()) {
             String id = matcher.group(1);
             actions.put(id, () -> {
-                int line = Viewer.getLine(doc.body().wholeText(), doc.getElementById(id.replaceFirst("^#", "")).text());
+                int line;
+                try {
+                    line = Viewer.getLine(doc.body().wholeText(), doc.getElementById(id.replaceFirst("^#", "")).text());
+                } catch (NullPointerException err) {
+                    line = 0;
+                }
                 element.state().scrollToLine(line);
             }); 
         }
