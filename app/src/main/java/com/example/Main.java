@@ -190,15 +190,19 @@ public class Main extends ToolkitApp {
         return line;
     }
 
+    public void indexEntries() throws Exception {
+        indexer.indexEntries();
+    }
 
     public static void main(String[] args) throws Exception {
         Logger logger = Logger.getLogger("org.apache.lucene");
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
 
-        indexer.indexEntries();
+        Main main = new Main();
+        main.indexEntries();
 
-        new Main().run();
+        main.run();
     }
 }
 
