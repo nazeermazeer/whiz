@@ -37,6 +37,7 @@ public class Main extends ToolkitApp {
     private String TEXT = getText(new File("app/src/main/java/com/example/functions.html"));
     private final TextInputState searchState = new TextInputState();  
 
+    public Indexer indexer = new Indexer();
 
     @Override
     protected Element render() {
@@ -64,7 +65,7 @@ public class Main extends ToolkitApp {
                     match = "";
                     TEXT = "";
                     try {
-                        List<SearchResult> results = Indexer.searchTerm(input);
+                        List<SearchResult> results = indexer.searchTerm(input);
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
@@ -189,13 +190,19 @@ public class Main extends ToolkitApp {
         return line;
     }
 
+    public void indexEntries() throws Exception {
+        indexer.indexEntries();
+    }
 
     public static void main(String[] args) throws Exception {
         Logger logger = Logger.getLogger("org.apache.lucene");
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
 
-        new Main().run();
+        Main main = new Main();
+        main.indexEntries();
+
+        main.run();
     }
 }
 
