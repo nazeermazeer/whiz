@@ -29,14 +29,14 @@ public class Indexer {
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
     public record SearchResult(String[] location, String[] term, String[] definition) {}
 
-    public static List<SearchResult> searchTerm (String search) throws Exception {
+    public List<SearchResult> searchTerm (String search) throws Exception {
         List<Definition> entries = readJSON(Path.of("app/src/main/java/com/example/entries.json").toFile());
         IndexResult result = readIndex(entries);
         return search(search, result.directory, result.analyzer);
         
     }
 
-    private static List<Definition> readJSON(File filePath) throws IOException {
+    private List<Definition> readJSON(File filePath) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         List<Definition> entries = mapper.readValue(
@@ -47,7 +47,7 @@ public class Indexer {
         return entries;
     }
 
-    private static IndexResult readIndex(List<Definition> entries) throws IOException {
+    private IndexResult readIndex(List<Definition> entries) throws IOException {
         ByteBuffersDirectory directory = new ByteBuffersDirectory();
         StandardAnalyzer analyzer = new StandardAnalyzer();
 
@@ -92,7 +92,7 @@ public class Indexer {
 
 
 
-    private static List<SearchResult> search(String search, ByteBuffersDirectory directory, StandardAnalyzer analyzer) throws Exception {
+    private List<SearchResult> search(String search, ByteBuffersDirectory directory, StandardAnalyzer analyzer) throws Exception {
 
     List<SearchResult> searchresults = new ArrayList<>();
     DirectoryReader reader = DirectoryReader.open(directory);
