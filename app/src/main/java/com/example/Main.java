@@ -37,6 +37,7 @@ public class Main extends ToolkitApp {
     private String TEXT = getText(new File("app/src/main/java/com/example/functions.html"));
     private final TextInputState searchState = new TextInputState();  
 
+    private Indexer indexer = new Indexer();
 
     @Override
     protected Element render() {
@@ -64,7 +65,7 @@ public class Main extends ToolkitApp {
                     match = "";
                     TEXT = "";
                     try {
-                        List<SearchResult> results = Indexer.searchTerm(input);
+                        List<SearchResult> results = indexer.searchTerm(input);
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
