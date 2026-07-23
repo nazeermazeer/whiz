@@ -72,32 +72,28 @@ public class Viewer {
 
 
         Elements ems = mydoc.select("em");
-        for (int i = 0; i < ems.size(); i++) {
-            Element em = ems.get(i);
+        for (Element em : ems) {
             em.before(new TextNode("[italic]"));
             em.after(new TextNode("[/italic]"));
             em.unwrap();
         }
 
         Elements bs = mydoc.select("b");
-        for (int i = 0; i < bs.size(); i++) {
-            Element b = bs.get(i);  
+        for (Element b : bs) {
             b.before(new TextNode("[bold]"));
             b.after(new TextNode("[/bold]"));   
             b.unwrap();
         }
 
         Elements strongs = mydoc.select("strong");
-        for (int i = 0; i < strongs.size(); i++) {
-            Element strong = strongs.get(i);
+        for (Element strong : strongs) {
             strong.before(new TextNode("[bold]"));
             strong.after(new TextNode("[/bold]"));   
             strong.unwrap();
         }
 
         Elements as = mydoc.select("a");
-        for (int i = 0; i < as.size(); i++) {
-            Element a = as.get(i);
+        for (Element a : as) {
             a.before(new TextNode("[action=" + a.attr("href") + "]"));
             a.after(new TextNode("[/action]"));   
             a.unwrap();
