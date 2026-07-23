@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.htmlunit.ScriptResult;
 import org.htmlunit.WebClient;
@@ -23,10 +25,12 @@ import org.jsoup.nodes.TextNode;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
+import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 
 
 public class Viewer {
     public record Style(String color, String bgcolor, String display) {}
+    private final Map<String, Runnable> actions = new HashMap<>(); 
     private static volatile List<Style> cachedStyles;
 
     public static int getLine(String text, String search) {
@@ -225,6 +229,22 @@ public class Viewer {
         at.addRule();
 
         return at.render();
+    }
+
+    public MarkupTextAreaElement registerActions(MarkupTextAreaElement element, Document doc) {
+        Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
+        Matcher matcher = pattern.matcher(doc.body().wholeText());
+
+        while (matcher.find()) {
+            String id = matcher.group(1);
+            actions.put(id, () -> {
+                int line = Viewer.getLine(doc.body().wholeText(), doc.getElementById(id.replaceFirst("^#", "")).text());
+                element.state().scrollToLine(line);
+            }); 
+        }
+
+        actions.forEach(element::action);
+        return element;
     }
 
     public static String getRubbishText() {
