@@ -43,6 +43,18 @@ public class Viewer {
         return -1;
     }
 
+    public static String getTitle(File html) {
+        String title;
+        try {
+            Document doc = Jsoup.parse(html, "UTF-8");
+            title = doc.title();
+        } catch (IOException err) {
+            throw new RuntimeException(err);
+        }
+
+        return title;
+    }
+
 
     public static Document getText(File html) {
         Document doc;
