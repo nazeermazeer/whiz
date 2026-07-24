@@ -43,6 +43,7 @@ public class Main extends ToolkitApp {
                 .mouseCapture(true)
                 .build();
     }
+    public Indexer indexer = new Indexer();
 
     @Override
     protected Element render() {
@@ -69,7 +70,7 @@ public class Main extends ToolkitApp {
                     match = "";
                     content = "";
                     try {
-                        List<SearchResult> results = Indexer.searchTerm(input);
+                        List<SearchResult> results = indexer.searchTerm(input);
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
@@ -88,6 +89,9 @@ public class Main extends ToolkitApp {
                     }   
 
                 });
+    public void indexEntries() throws Exception {
+        indexer.indexEntries();
+    }
 
     public static void main(String[] args) throws Exception {
         System.setProperty("java.awt.headless", "true");
@@ -98,6 +102,7 @@ public class Main extends ToolkitApp {
         logger.setUseParentHandlers(false);
 
         Main main = new Main();
+        main.indexEntries();
 
         main.run();
     }
