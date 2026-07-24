@@ -31,7 +31,6 @@ import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 public class Viewer {
     public record Style(String color, String bgcolor, String display) {}
     private final Map<String, Runnable> actions = new HashMap<>(); 
-    private static volatile List<Style> cachedStyles;
 
     public static int getLine(String text, String search) {
         String[] lines = text.split("\\R");
@@ -66,7 +65,7 @@ public class Viewer {
         return doc;
     }
 
-    public static Document stylizeText(Document doc) {
+    public static Document stylizeText(Document doc, File origin) {
         Document mydoc = doc;
 
 
@@ -103,14 +102,13 @@ public class Viewer {
             webClient.getOptions().setJavaScriptEnabled(true);
             webClient.getOptions().setThrowExceptionOnScriptError(false);
 
-            File file = new File("app/src/main/java/com/example/functions.html");
-            HtmlPage page = webClient.getPage(file.toURI().toURL());
+            HtmlPage page = webClient.getPage(origin.toURI().toURL());
 
             Elements spans = mydoc.select("span");
             // Resolve every span in one browser-script call. Calling
             // executeJavaScript once per span reparses the script and
             // searches the whole HtmlUnit document repeatedly.
-            List<Style> styles = getCachedStyles(page);
+            List<Style> styles = getStyles(page);
 
             for (int i = 0; i < spans.size(); i++) {
                 Element span = spans.get(i);
@@ -129,23 +127,6 @@ public class Viewer {
         }
 
         return mydoc;
-    }
-
-    private static List<Style> getCachedStyles(HtmlPage page) throws IOException {
-        // The viewer currently renders functions.html every time, so its CSS
-        // result is reusable. Avoid rebuilding the browser style information
-        // each time a search result is displayed.
-        List<Style> styles = cachedStyles;
-        if (styles == null) {
-            synchronized (Viewer.class) {
-                styles = cachedStyles;
-                if (styles == null) {
-                    styles = List.copyOf(getStyles(page));
-                    cachedStyles = styles;
-                }
-            }
-        }
-        return styles;
     }
 
     private static List<Style> getStyles(HtmlPage page) throws IOException {
