@@ -24,7 +24,7 @@ import org.jsoup.select.Selector.SelectorParseException;
  * analyzer supports inline styles, style blocks, linked stylesheets, CSS
  * selectors understood by Jsoup, specificity, !important, and inheritance.
  */
-public final class Test {
+public final class Colorizer {
     // Default HTML file whose <style> blocks and linked CSS selectors are
     // loaded and analyzed when no command-line path is supplied.
     private static final String HTML_FILE_PATH =
