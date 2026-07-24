@@ -26,7 +26,11 @@ import org.jsoup.nodes.Document;
 public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState(); 
     private static String title = "functions.html";
-    private static Document vieweddoc = Viewer.stylizeText(Viewer.getText(new File("app/src/main/java/com/example/functions.html")));
+    private static Document vieweddoc = Viewer.stylizeText(
+        Viewer.getText(new File("app/src/main/java/com/example/stdtypes.html")), 
+        new File("app/src/main/java/com/example/stdtypes.html")
+    );
+
     private static String content = vieweddoc.body().wholeText();
     private static String match;
 
@@ -59,8 +63,9 @@ public class Main extends ToolkitApp {
             textInput(searchState)
                 .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
-                    String input = searchState.text();
+                    String input = searchState.text();  
                     Document doc = null;
+                    File newfile = null;
                     match = "";
                     content = "";
                     try {
@@ -68,17 +73,19 @@ public class Main extends ToolkitApp {
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
-                                doc = Viewer.getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));  
+                                newfile = new File("app/src/main/java/com/example/" + String.join(" ", result.location()));
+                                doc = Viewer.getText(newfile);  
                                 title = String.join(" ", result.location());
                             }
                         }
+                        int line = Viewer.getLine(doc.body().wholeText(), String.join(" ", match));
+                        Document newdoc = Viewer.stylizeText(doc, newfile);
+                        browser = viewer.registerActions(browser, newdoc);
+                        browser.markup(newdoc.body().wholeText());
+                        browser.state().scrollToLine(line);
                     } catch (Exception err) {
                         throw new RuntimeException(err);
                     }   
-
-                    int line = Viewer.getLine(doc.body().wholeText(), String.join(" ", match));
-                    browser.markup(Viewer.stylizeText(doc).body().wholeText());
-                    browser.state().scrollToLine(line);
 
                 });
 
