@@ -25,7 +25,7 @@ import org.jsoup.nodes.Document;
 
 public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState(); 
-    private static String title = "functions.html";
+    private static String title = Viewer.getTitle(new File("app/src/main/java/com/example/stdtypes.html"));
     private static Document vieweddoc = Viewer.stylizeText(
         Viewer.getText(new File("app/src/main/java/com/example/stdtypes.html")), 
         new File("app/src/main/java/com/example/stdtypes.html")
@@ -76,7 +76,7 @@ public class Main extends ToolkitApp {
                                 match = result.term()[0];
                                 newfile = new File("app/src/main/java/com/example/" + String.join(" ", result.location()));
                                 doc = Viewer.getText(newfile);  
-                                title = String.join(" ", result.location());
+                                title = Viewer.getTitle(newfile);
                             }
                         }
                         int line = Viewer.getLine(doc.body().wholeText(), String.join(" ", match));
