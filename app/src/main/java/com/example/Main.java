@@ -56,7 +56,7 @@ public class Main extends ToolkitApp {
                     .focusable()
                     .wrapWord()
             ).borderType(BorderType.NONE),
-            panel(searchbar)
+            panel(searchbar).rounded()
         ).borderType(BorderType.NONE);
     }
 
