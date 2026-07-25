@@ -25,8 +25,9 @@ import org.jsoup.nodes.Document;
 
 public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState(); 
-    private static String title = Viewer.getTitle(new File("app/src/main/java/com/example/functions.html"));
-    private static Document vieweddoc = Viewer.stylizeText(Viewer.getText(new File("app/src/main/java/com/example/functions.html")));
+    private static File file = new File("app/src/main/java/com/example/stdtypes.html");
+    private static String title = Viewer.getTitle(file);
+    private static Document vieweddoc = Viewer.stylizeText(Viewer.getText(file));
 
     private static String content = vieweddoc.body().wholeText();
     private static String match;
@@ -63,7 +64,6 @@ public class Main extends ToolkitApp {
                 .onSubmit(() -> {
                     String input = searchState.text();  
                     Document doc = null;
-                    File newfile = null;
                     match = "";
                     content = "";
                     try {
@@ -71,9 +71,9 @@ public class Main extends ToolkitApp {
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
-                                newfile = new File("app/src/main/java/com/example/" + String.join(" ", result.location()));
-                                doc = Viewer.getText(newfile);  
-                                title = Viewer.getTitle(newfile);
+                                file = new File("app/src/main/java/com/example/" + String.join(" ", result.location()));
+                                doc = Viewer.getText(file);  
+                                title = Viewer.getTitle(file);
                             }
                         }
                         int line = Viewer.getLine(doc.body().wholeText(), String.join(" ", match));
