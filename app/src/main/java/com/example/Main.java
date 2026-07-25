@@ -32,7 +32,7 @@ public class Main extends ToolkitApp {
     private static String content = vieweddoc.body().wholeText();
     private static String match;
 
-    private MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), vieweddoc);
+    private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), vieweddoc);
 
     @Override
     protected TuiConfig configure() {
