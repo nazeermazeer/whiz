@@ -30,12 +30,17 @@ public final class Colorizer {
     private static final String HTML_FILE_PATH =
             "app/src/main/java/com/example/functions.html";
 
+    // Matches a CSS color declaration in either a stylesheet rule or an
+    // element's inline style attribute.
     private static final Pattern DECLARATION = Pattern.compile(
             "(?i)(?:^|;)\\s*color\\s*:\\s*([^;]+)");
 
+    // A parsed stylesheet rule, including the information needed for CSS
+    // cascade ordering.
     private record Rule(String selector, String color, boolean important,
                         int specificity, int order) {}
 
+    // The strongest color declaration found for one element so far.
     private record Candidate(String color, boolean important, int specificity,
                              int order) {}
 
@@ -43,7 +48,11 @@ public final class Colorizer {
         // An optional argument can still provide a different HTML file or URL.
         String htmlSource = args.length == 0 ? HTML_FILE_PATH : args[0];
         Document document = loadDocument(htmlSource);
+        // Parse all CSS before processing spans so the same rules can be
+        // reused for every element on the page.
         List<Rule> rules = loadColorRules(document);
+        // Cache only within this analysis run; parent colors may be reused by
+        // many nested spans without persisting data between runs.
         Map<Element, String> resolvedColors = new IdentityHashMap<>();
 
         for (Element span : document.select("span")) {
@@ -55,9 +64,13 @@ public final class Colorizer {
 
     private static Document loadDocument(String source) throws IOException {
         if (source.startsWith("http://") || source.startsWith("https://")) {
+            // Jsoup preserves the page URL as the document base URI, allowing
+            // relative stylesheet links to be resolved later.
             return Jsoup.connect(source).get();
         }
 
+        // A file URI similarly gives Jsoup enough context to resolve local
+        // relative stylesheet paths.
         File file = new File(source).getCanonicalFile();
         return Jsoup.parse(file, StandardCharsets.UTF_8.name(), file.toURI().toString());
     }
@@ -66,10 +79,13 @@ public final class Colorizer {
         List<Rule> rules = new ArrayList<>();
         int order = 0;
 
+        // Inline <style> blocks are part of the document itself.
         for (Element style : document.select("style")) {
             order = addRules(style.data(), rules, order);
         }
 
+        // Load each linked stylesheet and continue the source-order counter so
+        // later rules can override earlier rules with equal specificity.
         for (Element link : document.select("link[rel~=stylesheet][href]")) {
             String stylesheet = link.absUrl("href");
             if (!stylesheet.isBlank()) {
@@ -82,6 +98,7 @@ public final class Colorizer {
 
     private static String readStylesheet(String location) throws IOException {
         if (location.startsWith("http://") || location.startsWith("https://")) {
+            // Fetch remote CSS as text instead of parsing it as HTML.
             return Jsoup.connect(location).ignoreContentType(true).execute().body();
         }
 
@@ -102,6 +119,7 @@ public final class Colorizer {
         String withoutComments = css.replaceAll("(?s)/\\*.*?\\*/", "");
 
         for (String block : withoutComments.split("}")) {
+            // Each block is approximately "selector { declarations }".
             int openingBrace = block.indexOf('{');
             if (openingBrace < 0) {
                 continue;
@@ -114,6 +132,7 @@ public final class Colorizer {
             }
 
             String rawColor = declaration.group(1).trim();
+            // !important participates in the cascade before specificity.
             boolean important = rawColor.toLowerCase().endsWith("!important");
             if (important) {
                 rawColor = rawColor.substring(0, rawColor.length() - 10).trim();
@@ -122,6 +141,8 @@ public final class Colorizer {
             for (String selector : selectorText.split(",")) {
                 selector = selector.trim();
                 if (!selector.isBlank()) {
+                    // CSS groups such as ".keyword, .name" become separate
+                    // rules while retaining their original source order.
                     rules.add(new Rule(selector, normalizeColor(rawColor), important,
                             specificity(selector), order++));
                 }
@@ -133,6 +154,8 @@ public final class Colorizer {
 
     private static String resolveColor(Element element, List<Rule> rules,
                                         Map<Element, String> resolvedColors) {
+        // A span can inherit the already-computed color of its parent, so
+        // reuse that result when the same ancestor is visited repeatedly.
         String cached = resolvedColors.get(element);
         if (cached != null) {
             return cached;
@@ -160,6 +183,8 @@ public final class Colorizer {
         }
 
         String color;
+        // color is inherited by default. Treat inherit and unset the same way
+        // for this text-color-only analyzer.
         if (best == null || best.color().equalsIgnoreCase("inherit")
                 || best.color().equalsIgnoreCase("unset")) {
             color = element.parent() instanceof Element parent
@@ -176,6 +201,7 @@ public final class Colorizer {
     }
 
     private static boolean wins(Rule rule, Candidate current) {
+        // CSS cascade priority: !important, specificity, then source order.
         if (rule.important() != current.important()) {
             return rule.important();
         }
@@ -191,6 +217,8 @@ public final class Colorizer {
     }
 
     private static int specificity(String selector) {
+        // Approximate CSS specificity as (IDs, classes/attributes/pseudo-
+        // classes, elements), represented as 100/10/1 points.
         int ids = count(selector, "#");
         int classes = count(selector, ".") + count(selector, "[")
                 + countPseudoClasses(selector);
@@ -219,6 +247,8 @@ public final class Colorizer {
     }
 
     private static String normalizeColor(String color) {
+        // TamboUI output uses rgb(...), so normalize common CSS color formats
+        // while leaving named colors and unsupported formats unchanged.
         color = color.trim().toLowerCase();
 
         Matcher rgba = Pattern.compile(
@@ -242,10 +272,12 @@ public final class Colorizer {
     }
 
     private static int hex(String value) {
+        // Convert a two-digit hexadecimal color component to decimal.
         return Integer.parseInt(value, 16);
     }
 
     private static String quote(String text) {
+        // Keep span text readable when it contains quotes or backslashes.
         return "\"" + text.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 }
