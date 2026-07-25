@@ -16,6 +16,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 
 import de.vandermeer.asciitable.AsciiTable;
@@ -23,7 +24,7 @@ import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 
 
-public class Viewer {
+public class Viewer { 
     public record Style(String color, String bgcolor, String display) {}
     private final Map<String, Runnable> actions = new HashMap<>(); 
 
@@ -71,6 +72,18 @@ public class Viewer {
             throw new RuntimeException(err);
         } 
 
+        Elements openings = doc.select("*:containsOwn([)");
+        for (Element opening : openings) {
+            opening.before(new TextNode("\\"));
+            opening.unwrap();
+        }
+
+        Elements closings = doc.select("*:containsOwn(])");
+        for (Element closing : closings) {
+            closing.before(new TextNode("\\"));
+            closing.unwrap();
+        }
+
         return doc;
     }
 
@@ -78,21 +91,21 @@ public class Viewer {
         Elements ems = doc.select("em");
         for (Element em : ems) {
             em.before(new TextNode("[italic]"));
-            em.after(new TextNode("[/]"));
+            em.after(new TextNode("[/italic]"));
             em.unwrap();
         }
 
         Elements bs = doc.select("b");
         for (Element b : bs) {
             b.before(new TextNode("[bold]"));
-            b.after(new TextNode("[/]"));   
+            b.after(new TextNode("[/bold]"));   
             b.unwrap();
         }
 
         Elements strongs = doc.select("strong");
         for (Element strong : strongs) {
             strong.before(new TextNode("[bold]"));
-            strong.after(new TextNode("[/]"));   
+            strong.after(new TextNode("[/bold]"));   
             strong.unwrap();
         }
 
@@ -111,7 +124,7 @@ public class Viewer {
                 String rgb = Colorizer.resolveColor(span, color.rules(), color.colors());
                 // String rgb = "rgb(255, 0, 0)";
                 span.before(new TextNode("[" + rgb + "]"));
-                span.after(new TextNode("[/]"));
+                span.after(new TextNode("[/" + rgb + "]"));
                 span.unwrap();
             }
         } catch (Exception err) {
