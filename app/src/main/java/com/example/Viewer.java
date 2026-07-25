@@ -71,6 +71,10 @@ public class Viewer {
             throw new RuntimeException(err);
         } 
 
+        Element section = doc.selectFirst("section");
+        doc.body().empty();
+        doc.body().appendChild(section.clone());
+
         Elements openings = doc.select("*:containsOwn([)");
         for (Element opening : openings) {
             opening.before(new TextNode("\\"));
@@ -86,7 +90,7 @@ public class Viewer {
         return doc;
     }
 
-    public static Document stylizeText(Document doc, File origin) {
+    public static Document stylizeText(Document doc) {
         Elements ems = doc.select("em");
         for (Element em : ems) {
             em.before(new TextNode("[italic]"));
@@ -121,7 +125,6 @@ public class Viewer {
             Elements spans = doc.select("span");
             for (Element span : spans) {
                 String rgb = Colorizer.resolveColor(span, color.rules(), color.colors());
-                // String rgb = "rgb(255, 0, 0)";
                 span.before(new TextNode("[" + rgb + "]"));
                 span.after(new TextNode("[/" + rgb + "]"));
                 span.unwrap();
