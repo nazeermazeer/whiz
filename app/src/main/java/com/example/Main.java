@@ -25,10 +25,10 @@ import org.jsoup.nodes.Document;
 
 public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState(); 
-    private static String title = Viewer.getTitle(new File("app/src/main/java/com/example/stdtypes.html"));
+    private static String title = Viewer.getTitle(new File("app/src/main/java/com/example/functions.html"));
     private static Document vieweddoc = Viewer.stylizeText(
-        Viewer.getText(new File("app/src/main/java/com/example/stdtypes.html")), 
-        new File("app/src/main/java/com/example/stdtypes.html")
+        Viewer.getText(new File("app/src/main/java/com/example/functions.html")), 
+        new File("app/src/main/java/com/example/functions.html")
     );
 
     private static String content = vieweddoc.body().wholeText();
