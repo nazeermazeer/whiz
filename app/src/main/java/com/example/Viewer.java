@@ -76,16 +76,24 @@ public class Viewer {
         doc.body().appendChild(section.clone());
 
         Elements openings = doc.select("*:containsOwn([)");
-        for (Element opening : openings) {
-            opening.before(new TextNode("\\"));
-            opening.unwrap();
-        }
+        openings.forEach(element -> {
+            for (TextNode textNode : element.textNodes()) {
+                String text = textNode.text();
+                if (text.contains("[")) {
+                    textNode.text(text.replace("[", "[["));
+                }
+            }
+        });
 
         Elements closings = doc.select("*:containsOwn(])");
-        for (Element closing : closings) {
-            closing.before(new TextNode("\\"));
-            closing.unwrap();
-        }
+        closings.forEach(element -> {
+            for (TextNode textNode : element.textNodes()) {
+                String text = textNode.text();
+                if (text.contains("]")) {
+                    textNode.text(text.replace("]", "]]"));
+                }
+            }
+        });
 
         return doc;
     }
