@@ -32,8 +32,7 @@ public class Main extends ToolkitApp {
     private static String content = vieweddoc.body().wholeText();
     private static String match;
 
-    private Viewer viewer = new Viewer();
-    private MarkupTextAreaElement browser = viewer.registerActions(markupTextArea(content), vieweddoc);
+    private MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), vieweddoc);
 
     @Override
     protected TuiConfig configure() {
@@ -78,7 +77,7 @@ public class Main extends ToolkitApp {
                         }
                         int line = Viewer.getLine(doc.body().wholeText(), String.join(" ", match));
                         Document newdoc = Viewer.stylizeText(doc);
-                        browser = viewer.registerActions(browser, newdoc);
+                        browser = Viewer.registerActions(browser, newdoc);
                         browser.markup(newdoc.body().wholeText());
                         browser.state().scrollToLine(line);
                     } catch (Exception err) {
