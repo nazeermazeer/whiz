@@ -37,12 +37,14 @@ public final class Colorizer {
 
     // A parsed stylesheet rule, including the information needed for CSS
     // cascade ordering.
-    private record Rule(String selector, String color, boolean important,
+    public record Rule(String selector, String color, boolean important,
                         int specificity, int order) {}
 
     // The strongest color declaration found for one element so far.
     private record Candidate(String color, boolean important, int specificity,
                              int order) {}
+
+    public record ColorOutput(List<Rule> rules, Map<Element, String> colors) {}
 
     public static void main(String[] args) throws Exception {
         // An optional argument can still provide a different HTML file or URL.
@@ -60,6 +62,12 @@ public final class Colorizer {
             System.out.printf("%s text=%s -> %s%n",
                     span.cssSelector(), quote(span.text()), color);
         }
+    }
+
+    public static ColorOutput getColorOutput(Document doc) throws Exception {
+        List<Rule> rules = loadColorRules(doc);
+        Map<Element, String> colors = new IdentityHashMap<>();
+        return new ColorOutput(rules, colors);
     }
 
     private static Document loadDocument(String source) throws IOException {
@@ -152,7 +160,7 @@ public final class Colorizer {
         return order;
     }
 
-    private static String resolveColor(Element element, List<Rule> rules,
+    public static String resolveColor(Element element, List<Rule> rules,
                                         Map<Element, String> resolvedColors) {
         // A span can inherit the already-computed color of its parent, so
         // reuse that result when the same ancestor is visited repeatedly.

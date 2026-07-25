@@ -46,7 +46,7 @@ public class Viewer {
     public static String getTitle(File html) {
         String title;
         try {
-            Document doc = Jsoup.parse(html, "UTF-8");
+            Document doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
             title = doc.title();
         } catch (IOException err) {
             throw new RuntimeException(err);
@@ -60,7 +60,9 @@ public class Viewer {
         Document doc;
 
         try {
-            doc = Jsoup.parse(html, "UTF-8");
+            // Preserve the file URI so Colorizer can resolve relative
+            // stylesheet links such as ../_static/pygments.css.
+            doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
             doc.outputSettings().prettyPrint(false);
 
             Elements tables = doc.select("table");
@@ -78,67 +80,50 @@ public class Viewer {
     }
 
     public static Document stylizeText(Document doc, File origin) {
-        Document mydoc = doc;
-
-
-        Elements ems = mydoc.select("em");
+        Elements ems = doc.select("em");
         for (Element em : ems) {
             em.before(new TextNode("[italic]"));
-            em.after(new TextNode("[/italic]"));
+            em.after(new TextNode("[/]"));
             em.unwrap();
         }
 
-        Elements bs = mydoc.select("b");
+        Elements bs = doc.select("b");
         for (Element b : bs) {
             b.before(new TextNode("[bold]"));
-            b.after(new TextNode("[/bold]"));   
+            b.after(new TextNode("[/]"));   
             b.unwrap();
         }
 
-        Elements strongs = mydoc.select("strong");
+        Elements strongs = doc.select("strong");
         for (Element strong : strongs) {
             strong.before(new TextNode("[bold]"));
-            strong.after(new TextNode("[/bold]"));   
+            strong.after(new TextNode("[/]"));   
             strong.unwrap();
         }
 
-        Elements as = mydoc.select("a");
+        Elements as = doc.select("a");
         for (Element a : as) {
             a.before(new TextNode("[action=" + a.attr("href") + "]"));
             a.after(new TextNode("[/action]"));   
             a.unwrap();
         }
 
-        try (WebClient webClient = new WebClient()) {
-            webClient.getOptions().setCssEnabled(true);
-            webClient.getOptions().setJavaScriptEnabled(true);
-            webClient.getOptions().setThrowExceptionOnScriptError(false);
+        try {
+            Colorizer.ColorOutput color = Colorizer.getColorOutput(doc);
 
-            HtmlPage page = webClient.getPage(origin.toURI().toURL());
-
-            Elements spans = mydoc.select("span");
-            // Resolve every span in one browser-script call. Calling
-            // executeJavaScript once per span reparses the script and
-            // searches the whole HtmlUnit document repeatedly.
-            List<Style> styles = getStyles(page);
-
-            for (int i = 0; i < spans.size(); i++) {
-                Element span = spans.get(i);
-                Style style = i < styles.size()
-                        ? styles.get(i)
-                        : new Style("rgb(0, 0, 0)", "transparent", "inline");
-
-                span.before(new TextNode("[" + style.color + "]"));
-                span.after(new TextNode("[/" + style.color + "]"));   
+            Elements spans = doc.select("span");
+            for (Element span : spans) {
+                String rgb = Colorizer.resolveColor(span, color.rules(), color.colors());
+                // String rgb = "rgb(255, 0, 0)";
+                span.before(new TextNode("[" + rgb + "]"));
+                span.after(new TextNode("[/]"));
                 span.unwrap();
             }
-
-
-        } catch (IOException err) {
+        } catch (Exception err) {
             throw new RuntimeException(err);
         }
 
-        return mydoc;
+        return doc;
     }
 
     private static List<Style> getStyles(HtmlPage page) throws IOException {
