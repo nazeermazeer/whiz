@@ -25,7 +25,7 @@ import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 
 public class Viewer { 
     public record Style(String color, String bgcolor, String display) {}
-    private final Map<String, Runnable> actions = new HashMap<>(); 
+    private static final Map<String, Runnable> actions = new HashMap<>(); 
 
     public static int getLine(String text, String search) {
         String[] lines = text.split("\\R");
@@ -197,7 +197,7 @@ public class Viewer {
         return at.render();
     }
 
-    public MarkupTextAreaElement registerActions(MarkupTextAreaElement element, Document doc) {
+    public static MarkupTextAreaElement registerActions(MarkupTextAreaElement element, Document doc) {
         Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
         Matcher matcher = pattern.matcher(doc.body().wholeText());
 
