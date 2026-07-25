@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,9 +12,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.htmlunit.ScriptResult;
-import org.htmlunit.WebClient;
-import org.htmlunit.html.HtmlPage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -124,32 +119,6 @@ public class Viewer {
         }
 
         return doc;
-    }
-
-    private static List<Style> getStyles(HtmlPage page) throws IOException {
-        // Run one browser script so the result includes styles from external
-        // stylesheets, inherited colors, class selectors, and inline styles.
-        // The result order matches Jsoup's document.select("span") order.
-
-        String script = Files.readString(Path.of("app/src/main/java/com/example/colorizer.js"));
-
-
-        ScriptResult result = page.executeJavaScript(script);
-        // HtmlUnit returns the JavaScript string as one value. Split it back
-        // into the three fields stored by the Style record.
-        String value = String.valueOf(result.getJavaScriptResult());
-        String[] values = value.split("\u001f\u001f", -1);
-        List<Style> styles = new ArrayList<>(values.length);
-
-        for (String styleValue : values) {
-            String[] fields = styleValue.split("\u001f", -1);
-            if (fields.length == 3) {
-                styles.add(new Style(fields[0], fields[1], fields[2]));
-            }
-        }
-
-        return styles;
-
     }
     
     private static String getTableText(Element table) {
