@@ -3,7 +3,6 @@ package com.example;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -25,11 +24,6 @@ import org.jsoup.select.Selector.SelectorParseException;
  * selectors understood by Jsoup, specificity, !important, and inheritance.
  */
 public final class Colorizer {
-    // Default HTML file whose <style> blocks and linked CSS selectors are
-    // loaded and analyzed when no command-line path is supplied.
-    private static final String HTML_FILE_PATH =
-            "app/src/main/java/com/example/functions.html";
-
     // Matches a CSS color declaration in either a stylesheet rule or an
     // element's inline style attribute.
     private static final Pattern DECLARATION = Pattern.compile(
@@ -46,41 +40,10 @@ public final class Colorizer {
 
     public record ColorOutput(List<Rule> rules, Map<Element, String> colors) {}
 
-    public static void main(String[] args) throws Exception {
-        // An optional argument can still provide a different HTML file or URL.
-        String htmlSource = args.length == 0 ? HTML_FILE_PATH : args[0];
-        Document document = loadDocument(htmlSource);
-        // Parse all CSS before processing spans so the same rules can be
-        // reused for every element on the page.
-        List<Rule> rules = loadColorRules(document);
-        // Cache only within this analysis run; parent colors may be reused by
-        // many nested spans without persisting data between runs.
-        Map<Element, String> resolvedColors = new IdentityHashMap<>();
-
-        for (Element span : document.select("span")) {
-            String color = resolveColor(span, rules, resolvedColors);
-            System.out.printf("%s text=%s -> %s%n",
-                    span.cssSelector(), quote(span.text()), color);
-        }
-    }
-
     public static ColorOutput getColorOutput(Document doc) throws Exception {
         List<Rule> rules = loadColorRules(doc);
         Map<Element, String> colors = new IdentityHashMap<>();
         return new ColorOutput(rules, colors);
-    }
-
-    private static Document loadDocument(String source) throws IOException {
-        if (source.startsWith("http://") || source.startsWith("https://")) {
-            // Jsoup preserves the page URL as the document base URI, allowing
-            // relative stylesheet links to be resolved later.
-            return Jsoup.connect(source).get();
-        }
-
-        // A file URI similarly gives Jsoup enough context to resolve local
-        // relative stylesheet paths.
-        File file = new File(source).getCanonicalFile();
-        return Jsoup.parse(file, StandardCharsets.UTF_8.name(), file.toURI().toString());
     }
 
     private static List<Rule> loadColorRules(Document document) throws IOException {
@@ -282,10 +245,5 @@ public final class Colorizer {
     private static int hex(String value) {
         // Convert a two-digit hexadecimal color component to decimal.
         return Integer.parseInt(value, 16);
-    }
-
-    private static String quote(String text) {
-        // Keep span text readable when it contains quotes or backslashes.
-        return "\"" + text.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 }
