@@ -123,6 +123,24 @@ public class Viewer {
             a.unwrap();
         }
 
+        Elements uls = doc.select("ul");
+        for (Element ul : uls) {
+            Elements lis = ul.select("li");
+            for (Element li : lis) {
+                li.before(new TextNode("• "));
+                li.unwrap();
+            }
+        }
+
+        Elements ols = doc.select("ol");
+        for (Element ol : ols) {
+            Elements lis = ol.select("li");
+            for (int i = 0; i < lis.size(); i++) {
+                Element li = lis.get(i);
+                li.before(new TextNode((i + 1) + ". "));
+            }
+        }
+
         try {
             Colorizer.ColorOutput color = Colorizer.getColorOutput(doc);
 
