@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.security.SecureRandom;
+import java.util.Random;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +49,6 @@ public class Viewer {
 
         return title;
     }
-
 
     public static Document getText(File html) {
         Document doc;
@@ -164,7 +163,6 @@ public class Viewer {
 
         for (Element row : table.select("tr")) {
             List<String> cells = new ArrayList<>();
-
             for (Element cell : row.select("th, td")) {
                 int colspan = 1;
                 String colspanValue = cell.attr("colspan");
@@ -207,7 +205,6 @@ public class Viewer {
         }
 
         at.addRule();
-
         return at.render();
     }
 
@@ -233,7 +230,7 @@ public class Viewer {
     }
 
     public static String getRubbishText() {
-        SecureRandom myrandom = new SecureRandom();
+        Random myrandom = new Random();
         List<String> entries = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("app/src/main/java/com/example/rubbish.txt"))) {
@@ -247,8 +244,6 @@ public class Viewer {
 
         int randomIndex = myrandom.nextInt(entries.size());
         String line = entries.get(randomIndex);
-    
-
         return line;
     }
 }

@@ -16,13 +16,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Selector.SelectorParseException;
 
-/**
- * Small CSS color analyzer for an HTML page.
- *
- * It uses Jsoup only: no browser engine or JavaScript runtime is needed. The
- * analyzer supports inline styles, style blocks, linked stylesheets, CSS
- * selectors understood by Jsoup, specificity, !important, and inheritance.
- */
+
 public final class Colorizer {
     // Matches a CSS color declaration in either a stylesheet rule or an
     // element's inline style attribute.
@@ -218,8 +212,6 @@ public final class Colorizer {
     }
 
     private static String normalizeColor(String color) {
-        // TamboUI output uses rgb(...), so normalize common CSS color formats
-        // while leaving named colors and unsupported formats unchanged.
         color = color.trim().toLowerCase();
 
         Matcher rgba = Pattern.compile(

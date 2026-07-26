@@ -27,12 +27,12 @@ public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState(); 
     private static File file = new File("app/src/main/java/com/example/stdtypes.html");
     private static String title = Viewer.getTitle(file);
-    private static Document vieweddoc = Viewer.stylizeText(Viewer.getText(file));
+    private static Document currentdoc = Viewer.stylizeText(Viewer.getText(file));
 
-    private static String content = vieweddoc.body().wholeText();
+    private static String content = currentdoc.body().wholeText();
     private static String match;
 
-    private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), vieweddoc);
+    private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), currentdoc);
 
     @Override
     protected TuiConfig configure() {
@@ -82,17 +82,14 @@ public class Main extends ToolkitApp {
                         browser.state().scrollToLine(line);
                     } catch (Exception err) {
                         throw new RuntimeException(err);
-                    }   
-
+                    }
                 });
+
     public void indexEntries() throws Exception {
         indexer.indexEntries();
     }
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("java.awt.headless", "true");
-        System.setProperty("apple.awt.UIElement", "true");
-
         Logger logger = Logger.getLogger("org.apache.lucene");
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
