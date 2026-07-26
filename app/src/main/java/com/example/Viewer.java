@@ -55,18 +55,8 @@ public class Viewer {
         Document doc;
 
         try {
-            // Preserve the file URI so Colorizer can resolve relative
-            // stylesheet links such as ../_static/pygments.css.
             doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
             doc.outputSettings().prettyPrint(false);
-
-            Elements tables = doc.select("table");
-
-            for (Element table : tables) {
-                String renderedTable = getTableText(table);
-                table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
-            }
-
         } catch (IOException err) {
             throw new RuntimeException(err);
         } 
@@ -94,6 +84,12 @@ public class Viewer {
                 }
             }
         });
+
+        Elements tables = doc.select("table");
+        for (Element table : tables) {
+            String renderedTable = getTableText(table);
+            table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
+        }
 
         return doc;
     }
