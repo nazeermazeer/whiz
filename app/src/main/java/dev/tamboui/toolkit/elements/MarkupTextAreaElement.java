@@ -5,6 +5,10 @@
 package dev.tamboui.toolkit.elements;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Alignment;
@@ -14,10 +18,12 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.RichTextState;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.Tags;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.MarkupParser;
+import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
@@ -83,6 +89,8 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     private MarkupParser.StyleResolver customResolver;
     private Text parsedText;
     private boolean textDirty = true;
+    private final Map<String, Runnable> actions = new HashMap<>();
+    private Rect lastTextContentArea;
 
     // Rendering options
     private Overflow overflow;
@@ -127,6 +135,31 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     public MarkupTextAreaElement markup(String markup) {
         this.markup = markup != null ? markup : "";
         this.textDirty = true;
+        return this;
+    }
+
+    /**
+     * Registers Java code that can be invoked by an {@code [action=...]}
+     * markup tag. The value in the tag is an action name or command string;
+     * it is not evaluated as arbitrary Java source.
+     *
+     * <pre>{@code
+     * markupTextArea("Run [action=print-hello]this[/action]")
+     *     .action("print-hello", () -> System.out.println("Hello"));
+     * }</pre>
+     *
+     * @param name the value used in {@code [action=name]}
+     * @param action code to run when the action is clicked
+     * @return this element for chaining
+     */
+    public MarkupTextAreaElement action(String name, Runnable action) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Action name cannot be blank");
+        }
+        if (action == null) {
+            throw new IllegalArgumentException("Action cannot be null");
+        }
+        actions.put(name, action);
         return this;
     }
 
@@ -463,7 +496,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
 
         // Parse markup with the combined resolver (including context for TCSS)
         MarkupParser.StyleResolver combinedResolver = createCombinedResolver(context);
-        parsedText = MarkupParser.parse(markup, combinedResolver);
+        parsedText = MarkupParser.parse(markupForParser(), combinedResolver);
         textDirty = false;
 
         // Get lines from parsed text
@@ -518,6 +551,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
             );
         }
         visualLineCount = visualLineCount(parsedLines, textContentArea.width());
+        lastTextContentArea = textContentArea;
 
         // Update state with content dimensions
         state.setContentHeight(visualLineCount);
@@ -712,13 +746,78 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     private void ensureTextParsed() {
         if (textDirty || parsedText == null) {
             MarkupParser.StyleResolver resolver = createSimpleResolver();
-            parsedText = MarkupParser.parse(markup, resolver);
+            parsedText = MarkupParser.parse(markupForParser(), resolver);
             textDirty = false;
+        }
+    }
+
+    /** Converts action tags to non-hyperlink style tags understood by MarkupParser. */
+    private String markupForParser() {
+        StringBuilder result = new StringBuilder(markup.length());
+        Deque<String> openActions = new ArrayDeque<>();
+        int position = 0;
+        while (position < markup.length()) {
+            int start = markup.indexOf('[', position);
+            if (start < 0) {
+                result.append(markup, position, markup.length());
+                break;
+            }
+            result.append(markup, position, start);
+
+            int end = markup.indexOf(']', start + 1);
+            if (end < 0) {
+                result.append(markup, start, markup.length());
+                break;
+            }
+
+            String tag = markup.substring(start, end + 1);
+            if (tag.startsWith("[action=") && tag.length() > "[action=]".length()) {
+                String actionName = tag.substring("[action=".length(), tag.length() - 1);
+                String encoded = encodeActionName(actionName);
+                String actionTag = "__action_" + encoded;
+                result.append('[').append(actionTag).append(']');
+                openActions.push(actionTag);
+            } else if (tag.equals("[/action]") && !openActions.isEmpty()) {
+                result.append("[/").append(openActions.pop()).append(']');
+            } else {
+                result.append(tag);
+            }
+            position = end + 1;
+        }
+        return result.toString();
+    }
+
+    /** Encodes an action using only lowercase characters because tag names are lowercased by the parser. */
+    private String encodeActionName(String actionName) {
+        byte[] bytes = actionName.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        StringBuilder encoded = new StringBuilder(bytes.length * 2);
+        for (byte value : bytes) {
+            encoded.append(String.format("%02x", value & 0xff));
+        }
+        return encoded.toString();
+    }
+
+    private String decodeActionName(String encoded) {
+        if ((encoded.length() & 1) != 0) {
+            return null;
+        }
+        byte[] bytes = new byte[encoded.length() / 2];
+        try {
+            for (int i = 0; i < bytes.length; i++) {
+                bytes[i] = (byte) Integer.parseInt(encoded.substring(i * 2, i * 2 + 2), 16);
+            }
+            return new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+        } catch (NumberFormatException ignored) {
+            return null;
         }
     }
 
     private MarkupParser.StyleResolver createSimpleResolver() {
         return tagName -> {
+            Style actionStyle = actionStyle(tagName);
+            if (actionStyle != null) {
+                return actionStyle;
+            }
             if (customResolver != null) {
                 return customResolver.resolve(tagName);
             }
@@ -728,6 +827,11 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
 
     private MarkupParser.StyleResolver createCombinedResolver(RenderContext context) {
         return tagName -> {
+            Style actionStyle = actionStyle(tagName);
+            if (actionStyle != null) {
+                return actionStyle;
+            }
+
             // 1. Check custom resolver
             if (customResolver != null) {
                 Style customStyle = customResolver.resolve(tagName);
@@ -742,6 +846,14 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
                     .map(CssStyleResolver::toStyle)
                     .orElse(null);
         };
+    }
+
+    /** Returns the default visual style for an internal clickable action. */
+    private Style actionStyle(String tagName) {
+        if (tagName != null && tagName.startsWith("__action_")) {
+            return Style.EMPTY.fg(Color.CYAN).underlined();
+        }
+        return null;
     }
 
     @Override
@@ -805,16 +917,59 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
             return result;
         }
 
+        if (event.isClick()) {
+            String actionName = actionAt(event.x(), event.y());
+            Runnable action = actionName == null ? null : actions.get(actionName);
+            if (action != null) {
+                action.run();
+                return EventResult.HANDLED;
+            }
+        }
+
         if (event.kind() == MouseEventKind.SCROLL_UP) {
-            state.scrollUp(3);
+            state.scrollUp(1);
             return EventResult.HANDLED;
         }
 
         if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-            state.scrollDown(3);
+            state.scrollDown(1);
             return EventResult.HANDLED;
         }
 
         return EventResult.UNHANDLED;
     }
+
+    /**
+     * Finds an action under a screen coordinate. This hit test intentionally
+     * works on unwrapped lines; wrapped text needs a visual-row-to-span map.
+     */
+    private String actionAt(int x, int y) {
+        if (lastTextContentArea == null
+                || !lastTextContentArea.contains(x, y)) {
+            return null;
+        }
+
+        int lineIndex = state.scrollRow() + y - lastTextContentArea.top();
+        if (lineIndex < 0 || lineIndex >= parsedText.lines().size()) {
+            return null;
+        }
+
+        int column = lastTextContentArea.left();
+        for (Span span : parsedText.lines().get(lineIndex).spans()) {
+            int width = span.width();
+            if (x >= column && x < column + width) {
+                for (String tag : span.style().extension(Tags.class, Tags.empty()).values()) {
+                    if (tag.startsWith("__action_")) {
+                        String encoded = tag.substring("__action_".length());
+                        return decodeActionName(encoded);
+                    }
+                }
+                return null;
+            }
+            column += width;
+        }
+        return null;
+    }
+
+    
 }

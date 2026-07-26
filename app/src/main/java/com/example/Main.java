@@ -6,189 +6,84 @@ import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Path;
-
-import org.jsoup.nodes.Document;
-import org.jsoup.Jsoup;
-import org.jsoup.select.Elements;
 
 import com.example.Indexer.SearchResult;
 
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.common.ScrollBarPolicy;
+import dev.tamboui.widgets.common.ScrollBarPolicy; 
 
 import dev.tamboui.widgets.input.TextInputState;
 
-import java.io.BufferedReader;
-import java.util.ArrayList;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.vandermeer.asciitable.AsciiTable;
-import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
+import org.jsoup.nodes.Document;
+
 
 public class Main extends ToolkitApp {
-    private static final Path PATH = Path.of("app/src/main/java/com/example/functions.html");
-    private String TEXT = getText(new File("app/src/main/java/com/example/functions.html"));
-    private final TextInputState searchState = new TextInputState();  
+    private static final TextInputState searchState = new TextInputState(); 
+    private static File file = new File("app/src/main/java/com/example/stdtypes.html");
+    private static String title = Viewer.getTitle(file);
+    private static Document currentdoc = Viewer.stylizeText(Viewer.getText(file));
 
+    private static String content = currentdoc.body().wholeText();
+    private static String match;
+
+    private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), currentdoc);
+
+    @Override
+    protected TuiConfig configure() {
+        return TuiConfig.builder()
+                .mouseCapture(true)
+                .build();
+    }
     public Indexer indexer = new Indexer();
 
     @Override
     protected Element render() {
         return panel(
-            PATH.getFileName().toString(),
+            title,
             panel(
-                document
-                    .wrapWord()
+                browser
                     .scrollbar(ScrollBarPolicy.AS_NEEDED)
                     .borderType(BorderType.NONE)
                     .focusable()
+                    .wrapWord()
             ).borderType(BorderType.NONE),
-            panel(searchbar)
+            panel(searchbar).rounded()
         ).borderType(BorderType.NONE);
     }
 
-    private MarkupTextAreaElement document = markupTextArea(TEXT);
-    String match;
-
     private final Element searchbar = 
             textInput(searchState)
-                .placeholder(this.getRubbishText() + "...")
+                .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
-                    String input = searchState.text();
+                    String input = searchState.text();  
+                    Document doc = null;
                     match = "";
-                    TEXT = "";
+                    content = "";
                     try {
                         List<SearchResult> results = indexer.searchTerm(input);
                         for (SearchResult result : results) {
                             if (match == "") { 
                                 match = result.term()[0];
-                                TEXT = getText(new File("app/src/main/java/com/example/" + String.join(" ", result.location())));    
+                                file = new File("app/src/main/java/com/example/" + String.join(" ", result.location()));
+                                doc = Viewer.getText(file);  
+                                title = Viewer.getTitle(file);
                             }
                         }
+                        int line = Viewer.getLine(doc.body().wholeText(), String.join(" ", match));
+                        Document newdoc = Viewer.stylizeText(doc);
+                        browser = Viewer.registerActions(browser, newdoc);
+                        browser.markup(newdoc.body().wholeText());
+                        browser.state().scrollToLine(line);
                     } catch (Exception err) {
                         throw new RuntimeException(err);
-                    }   
-
-                    document.markup(TEXT);
-                    int line = getLine(TEXT, String.join(" ", match));
-                    document.state().scrollToLine(line);
-
-                });
-
-    private static int getLine(String text, String search) {
-        String[] lines = text.split("\\R");
-        for (int i = 0; i < lines.length; i++) {
-            if (lines[i].contains(search)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-
-    public static String getText(File html) {
-        String text;
-
-        try {
-            Document doc = Jsoup.parse(html, "UTF-8");
-            doc.outputSettings().prettyPrint(false);
-
-            Elements tables = doc.select("table");
-
-            for (org.jsoup.nodes.Element table : tables) {
-                String renderedTable = getTableText(table);
-                table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
-            }
-
-
-            text = doc.body().wholeText();
-        } catch (IOException err) {
-            throw new RuntimeException(err);
-        } 
-
-        return text;
-    }
-
-    public static String getTableText(org.jsoup.nodes.Element table) {
-        List<List<String>> rows = new ArrayList<>();
-        int maxColumns = 0;
-
-        for (org.jsoup.nodes.Element row : table.select("tr")) {
-            List<String> cells = new ArrayList<>();
-
-            for (org.jsoup.nodes.Element cell : row.select("th, td")) {
-                int colspan = 1;
-                String colspanValue = cell.attr("colspan");
-                if (!colspanValue.isBlank()) {
-                    try {
-                        colspan = Integer.parseInt(colspanValue);
-                    } catch (NumberFormatException ignored) {
-                        colspan = 1;
                     }
-                }
-
-                String text = cell.wholeText().trim();
-                for (int i = 0; i < colspan; i++) {
-                    cells.add(i == 0 ? text : "");
-                }
-            }
-
-            if (!cells.isEmpty()) {
-                maxColumns = Math.max(maxColumns, cells.size());
-                rows.add(cells);
-            }
-        }
-
-        if (rows.isEmpty()) {
-            return "";
-        }
-
-        for (List<String> row : rows) {
-            while (row.size() < maxColumns) {
-                row.add("");
-            }
-        }
-
-        AsciiTable at = new AsciiTable();
-        at.setTextAlignment(TextAlignment.LEFT);
-
-        for (List<String> row : rows) {
-            at.addRule();
-            at.addRow(((Object[]) row.toArray(new String[0])));
-        }
-
-        at.addRule();
-
-        return at.render();
-    }
-
-    public String getRubbishText() {
-        SecureRandom myrandom = new SecureRandom();
-        List<String> entries = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader("app/src/main/java/com/example/rubbish.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                entries.add(line);
-            }
-        } catch (IOException err) {
-            entries.add("rubbish is not rubbishing");
-        }
-
-        int randomIndex = myrandom.nextInt(entries.size());
-        String line = entries.get(randomIndex);
-    
-
-        return line;
-    }
+                });
 
     public void indexEntries() throws Exception {
         indexer.indexEntries();
@@ -205,4 +100,3 @@ public class Main extends ToolkitApp {
         main.run();
     }
 }
-

@@ -60,6 +60,8 @@ dependencies {
     // ascii table for rendering html tables
     implementation("de.vandermeer:asciitable:0.3.2")
 
+    // css parsing
+    implementation("org.htmlunit:htmlunit:4.13.0")
 }
 
 
@@ -76,6 +78,12 @@ version = "1.0.0"
 
 application {
     mainClass = "com.example.Main"
+    // Pass these at JVM startup. Setting them inside main() can be too late
+    // on macOS because desktop integration may initialize before main().
+    applicationDefaultJvmArgs = listOf(
+        "-Djava.awt.headless=true",
+        "-Dapple.awt.UIElement=true"
+    )
 }
 
 tasks.jar {
@@ -109,6 +117,8 @@ tasks.run {
 
 tasks.withType<JavaExec>().configureEach {
     jvmArgs("--add-modules", "jdk.incubator.vector")
+    // Keep Gradle-launched Java processes headless as well.
+    jvmArgs("-Djava.awt.headless=true", "-Dapple.awt.UIElement=true")
 }
 
 publishing {
