@@ -29,15 +29,26 @@ public class Indexer {
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
     public record SearchResult(String[] location, String[] term, String[] definition) {}
 
+    private List<Definition> entries;
     private IndexResult index;
 
     public void indexEntries() throws Exception {
-        List<Definition> entries = readJSON(Path.of("app/src/main/java/com/example/entries.json").toFile());
+        entries = readJSON(Path.of("app/src/main/java/com/example/entries.json").toFile());
         index = readIndex(entries);
     }
 
     public List<SearchResult> searchTerm (String search) throws Exception {
         return search(search, index.directory, index.analyzer);
+    }
+
+    public List<String> getAnchors(String location) {
+        List<String> anchors = new ArrayList<>();
+        for (Definition entry : entries) {
+            if (entry.getLocation().equals(location)) {
+                anchors.add(entry.getAnchor());
+            }
+        }
+        return anchors;
     }
 
     private List<Definition> readJSON(File filePath) throws IOException {

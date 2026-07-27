@@ -36,16 +36,16 @@ public class Main extends ToolkitApp {
     private static File file = new File("app/src/main/java/com/example/functions.html");
     private static String title = Viewer.getTitle(file);
     private static Document currentdoc = Viewer.stylizeText(Viewer.getText(file));
+    private static List<String> anchors;
 
     private static String content = currentdoc.body().wholeText();
     private static String match;
 
+    public Indexer indexer = new Indexer();
+
     private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), currentdoc);
-    private static ListElement<?> list = list()
-        .add(row(text("*").yellow(), text(" Featured Item")))
-        .add(text("Plain Item"))
-        .highlightColor(Color.CYAN)
-        .autoScroll();
+    private static ListElement<?> list;
+        
 
     @Override
     protected TuiConfig configure() {
@@ -53,14 +53,15 @@ public class Main extends ToolkitApp {
                 .mouseCapture(true)
                 .build();
     }
-    public Indexer indexer = new Indexer();
 
     @Override
     protected Element render() {
         return panel(
             title,
             row(
-                panel(list), 
+                panel(list)
+                    .focusable()
+                    .rounded(), 
                 spacer(1),
                 column(
                     spacer(1),
@@ -108,6 +109,20 @@ public class Main extends ToolkitApp {
         indexer.indexEntries();
     }
 
+    public List<String> getAnchors() {
+        return indexer.getAnchors("functions.html");
+    }
+
+    public static ListElement<?> getSidebarElement(List<String> anchors) {
+        ListElement<?> list = list()
+            .highlightColor(Color.CYAN)
+            .autoScroll();
+        for (String anchor : anchors) {
+            list.add(text(anchor));
+        }
+        return list;
+    }
+
     public static void main(String[] args) throws Exception {
         Logger logger = Logger.getLogger("org.apache.lucene");
         logger.setLevel(Level.OFF);
@@ -115,6 +130,8 @@ public class Main extends ToolkitApp {
 
         Main main = new Main();
         main.indexEntries();
+
+        list = getSidebarElement(main.getAnchors());
 
         main.run();
     }
