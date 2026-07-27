@@ -44,7 +44,6 @@ public class Main extends ToolkitApp {
     private static ListElement list = list()
         .add(row(text("*").yellow(), text(" Featured Item")))
         .add(text("Plain Item"))
-        .add(panel("Nested Panel", text("Content")).rounded())
         .highlightColor(Color.CYAN)
         .autoScroll();
 
@@ -60,15 +59,21 @@ public class Main extends ToolkitApp {
     protected Element render() {
         return panel(
             title,
-            row(list, panel(panel(
-                browser
-                    .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                    .borderType(BorderType.NONE)
-                    .focusable()
-                    .wrapWord()
-            ).borderType(BorderType.NONE),
-            panel(searchbar).rounded()).borderType(BorderType.NONE).fill())
-        ).borderType(BorderType.NONE);
+            row(
+                panel(list), 
+                spacer(1),
+                column(
+                    spacer(1),
+                    browser
+                        .scrollbar(ScrollBarPolicy.AS_NEEDED)
+                        .borderType(BorderType.NONE)
+                        .focusable()
+                        .wrapWord(),
+                    panel(searchbar)
+                        .rounded()
+                ).fill()
+            )
+        ).borderType(BorderType.NONE).fill();
     }
 
     private final Element searchbar = 
