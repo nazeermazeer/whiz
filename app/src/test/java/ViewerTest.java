@@ -11,6 +11,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 import com.example.Viewer;
 
 public class ViewerTest {
+    public static final String table = "┌──────────────────────────────────────────────────────────────────────────────┐"
+                              + "\n" + "│This is a table heading                                                       │"
+                              + "\n" + "├──────────────────────────────────────────────────────────────────────────────┤"
+                              + "\n" + "│This is a table data cell                                                     │"
+                              + "\n" + "└──────────────────────────────────────────────────────────────────────────────┘";
     @Test
     public void testGetTitle_ReturnsValidOutput() {
         File html = new File("src/test/java/sample.html");
@@ -55,4 +60,10 @@ public class ViewerTest {
         assertTrue(doc.body().wholeText().contains("]]"));
     }
 
+    @Test
+    public void testGetText_RendersTable() {
+        File html = new File("src/test/java/sample.html");
+        Document doc = Viewer.getText(html);
+        assertTrue(doc.body().wholeText().replaceAll("\\s+", " ").contains(table.replaceAll("\\s+", " ")));
+    }
 }
