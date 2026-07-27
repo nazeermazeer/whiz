@@ -60,14 +60,14 @@ public class Main extends ToolkitApp {
     protected Element render() {
         return panel(
             title,
-            panel(
+            row(list, panel(panel(
                 browser
                     .scrollbar(ScrollBarPolicy.AS_NEEDED)
                     .borderType(BorderType.NONE)
                     .focusable()
                     .wrapWord()
             ).borderType(BorderType.NONE),
-            panel(searchbar).rounded(), panel(list)
+            panel(searchbar).rounded()).borderType(BorderType.NONE))
         ).borderType(BorderType.NONE);
     }
 
