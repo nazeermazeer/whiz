@@ -24,7 +24,7 @@ import org.jsoup.nodes.Document;
 
 
 public class Main extends ToolkitApp {
-    private static final TextInputState searchState = new TextInputState(); 
+    private static final TextInputState searchState = new TextInputState();
     private static File file = new File("app/src/main/java/com/example/functions.html");
     private static String title = Viewer.getTitle(file);
     private static Document currentdoc = Viewer.stylizeText(Viewer.getText(file));
