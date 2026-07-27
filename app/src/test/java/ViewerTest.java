@@ -1,6 +1,9 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -29,4 +32,27 @@ public class ViewerTest {
         int result = Viewer.getLine(lines, input);
         assertEquals(result, line);
     }
+
+    @Test
+    public void testGetText_RemovesJunk() {
+        File html = new File("src/test/java/sample.html");
+        Document doc = Viewer.getText(html);
+        assertTrue(!doc.body().wholeText().contains("This heading is outside the section"));
+        assertTrue(doc.body().wholeText().contains("This heading is inside the section"));
+    }
+
+    @Test
+    public void testGetText_EscapesOpeningBrackets() {
+        File html = new File("src/test/java/sample.html");
+        Document doc = Viewer.getText(html);
+        assertTrue(doc.body().wholeText().contains("[["));
+    }
+
+    @Test
+    public void testGetText_EscapesClosingBrackets() {
+        File html = new File("src/test/java/sample.html");
+        Document doc = Viewer.getText(html);
+        assertTrue(doc.body().wholeText().contains("]]"));
+    }
+
 }
