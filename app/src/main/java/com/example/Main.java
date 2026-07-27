@@ -2,6 +2,8 @@ package com.example;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 
@@ -9,12 +11,18 @@ import java.io.File;
 
 import com.example.Indexer.SearchResult;
 
+import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.common.ScrollBarPolicy; 
 
 import dev.tamboui.widgets.input.TextInputState;
+import dev.tamboui.widgets.list.ListItem;
+import dev.tamboui.widgets.list.ListState;
+import dev.tamboui.widgets.list.ListWidget;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -33,6 +41,12 @@ public class Main extends ToolkitApp {
     private static String match;
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), currentdoc);
+    private static ListElement list = list()
+        .add(row(text("*").yellow(), text(" Featured Item")))
+        .add(text("Plain Item"))
+        .add(panel("Nested Panel", text("Content")).rounded())
+        .highlightColor(Color.CYAN)
+        .autoScroll();
 
     @Override
     protected TuiConfig configure() {
@@ -53,7 +67,7 @@ public class Main extends ToolkitApp {
                     .focusable()
                     .wrapWord()
             ).borderType(BorderType.NONE),
-            panel(searchbar).rounded()
+            panel(searchbar).rounded(), panel(list)
         ).borderType(BorderType.NONE);
     }
 
