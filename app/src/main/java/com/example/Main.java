@@ -36,7 +36,6 @@ public class Main extends ToolkitApp {
     private static File file = new File("app/src/main/java/com/example/functions.html");
     private static String title = Viewer.getTitle(file);
     private static Document currentdoc = Viewer.stylizeText(Viewer.getText(file));
-    private static List<String> anchors;
 
     private static String content = currentdoc.body().wholeText();
     private static String match;
