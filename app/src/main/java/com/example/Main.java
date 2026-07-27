@@ -41,7 +41,7 @@ public class Main extends ToolkitApp {
     private static String match;
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), currentdoc);
-    private static ListElement list = list()
+    private static ListElement<?> list = list()
         .add(row(text("*").yellow(), text(" Featured Item")))
         .add(text("Plain Item"))
         .highlightColor(Color.CYAN)
