@@ -41,16 +41,6 @@ public class Indexer {
         return search(search, index.directory, index.analyzer);
     }
 
-    public List<String> getAnchors(String location) {
-        List<String> anchors = new ArrayList<>();
-        for (Definition entry : entries) {
-            if (entry.getLocation().equals(location)) {
-                anchors.add(entry.getAnchor());
-            }
-        }
-        return anchors;
-    }
-
     private List<Definition> readJSON(File filePath) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 

@@ -43,7 +43,7 @@ public class Main extends ToolkitApp {
     public Indexer indexer = new Indexer();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), currentdoc);
-    private static ListElement<?> list;
+    private static ListElement<?> list = getSidebarElement(Sidebar.getAnchors(new File("app/src/main/java/com/example/entries.json")));
         
 
     @Override
@@ -108,10 +108,6 @@ public class Main extends ToolkitApp {
         indexer.indexEntries();
     }
 
-    public List<String> getAnchors() {
-        return indexer.getAnchors("functions.html");
-    }
-
     public static ListElement<?> getSidebarElement(List<String> anchors) {
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
@@ -130,7 +126,6 @@ public class Main extends ToolkitApp {
         Main main = new Main();
         main.indexEntries();
 
-        list = getSidebarElement(main.getAnchors());
 
         main.run();
     }
