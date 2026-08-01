@@ -15,6 +15,7 @@ import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -136,6 +137,19 @@ public class Main extends ToolkitApp {
         for (String anchor : anchors) {
             list.add(text(anchor));
         }
+
+        list.onMouseEvent(event -> {
+            if (event.kind() == MouseEventKind.SCROLL_UP) {
+                list.selectPrevious();
+                return EventResult.HANDLED;
+            }
+            if (event.kind() == MouseEventKind.SCROLL_DOWN) {
+                list.selectNext(anchors.size());
+                return EventResult.HANDLED;
+            }
+            return EventResult.UNHANDLED;
+        });
+
         return list;
     }
 
