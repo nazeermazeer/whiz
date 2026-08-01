@@ -44,30 +44,26 @@ public class Main extends ToolkitApp {
     public Indexer indexer = new Indexer();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), currentdoc);
-    private static final List<String> anchors = Sidebar.getAnchors(new File("app/src/main/java/com/example/entries.json"));
-    private static ListElement<?> list = createSidebar();
+    private static ListElement<?> sidebar = createSidebar();
 
     private static ListElement<?> createSidebar() {
-    List<String> anchors = Sidebar.getAnchors(
-        new File("app/src/main/java/com/example/entries.json")
-    );
+        List<String> anchors = Sidebar.getAnchors(new File("app/src/main/java/com/example/entries.json"));
+        ListElement<?> sidebar = getSidebarElement(anchors);
 
-    ListElement<?> sidebar = getSidebarElement(anchors);
+        sidebar.onKeyEvent(event -> {
+            if (!event.isConfirm()) {
+                return EventResult.UNHANDLED;
+            }
 
-    sidebar.onKeyEvent(event -> {
-        if (!event.isConfirm()) {
-            return EventResult.UNHANDLED;
-        }
+            String anchor = anchors.get(sidebar.selected());
+            System.out.println(anchor);
 
-        String anchor = anchors.get(sidebar.selected());
-        System.out.println(anchor);
+            return EventResult.HANDLED;
+        });
 
-        return EventResult.HANDLED;
-    });
-
-    return sidebar;
-}
-        
+        return sidebar;
+    }
+            
 
     @Override
     protected TuiConfig configure() {
@@ -81,7 +77,7 @@ public class Main extends ToolkitApp {
         return panel(
             title,
             row(
-                panel(list)
+                panel(sidebar)
                     .focusable()
                     .rounded(), 
                 spacer(1),
