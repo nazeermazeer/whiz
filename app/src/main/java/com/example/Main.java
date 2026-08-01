@@ -13,6 +13,7 @@ import com.example.Indexer.SearchResult;
 
 import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
@@ -43,7 +44,29 @@ public class Main extends ToolkitApp {
     public Indexer indexer = new Indexer();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), currentdoc);
-    private static ListElement<?> list = getSidebarElement(Sidebar.getAnchors(new File("app/src/main/java/com/example/entries.json")));
+    private static final List<String> anchors = Sidebar.getAnchors(new File("app/src/main/java/com/example/entries.json"));
+    private static ListElement<?> list = createSidebar();
+
+    private static ListElement<?> createSidebar() {
+    List<String> anchors = Sidebar.getAnchors(
+        new File("app/src/main/java/com/example/entries.json")
+    );
+
+    ListElement<?> sidebar = getSidebarElement(anchors);
+
+    sidebar.onKeyEvent(event -> {
+        if (!event.isConfirm()) {
+            return EventResult.UNHANDLED;
+        }
+
+        String anchor = anchors.get(sidebar.selected());
+        System.out.println(anchor);
+
+        return EventResult.HANDLED;
+    });
+
+    return sidebar;
+}
         
 
     @Override
