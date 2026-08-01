@@ -36,7 +36,8 @@ public class Main extends ToolkitApp {
     private static final TextInputState searchState = new TextInputState(); 
     private static File file = new File("app/src/main/java/com/example/functions.html");
     private static String title = Viewer.getTitle(file);
-    private static Document currentdoc = Viewer.stylizeText(Viewer.getText(file));
+    private static Document unstylizeddoc = Viewer.getText(file);
+    private static Document currentdoc = Viewer.stylizeText(unstylizeddoc);
 
     private static String content = currentdoc.body().wholeText();
     private static String match;
@@ -56,7 +57,8 @@ public class Main extends ToolkitApp {
             }
 
             String anchor = anchors.get(sidebar.selected());
-            System.out.println(anchor);
+            int line = Viewer.getLine(unstylizeddoc.body().wholeText(), anchor);
+            browser.state().scrollToLine(line);
 
             return EventResult.HANDLED;
         });
