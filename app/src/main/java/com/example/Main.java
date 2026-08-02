@@ -10,6 +10,7 @@ import dev.tamboui.toolkit.element.Element;
 import java.io.File;
 
 import com.example.Indexer.SearchResult;
+import com.example.Sidebar.Item;
 
 import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
@@ -26,6 +27,7 @@ import dev.tamboui.widgets.list.ListItem;
 import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,17 +51,25 @@ public class Main extends ToolkitApp {
     private static ListElement<?> sidebar = createSidebar();
 
     private static ListElement<?> createSidebar() {
-        List<String> items = Sidebar.getItems(new File("app/src/main/java/com/example/entries.json"));
-        ListElement<?> sidebar = getSidebarElement(items);
+        List<Item> items = Sidebar.getItems(new File("app/src/main/java/com/example/entries.json"));
+        List<String> anchors = new ArrayList<>();
+        for (Item item : items) 
+            anchors.add(item.anchor());
+        ListElement<?> sidebar = getSidebarElement(anchors);
 
         sidebar.onKeyEvent(event -> {
             if (!event.isConfirm()) {
                 return EventResult.UNHANDLED;
             }
 
-            String anchor = items.get(sidebar.selected());
-            int line = Viewer.getLine(unstylizeddoc.body().wholeText(), anchor);
-            browser.state().scrollToLine(line);
+            String anchor = anchors.get(sidebar.selected());
+            String signature = items.stream()
+                .filter(r -> r.anchor().equals(anchor))
+                .map(Item::signature)
+                .findFirst()
+                .orElse(null);
+            int line = Viewer.getLine(unstylizeddoc.body().wholeText(), signature);
+            browser.state().scrollToLine(line);            
 
             return EventResult.HANDLED;
         });
@@ -130,12 +140,12 @@ public class Main extends ToolkitApp {
         indexer.indexEntries();
     }
 
-    public static ListElement<?> getSidebarElement(List<String> items) {
+    public static ListElement<?> getSidebarElement(List<String> anchors) {
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
             .autoScroll();
-        for (String item : items) {
-            list.add(text(item));
+        for (String anchor : anchors) {
+            list.add(text(anchor));
         }
 
         list.onMouseEvent(event -> {
@@ -144,7 +154,7 @@ public class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                list.selectNext(items.size());
+                list.selectNext(anchors.size());
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;

@@ -10,19 +10,21 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Sidebar {
-    public static List<String> getItems(File target) {
+    public record Item(String anchor, String signature) {}
+
+    public static List<Item> getItems(File target) {
         ObjectMapper mapper = new ObjectMapper();
-        List<String> anchors = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
         try {
             List<Definition> entries = mapper.readValue(target, new TypeReference<List<Definition>>(){});
             for (Definition entry : entries) {
-                anchors.add(entry.getAnchor());
+                items.add(new Item(entry.getAnchor(), entry.getSignature().getFirst()));
             }
         } catch (IOException e) {
             throw new RuntimeException();
         
         }
 
-        return anchors;
+        return items;
     }
 }
