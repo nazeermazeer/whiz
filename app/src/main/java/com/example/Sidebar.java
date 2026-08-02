@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Sidebar {
-    public static List<String> getAnchors(File target) {
+    public static List<String> getItems(File target) {
         ObjectMapper mapper = new ObjectMapper();
         List<String> anchors = new ArrayList<>();
         try {

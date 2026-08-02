@@ -49,15 +49,15 @@ public class Main extends ToolkitApp {
     private static ListElement<?> sidebar = createSidebar();
 
     private static ListElement<?> createSidebar() {
-        List<String> anchors = Sidebar.getAnchors(new File("app/src/main/java/com/example/entries.json"));
-        ListElement<?> sidebar = getSidebarElement(anchors);
+        List<String> items = Sidebar.getItems(new File("app/src/main/java/com/example/entries.json"));
+        ListElement<?> sidebar = getSidebarElement(items);
 
         sidebar.onKeyEvent(event -> {
             if (!event.isConfirm()) {
                 return EventResult.UNHANDLED;
             }
 
-            String anchor = anchors.get(sidebar.selected());
+            String anchor = items.get(sidebar.selected());
             int line = Viewer.getLine(unstylizeddoc.body().wholeText(), anchor);
             browser.state().scrollToLine(line);
 
@@ -130,12 +130,12 @@ public class Main extends ToolkitApp {
         indexer.indexEntries();
     }
 
-    public static ListElement<?> getSidebarElement(List<String> anchors) {
+    public static ListElement<?> getSidebarElement(List<String> items) {
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
             .autoScroll();
-        for (String anchor : anchors) {
-            list.add(text(anchor));
+        for (String item : items) {
+            list.add(text(item));
         }
 
         list.onMouseEvent(event -> {
@@ -144,7 +144,7 @@ public class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                list.selectNext(anchors.size());
+                list.selectNext(items.size());
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
