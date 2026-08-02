@@ -113,7 +113,6 @@ public class Main extends ToolkitApp {
                 .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
                     String input = searchState.text();  
-                    Document doc = null;
                     match = "";
                     content = "";
                     try {
@@ -122,15 +121,16 @@ public class Main extends ToolkitApp {
                             if (match == "") { 
                                 match = result.term()[0];
                                 file = new File("app/src/main/java/com/example/" + String.join(" ", result.location()));
-                                doc = Viewer.getText(file);  
+                                unstylizeddoc = Viewer.getText(file);  
                                 title = Viewer.getTitle(file);
                             }
                         }
-                        int line = Viewer.getLine(doc.body().wholeText(), String.join(" ", match));
-                        Document newdoc = Viewer.stylizeText(doc);
-                        browser = Viewer.registerActions(browser, newdoc);
-                        browser.markup(newdoc.body().wholeText());
+                        int line = Viewer.getLine(unstylizeddoc.body().wholeText(), String.join(" ", match));
+                        currentdoc = Viewer.stylizeText(unstylizeddoc);
+                        browser = Viewer.registerActions(browser, currentdoc);
+                        browser.markup(currentdoc.body().wholeText());
                         browser.state().scrollToLine(line);
+                        sidebar = createSidebar();
                     } catch (Exception err) {
                         throw new RuntimeException(err);
                     }
