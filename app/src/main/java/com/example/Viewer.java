@@ -93,7 +93,10 @@ public class Viewer {
         return doc;
     }
 
-    public static Document stylizeText(Document doc) {
+    public static Document stylizeText(Document input) {
+        Document doc = Jsoup.parse(input.outerHtml(), input.baseUri());
+        doc.outputSettings().prettyPrint(false);
+
         Elements ems = doc.select("em");
         for (Element em : ems) {
             em.before(new TextNode("[italic]"));
