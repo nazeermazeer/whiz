@@ -51,7 +51,7 @@ public class Main extends ToolkitApp {
     private static ListElement<?> sidebar = createSidebar();
 
     private static ListElement<?> createSidebar() {
-        List<Item> items = Sidebar.getItems(new File("app/src/main/java/com/example/entries.json"));
+        List<Item> items = Sidebar.getItems(new File("app/src/main/java/com/example/entries.json"), file.getName());
         List<String> anchors = new ArrayList<>();
         for (Item item : items) 
             anchors.add(item.anchor());
