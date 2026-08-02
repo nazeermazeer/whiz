@@ -3,7 +3,6 @@ package com.example;
 import static dev.tamboui.toolkit.Toolkit.*;
 
 import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 
@@ -17,15 +16,10 @@ import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.MouseEventKind;
-import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.common.ScrollBarPolicy; 
 
 import dev.tamboui.widgets.input.TextInputState;
-import dev.tamboui.widgets.list.ListItem;
-import dev.tamboui.widgets.list.ListState;
-import dev.tamboui.widgets.list.ListWidget;
 
 import java.util.ArrayList;
 import java.util.List;
