@@ -69,7 +69,7 @@ public class Main extends ToolkitApp {
                 .findFirst()
                 .orElse(null);
             int line = Viewer.getLine(unstylizeddoc.body().wholeText(), signature);
-            browser.state().scrollToLine(line);            
+            browser.state().scrollToLine(line);
 
             return EventResult.HANDLED;
         });
