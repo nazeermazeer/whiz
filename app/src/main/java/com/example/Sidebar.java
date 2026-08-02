@@ -12,13 +12,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Sidebar {
     public record Item(String anchor, String signature) {}
 
-    public static List<Item> getItems(File target) {
+    public static List<Item> getItems(File target, String filename) {
         ObjectMapper mapper = new ObjectMapper();
         List<Item> items = new ArrayList<>();
         try {
             List<Definition> entries = mapper.readValue(target, new TypeReference<List<Definition>>(){});
             for (Definition entry : entries) {
-                items.add(new Item(entry.getAnchor(), entry.getSignature().getFirst()));
+                if (entry.getLocation().equals(filename))
+                    items.add(new Item(entry.getAnchor(), entry.getSignature().getFirst()));
             }
         } catch (IOException e) {
             throw new RuntimeException();
