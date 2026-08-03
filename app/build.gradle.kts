@@ -32,6 +32,10 @@ repositories {
 dependencies {
     implementation(platform("dev.tamboui:tamboui-bom:0.5.0-SNAPSHOT"))
 
+    // linting and shirt
+    implementation("com.puppycrawl.tools:checkstyle:13.9.0")
+
+
     // For Toolkit DSL (recommended)
     implementation("dev.tamboui:tamboui-toolkit")
 
