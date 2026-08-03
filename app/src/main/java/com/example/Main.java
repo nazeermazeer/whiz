@@ -7,6 +7,8 @@ import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
@@ -112,7 +114,7 @@ public class Main extends ToolkitApp {
                     try {
                         List<SearchResult> results = indexer.searchTerm(input);
                         for (SearchResult result : results) {
-                            if (match == "") { 
+                            if (match.equals("")) { 
                                 match = result.term()[0];
                                 file = new File("app/src/main/java/com/example/" + String.join(" ", result.location()));
                                 unstylizeddoc = Viewer.getText(file);  
@@ -130,8 +132,12 @@ public class Main extends ToolkitApp {
                     }
                 });
 
-    public void indexEntries() throws Exception {
-        indexer.indexEntries();
+    public void indexEntries() {
+        try {
+            indexer.indexEntries();
+        } catch (IOException err) {
+            throw new UncheckedIOException(err);
+        }
     }
 
     public static ListElement<?> getSidebarElement(List<String> anchors) {
