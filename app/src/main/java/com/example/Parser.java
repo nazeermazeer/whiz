@@ -20,13 +20,12 @@ import com.example.model.Definition;
 
 public class Parser {
     private static final String CLASS = "class";
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException{
         ObjectMapper mapper = new ObjectMapper();
         List<Definition> jsonvalues = new ArrayList<>();
 
         for (int file = 1; file <= 2; file++) {
-            try {
-                File html;
+            File html;
                 if (file == 1) {
                     html = new File("app/src/main/java/com/example/functions.html");
                 } else {
@@ -58,7 +57,6 @@ public class Parser {
 
                     anchor = dl.attr("id");
 
-
                     if (dl != null) {
                         for (Element element : dl.children()) {
                             if (element.tagName().equals("dt")) {
@@ -86,16 +84,11 @@ public class Parser {
                     if (!anchor.equals("") && !type.equals(""))
                         jsonvalues.add(new Definition(html.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def));
                 }
-            } catch (IOException err) {
-                throw new UncheckedIOException(err);
-            }
         }
-        try{
 
+        try {
             File outputfile = new File("app/src/main/java/com/example/entries.json");
             mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, jsonvalues);
-
-        
         } catch (IOException err) {
             throw new UncheckedIOException(err);
         } 
