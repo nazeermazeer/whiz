@@ -6,6 +6,8 @@ import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+
 import org.jsoup.select.Elements;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +19,7 @@ import com.example.model.Definition;
 
 
 public class Parser {
+    private static final String CLASS = "class";
     public static void main(String[] args) {
         ObjectMapper mapper = new ObjectMapper();
         List<Definition> jsonvalues = new ArrayList<>();
@@ -45,11 +48,11 @@ public class Parser {
                     String parent = "";
                     List<String> keywords = new ArrayList<>();
 
-                    if (dl.attr("class").equals("py function")) 
+                    if (dl.attr(CLASS).equals("py function")) 
                         type = "function";
-                    else if (dl.attr("class").equals("py class")) {
-                        type = "class";
-                    } else if (dl.attr("class").equals("py method")) {
+                    else if (dl.attr(CLASS).equals("py class")) {
+                        type = CLASS;
+                    } else if (dl.attr(CLASS).equals("py method")) {
                         type = "method";
                     }
 
@@ -84,7 +87,7 @@ public class Parser {
                         jsonvalues.add(new Definition(html.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def));
                 }
             } catch (IOException err) {
-                System.out.println("Cannot read file");
+                throw new UncheckedIOException(err);
             }
         }
         try{
@@ -94,10 +97,9 @@ public class Parser {
 
         
         } catch (IOException err) {
-            System.out.println("cannot read file");
+            throw new UncheckedIOException(err);
         } 
-
-            
+       
         } 
 
     }

@@ -2,6 +2,7 @@ package com.example;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +22,8 @@ public class Sidebar {
                 if (entry.getLocation().equals(filename))
                     items.add(new Item(entry.getAnchor(), entry.getSignature().getFirst()));
             }
-        } catch (IOException e) {
-            throw new RuntimeException();
+        } catch (IOException err) {
+            throw new UncheckedIOException(err);
         
         }
 
