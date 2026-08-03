@@ -2,10 +2,10 @@ package com.example.model;
 
 import java.util.List;
 
-public class Value {
+public final class Value {
     private List<Definition> definitions;
 
-    public Value() {}
+    public Value() { }
 
     public Value(List<Definition> defs) {
         this.definitions = defs;
