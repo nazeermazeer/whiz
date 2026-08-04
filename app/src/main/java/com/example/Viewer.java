@@ -1,9 +1,10 @@
 package com.example;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,12 +48,19 @@ public final class Viewer {
         Random myrandom = new Random();
         List<String> entries = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(
-            new FileReader("app/src/main/java/com/example/rubbish.txt")
-        )) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                entries.add(line);
+        try (InputStream resource = Viewer.class.getClassLoader()
+                .getResourceAsStream("rubbish.txt")) {
+            if (resource == null) {
+                throw new IOException("Classpath resource not found: rubbish.txt");
+            }
+
+            try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(resource, StandardCharsets.UTF_8)
+            )) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    entries.add(line);
+                }
             }
         } catch (IOException err) {
             entries.add("rubbish is not rubbishing");
@@ -114,11 +122,11 @@ public final class Viewer {
         return at.render();
     }
 
-    public static Document getText(File html) {
+    public static Document getText(InputStream html, String baseuri) {
         Document doc;
 
         try {
-            doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
+            doc = Jsoup.parse(html, "UTF-8", baseuri);
             doc.outputSettings().prettyPrint(false);
         } catch (IOException err) {
             throw new RuntimeException(err);
@@ -157,10 +165,10 @@ public final class Viewer {
         return doc;
     }
 
-    public static String getTitle(File html) {
+    public static String getTitle(InputStream html, String baseuri) {
         String title;
         try {
-            Document doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
+            Document doc = Jsoup.parse(html, "UTF-8", baseuri);
             title = doc.title();
         } catch (IOException err) {
             throw new RuntimeException(err);

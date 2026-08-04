@@ -21,7 +21,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.ByteBuffersDirectory;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -107,11 +107,17 @@ public class Indexer {
     private List<Definition> readJSON() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
+        InputStream resource = Indexer.class.getClassLoader()
+            .getResourceAsStream("entries.json");
+        if (resource == null) {
+            throw new IOException("Classpath resource not found: entries.json");
+        }
 
-        return mapper.readValue(
-                Path.of("app/src/main/java/com/example/entries.json").toFile(),
-                new TypeReference<List<Definition>>() { }
-        );
+        try (resource) {
+            return mapper.readValue(
+                resource, new TypeReference<List<Definition>>() { }
+            );
+        }
     }
 
 

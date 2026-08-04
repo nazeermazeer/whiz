@@ -2,7 +2,9 @@ package com.example;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -175,7 +177,9 @@ public final class Colorizer {
             return Files.readString(new File(uri.getPath()).toPath());
         }
 
-        return Files.readString(new File(location).toPath());
+        try (InputStream css = uri.toURL().openStream()) {
+            return new String(css.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
     public static String resolveColor(Element element, List<Rule> rules,

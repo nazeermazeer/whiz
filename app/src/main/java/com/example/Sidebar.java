@@ -2,6 +2,7 @@ package com.example;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public final class Sidebar {
     }
     public record Item(String anchor, String signature) { }
 
-    public static List<Item> getItems(File target, String filename) {
+    public static List<Item> getItems(InputStream target, String filename) {
         ObjectMapper mapper = new ObjectMapper();
         List<Item> items = new ArrayList<>();
         try {

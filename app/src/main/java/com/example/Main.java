@@ -10,9 +10,12 @@ import static dev.tamboui.toolkit.Toolkit.spacer;
 import static dev.tamboui.toolkit.Toolkit.text;
 import static dev.tamboui.toolkit.Toolkit.textInput;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,11 +37,8 @@ import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
     private static final TextInputState SEARCHSTATE = new TextInputState();
-    private static File file = new File(
-        "app/src/main/java/com/example/functions.html"
-    );
-    private static String title = Viewer.getTitle(file);
-    private static Document unstylizeddoc = Viewer.getText(file);
+    private static Document unstylizeddoc = loadDocument("functions.html");
+    private static String title = unstylizeddoc.title();
     private static Document currentdoc = Viewer.stylizeText(unstylizeddoc);
     private static String content = currentdoc.body().wholeText();
     private static String match;
@@ -61,12 +61,9 @@ public final class Main extends ToolkitApp {
                         for (SearchResult result : results) {
                             if (match.equals("")) {
                                 match = result.term()[0];
-                                file = new File(
-                                    "app/src/main/java/com/example/"
-                                    + String.join(" ", result.location())
-                                );
-                                unstylizeddoc = Viewer.getText(file);
-                                title = Viewer.getTitle(file);
+                                String resource = String.join(" ", result.location());
+                                unstylizeddoc = loadDocument(resource);
+                                title = unstylizeddoc.title();
                             }
                         }
                         int line = Viewer.getLine(
@@ -92,10 +89,26 @@ public final class Main extends ToolkitApp {
                 .build();
     }
 
+    private static Document loadDocument(String resource) {
+        URL resourceUrl = Viewer.class.getClassLoader().getResource(resource);
+        if (resourceUrl == null) {
+            throw new IllegalArgumentException("Resource not found: " + resource);
+        }
+
+        try (InputStream html = resourceUrl.openStream()) {
+            URI baseUri = resourceUrl.toURI().resolve("library/" + resource);
+            return Viewer.getText(html, baseUri.toString());
+        } catch (URISyntaxException err) {
+            throw new RuntimeException(err);
+        } catch (IOException err) {
+            throw new UncheckedIOException(err);
+        }
+    }
+
     private static ListElement<?> createSidebar() {
         List<Item> items = Sidebar.getItems(
-            new File("app/src/main/java/com/example/entries.json"),
-            file.getName()
+            Viewer.class.getClassLoader().getResourceAsStream("entries.json"),
+            "functions.html"
         );
         List<String> anchors = new ArrayList<>();
         for (Item item : items) {
