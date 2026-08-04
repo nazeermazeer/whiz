@@ -18,21 +18,79 @@ import org.jsoup.select.Selector.SelectorParseException;
 
 
 public final class Colorizer {
-    // Matches a CSS color declaration in either a stylesheet rule or an
-    // element's inline style attribute.
-    private static final Pattern DECLARATION = Pattern.compile(
-            "(?i)(?:^|;)\\s*color\\s*:\\s*([^;]+)");
+    // The strongest color declaration found for one element so far.
+    private record Candidate(String color, boolean important, int specificity,
+                             int order) { }
+
+    public record ColorOutput(List<Rule> rules, Map<Element, String> colors) { }
 
     // A parsed stylesheet rule, including the information needed for CSS
     // cascade ordering.
     public record Rule(String selector, String color, boolean important,
-                        int specificity, int order) {}
+                        int specificity, int order) { }
 
-    // The strongest color declaration found for one element so far.
-    private record Candidate(String color, boolean important, int specificity,
-                             int order) {}
+    // Matches a CSS color declaration in either a stylesheet rule or an
+    // element's inline style attribute.
+    private static final Pattern DECLARATION = Pattern.compile(
+    "(?i)(?:^|;)\\s*color\\s*:\\s*([^;]+)"
+    );
+    private Colorizer() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
-    public record ColorOutput(List<Rule> rules, Map<Element, String> colors) {}
+    private static int addRules(String css, List<Rule> rules, int order) {
+        // Comments cannot contain declarations and would otherwise confuse
+        // the simple rule parser.
+        String withoutComments = css.replaceAll("(?s)/\\*.*?\\*/", "");
+
+        for (String block : withoutComments.split("}")) {
+            // Each block is approximately "selector { declarations }".
+            int openingBrace = block.indexOf('{');
+            if (openingBrace < 0) {
+                continue;
+            }
+
+            String selectorText = block.substring(0, openingBrace).trim();
+            Matcher declaration = DECLARATION.matcher(
+                block.substring(openingBrace + 1)
+            );
+            if (!declaration.find() || selectorText.startsWith("@")) {
+                continue;
+            }
+
+            String rawColor = declaration.group(1).trim();
+            // !important participates in the cascade before specificity.
+            boolean important = rawColor.toLowerCase().endsWith("!important");
+            if (important) {
+                rawColor = rawColor.substring(0, rawColor.length() - 10).trim();
+            }
+
+            for (String selector : selectorText.split(",")) {
+                selector = selector.trim();
+                if (!selector.isBlank()) {
+                    // CSS groups such as ".keyword, .name" become separate
+                    // rules while retaining their original source order.
+                    rules.add(new Rule(selector, normalizeColor(rawColor),
+                            important, specificity(selector), order++));
+                }
+            }
+        }
+
+        return order;
+    }
+
+    private static int count(String value, String token) {
+        return value.length() - value.replace(token, "").length();
+    }
+
+    private static int countPseudoClasses(String selector) {
+        Matcher matcher = Pattern.compile(":(?!:)[a-zA-Z-]+").matcher(selector);
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+        }
+        return count;
+    }
 
     public static ColorOutput getColorOutput(Document doc) throws Exception {
         List<Rule> rules = loadColorRules(doc);
@@ -40,7 +98,18 @@ public final class Colorizer {
         return new ColorOutput(rules, colors);
     }
 
-    private static List<Rule> loadColorRules(Document document) throws IOException {
+    private static int hex(String value) {
+        // Convert a two-digit hexadecimal color component to decimal.
+        return Integer.parseInt(value, 16);
+    }
+
+    private static String inlineColor(String style) {
+        Matcher matcher = DECLARATION.matcher(style);
+        return matcher.find() ? normalizeColor(matcher.group(1).trim()) : null;
+    }
+
+    private static List<Rule> loadColorRules(Document document)
+     throws IOException {
         List<Rule> rules = new ArrayList<>();
         int order = 0;
 
@@ -61,10 +130,41 @@ public final class Colorizer {
         return rules;
     }
 
+    private static String normalizeColor(String color) {
+        color = color.trim().toLowerCase();
+
+        Matcher rgba = Pattern.compile(
+        "rgba\\(\\s*([0-9.]+)\\s*,\\s*([0-9.]+)\\s*,\\s*([0-9.]+)\\s*,[^)]+\\)"
+        ).matcher(color);
+        if (rgba.matches()) {
+            return "rgb("
+                + rgba.group(1)
+                + ", " + rgba.group(2)
+                + ", " + rgba.group(3)
+                + ")";
+        }
+
+        if (color.matches("#[0-9a-f]{3}")) {
+            return "rgb(" + hex(color.substring(1, 2) + color.substring(1, 2))
+                    + ", " + hex(color.substring(2, 3) + color.substring(2, 3))
+                    + ", " + hex(color.substring(3, 4) + color.substring(3, 4))
+                    + ")";
+        }
+        if (color.matches("#[0-9a-f]{6}")) {
+            return "rgb(" + hex(color.substring(1, 3)) + ", "
+                    + hex(color.substring(3, 5)) + ", "
+                    + hex(color.substring(5, 7)) + ")";
+        }
+        return color;
+    }
+
     private static String readStylesheet(String location) throws IOException {
         if (location.startsWith("http://") || location.startsWith("https://")) {
             // Fetch remote CSS as text instead of parsing it as HTML.
-            return Jsoup.connect(location).ignoreContentType(true).execute().body();
+            return Jsoup.connect(location)
+                .ignoreContentType(true)
+                .execute()
+                .body();
         }
 
         URI uri = URI.create(location);
@@ -76,45 +176,6 @@ public final class Colorizer {
         }
 
         return Files.readString(new File(location).toPath());
-    }
-
-    private static int addRules(String css, List<Rule> rules, int order) {
-        // Comments cannot contain declarations and would otherwise confuse
-        // the simple rule parser.
-        String withoutComments = css.replaceAll("(?s)/\\*.*?\\*/", "");
-
-        for (String block : withoutComments.split("}")) {
-            // Each block is approximately "selector { declarations }".
-            int openingBrace = block.indexOf('{');
-            if (openingBrace < 0) {
-                continue;
-            }
-
-            String selectorText = block.substring(0, openingBrace).trim();
-            Matcher declaration = DECLARATION.matcher(block.substring(openingBrace + 1));
-            if (!declaration.find() || selectorText.startsWith("@")) {
-                continue;
-            }
-
-            String rawColor = declaration.group(1).trim();
-            // !important participates in the cascade before specificity.
-            boolean important = rawColor.toLowerCase().endsWith("!important");
-            if (important) {
-                rawColor = rawColor.substring(0, rawColor.length() - 10).trim();
-            }
-
-            for (String selector : selectorText.split(",")) {
-                selector = selector.trim();
-                if (!selector.isBlank()) {
-                    // CSS groups such as ".keyword, .name" become separate
-                    // rules while retaining their original source order.
-                    rules.add(new Rule(selector, normalizeColor(rawColor), important,
-                            specificity(selector), order++));
-                }
-            }
-        }
-
-        return order;
     }
 
     public static String resolveColor(Element element, List<Rule> rules,
@@ -165,22 +226,6 @@ public final class Colorizer {
         return color;
     }
 
-    private static boolean wins(Rule rule, Candidate current) {
-        // CSS cascade priority: !important, specificity, then source order.
-        if (rule.important() != current.important()) {
-            return rule.important();
-        }
-        if (rule.specificity() != current.specificity()) {
-            return rule.specificity() > current.specificity();
-        }
-        return rule.order() > current.order();
-    }
-
-    private static String inlineColor(String style) {
-        Matcher matcher = DECLARATION.matcher(style);
-        return matcher.find() ? normalizeColor(matcher.group(1).trim()) : null;
-    }
-
     private static int specificity(String selector) {
         // Approximate CSS specificity as (IDs, classes/attributes/pseudo-
         // classes, elements), represented as 100/10/1 points.
@@ -198,44 +243,14 @@ public final class Colorizer {
         return ids * 100 + classes * 10 + elements;
     }
 
-    private static int count(String value, String token) {
-        return value.length() - value.replace(token, "").length();
-    }
-
-    private static int countPseudoClasses(String selector) {
-        Matcher matcher = Pattern.compile(":(?!:)[a-zA-Z-]+").matcher(selector);
-        int count = 0;
-        while (matcher.find()) {
-            count++;
+    private static boolean wins(Rule rule, Candidate current) {
+        // CSS cascade priority: !important, specificity, then source order.
+        if (rule.important() != current.important()) {
+            return rule.important();
         }
-        return count;
-    }
-
-    private static String normalizeColor(String color) {
-        color = color.trim().toLowerCase();
-
-        Matcher rgba = Pattern.compile(
-                "rgba\\(\\s*([0-9.]+)\\s*,\\s*([0-9.]+)\\s*,\\s*([0-9.]+)\\s*,[^)]+\\)")
-                .matcher(color);
-        if (rgba.matches()) {
-            return "rgb(" + rgba.group(1) + ", " + rgba.group(2) + ", " + rgba.group(3) + ")";
+        if (rule.specificity() != current.specificity()) {
+            return rule.specificity() > current.specificity();
         }
-
-        if (color.matches("#[0-9a-f]{3}")) {
-            return "rgb(" + hex(color.substring(1, 2) + color.substring(1, 2))
-                    + ", " + hex(color.substring(2, 3) + color.substring(2, 3))
-                    + ", " + hex(color.substring(3, 4) + color.substring(3, 4)) + ")";
-        }
-        if (color.matches("#[0-9a-f]{6}")) {
-            return "rgb(" + hex(color.substring(1, 3)) + ", "
-                    + hex(color.substring(3, 5)) + ", "
-                    + hex(color.substring(5, 7)) + ")";
-        }
-        return color;
-    }
-
-    private static int hex(String value) {
-        // Convert a two-digit hexadecimal color component to decimal.
-        return Integer.parseInt(value, 16);
+        return rule.order() > current.order();
     }
 }
