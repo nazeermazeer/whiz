@@ -122,7 +122,7 @@ public final class Main extends ToolkitApp {
             return EventResult.HANDLED;
         });
 
-        return sidebar;
+        return newsidebar;
     }
 
     public static ListElement<?> getSidebarElement(List<String> anchors) {
