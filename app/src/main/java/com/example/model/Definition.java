@@ -2,7 +2,7 @@ package com.example.model;
 
 import java.util.List;
 
-public class Definition {
+public final class Definition {
     private String location;
     private String type;
     private String id;
@@ -12,52 +12,61 @@ public class Definition {
     private List<String> signature;
     private String definition;
 
-    public Definition() {}
+    public Definition() { }
 
-    public Definition(String location, String type, String id, String anchor, String parent, List<String> keywords, List<String> signatures, String def) {
-        this.location = location;
-        this.type = type;
-        this.id = id;
-        this.anchor = anchor;
-        this.parent = parent;
-        this.keywords = keywords;
-        this.signature = signatures;
-        this.definition = def;
+    public Definition(
+        String newlocation,
+        String newtype,
+        String newid,
+        String newanchor,
+        String newparent,
+        List<String> newkeywords,
+        List<String> newsignatures,
+        String newdef
+    ) {
+        this.location = newlocation;
+        this.type = newtype;
+        this.id = newid;
+        this.anchor = newanchor;
+        this.parent = newparent;
+        this.keywords = newkeywords;
+        this.signature = newsignatures;
+        this.definition = newdef;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLocation(String newlocation) {
+        this.location = newlocation;
     }
 
-    public void setType(String type){
-        this.type = type;
+    public void setType(String newtype) {
+        this.type = newtype;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(String newid) {
+        this.id = newid;
     }
 
-    public void setAnchor(String anchor) {
-        this.anchor = anchor;
+    public void setAnchor(String newanchor) {
+        this.anchor = newanchor;
     }
 
-    public void setParent(String parent) {
-        this.parent = parent;
+    public void setParent(String newparent) {
+        this.parent = newparent;
     }
 
-    public void setKeywords(List<String> keywords) {
-        this.keywords = keywords;
+    public void setKeywords(List<String> newkeywords) {
+        this.keywords = newkeywords;
     }
 
-    public void setSignature(List<String> signature){
-        this.signature = signature;
+    public void setSignature(List<String> newsignature) {
+        this.signature = newsignature;
     }
 
-    public void setDefinition(String def){
-        this.definition = def;
+    public void setDefinition(String newdef) {
+        this.definition = newdef;
     }
 
-    public String getLocation(){
+    public String getLocation() {
         return this.location;
     }
 
@@ -81,7 +90,7 @@ public class Definition {
         return this.keywords;
     }
 
-    public List<String> getSignature(){
+    public List<String> getSignature() {
         return this.signature;
     }
 
