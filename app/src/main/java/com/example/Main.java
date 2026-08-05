@@ -46,6 +46,7 @@ public final class Main extends ToolkitApp {
         markupTextArea(content), currentdoc
     );
     private static ListElement<?> sidebar = createSidebar();
+    private static ListElement<?> suggestions = list().add(text("Pariatur laborum incididunt id cillum proident ipsum.")).add(text("Consequat nulla esse nostrud."));
 
     private Indexer indexer = new Indexer();
 
@@ -186,6 +187,7 @@ public final class Main extends ToolkitApp {
                         .borderType(BorderType.NONE)
                         .focusable()
                         .wrapWord(),
+                    suggestions.focusable(),
                     panel(searchbar)
                         .rounded()
                 ).fill()
