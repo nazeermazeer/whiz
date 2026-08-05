@@ -167,37 +167,38 @@ public final class Main extends ToolkitApp {
 
         public static ListElement<?> createSuggestions(String suggestion) {
             List<SearchResult> results;
-        ListElement<?> newsuggestions = list();
-        // for (String suggestion : suggestions) {
-        try {
-            results = indexer.searchTerm(suggestion);
-        } catch (org.apache.lucene.queryparser.classic.ParseException err) {
-            results = new ArrayList<>();
-        } catch (IOException err) {
-            throw new RuntimeException(err);
-        }
-        if (results.size() != 0) {
-            newsuggestions.add(text(results.get(0).term()[0]));
-        }
-        // }
-        newsuggestions
-            .highlightColor(Color.CYAN)
-            .scrollbar(ScrollBarPolicy.AS_NEEDED)
-            .autoScroll();
+            ListElement<?> newsuggestions = list();
 
-        newsuggestions.onMouseEvent(event -> {
-            if (event.kind() == MouseEventKind.SCROLL_UP) {
-                newsuggestions.selectPrevious();
-                return EventResult.HANDLED;
+            try {
+                results = indexer.searchTerm(suggestion);
+            } catch (org.apache.lucene.queryparser.classic.ParseException err) {
+                results = new ArrayList<>();
+            } catch (IOException err) {
+                throw new RuntimeException(err);
             }
-            if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                newsuggestions.selectNext(1);
-                return EventResult.HANDLED;
-            }
-            return EventResult.UNHANDLED;
-        });
 
-        return newsuggestions;
+            if (results.size() != 0) {
+                newsuggestions.add(text(results.get(0).term()[0]));
+            }
+            
+            newsuggestions
+                .highlightColor(Color.CYAN)
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
+                .autoScroll();
+
+            newsuggestions.onMouseEvent(event -> {
+                if (event.kind() == MouseEventKind.SCROLL_UP) {
+                    newsuggestions.selectPrevious();
+                    return EventResult.HANDLED;
+                }
+                if (event.kind() == MouseEventKind.SCROLL_DOWN) {
+                    newsuggestions.selectNext(1);
+                    return EventResult.HANDLED;
+                }
+                return EventResult.UNHANDLED;
+            });
+
+            return newsuggestions;
 
     }
 
