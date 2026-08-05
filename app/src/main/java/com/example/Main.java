@@ -111,7 +111,7 @@ public final class Main extends ToolkitApp {
             String anchor = anchors.get(newsidebar.selected());
             String signature = items.stream()
                 .filter(r -> r.anchor().equals(anchor))
-                .map(Item::signature)
+                .map(item -> item.signature())
                 .findFirst()
                 .orElse(null);
             int line = Viewer.getLine(
