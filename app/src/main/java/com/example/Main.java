@@ -46,7 +46,7 @@ public final class Main extends ToolkitApp {
         markupTextArea(content), currentdoc
     );
     private static ListElement<?> sidebar = createSidebar();
-    private static ListElement<?> suggestions = list().add(text("Pariatur laborum incididunt id cillum proident ipsum.")).add(text("Consequat nulla esse nostrud."));
+    private static ListElement<?> suggestions = list().highlightColor(Color.CYAN).add(text("Pariatur laborum incididunt id cillum proident ipsum.")).add(text("Consequat nulla esse nostrud.")).add("Labore nulla eiusmod ullamco culpa officia ex ullamco ea adipisicing esse Lorem.").add("Eiusmod ex ut excepteur sunt duis exercitation aute irure quis do anim laboris aliqua.").add("Eu velit laboris cillum.").add("Eiusmod incididunt magna id ut enim sit nulla nisi esse.").add("Laboris laborum mollit minim ut deserunt est eiusmod laboris consequat veniam ad dolor ea magna laborum.").add("Nulla qui elit mollit.").add("Velit ad qui irure nostrud non id aute ea excepteur ea.").add("Excepteur deserunt aliquip do fugiat nisi labore dolor incididunt dolor.").add("Pariatur reprehenderit Lorem pariatur deserunt voluptate aliqua cillum eu et duis sunt aliquip culpa.").add("Velit aliquip nulla fugiat veniam eu ex sunt quis ad anim cillum qui.").add("Enim ipsum tempor ea ut pariatur excepteur irure sunt.").add("Voluptate laborum commodo non laborum non eu consequat est.").add("Mollit ea eu aliquip aliquip excepteur ad occaecat laborum.").scrollbar(ScrollBarPolicy.AS_NEEDED).autoScroll();
 
     private Indexer indexer = new Indexer();
 
@@ -188,6 +188,7 @@ public final class Main extends ToolkitApp {
                         .focusable()
                         .wrapWord(),
                     panel(suggestions)
+                        .length(10)
                         .rounded()
                         .focusable(),
                     panel(searchbar)
