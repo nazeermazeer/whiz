@@ -45,20 +45,19 @@ public final class Main extends ToolkitApp {
         "app/src/main/java/com/example/functions.html"
     );
     private static String title = Viewer.getTitle(file);
+    private static String query = "";
     private static Document unstylizeddoc = Viewer.getText(file);
     private static Document currentdoc = Viewer.stylizeText(unstylizeddoc);
     private static String content = currentdoc.body().wholeText();
     private static String match;
     private static ListElement<?> sidebar = createSidebar();
     private static ListElement<?> suggestions = createSuggestions();
+    private static Element suggestionsPanel = panel(suggestions).rounded();
     private Indexer indexer = new Indexer();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(
         markupTextArea(content), currentdoc
     );
-
-    private static Element suggestionsPanel = panel(suggestions)
-        .rounded();
 
     private final Element searchbar =
             textInput(SEARCHSTATE)
@@ -162,6 +161,32 @@ public final class Main extends ToolkitApp {
         return list;
     }
 
+        public static ListElement<?> createSuggestions(String suggestion) {
+        ListElement<?> newsuggestions = list();
+        // for (String suggestion : suggestions) {
+            newsuggestions.add(text(suggestion));
+        // }
+        newsuggestions
+            .highlightColor(Color.CYAN)
+            .scrollbar(ScrollBarPolicy.AS_NEEDED)
+            .autoScroll();
+
+        newsuggestions.onMouseEvent(event -> {
+            if (event.kind() == MouseEventKind.SCROLL_UP) {
+                newsuggestions.selectPrevious();
+                return EventResult.HANDLED;
+            }
+            if (event.kind() == MouseEventKind.SCROLL_DOWN) {
+                newsuggestions.selectNext(1);
+                return EventResult.HANDLED;
+            }
+            return EventResult.UNHANDLED;
+        });
+
+        return newsuggestions;
+
+    }
+
     public static ListElement<?> createSuggestions() {
         ListElement<?> newsuggestions = list();
         newsuggestions
@@ -258,6 +283,13 @@ public final class Main extends ToolkitApp {
 
     @Override
     protected Element render() {
+        String currentQuery = SEARCHSTATE.text();
+        if (!currentQuery.equals(query)) {
+            query = currentQuery;
+            suggestions = createSuggestions(query);
+            suggestionsPanel = panel(suggestions).rounded();
+        }
+
         return panel(
             title,
             row(
