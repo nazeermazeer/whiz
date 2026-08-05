@@ -178,9 +178,11 @@ public final class Main extends ToolkitApp {
             }
 
             if (results.size() != 0) {
-                newsuggestions.add(text(results.get(0).term()[0]));
+                for (SearchResult result : results) {
+                    newsuggestions.add(text(result.term()[0]));
+                }
             }
-            
+
             newsuggestions
                 .highlightColor(Color.CYAN)
                 .scrollbar(ScrollBarPolicy.AS_NEEDED)
