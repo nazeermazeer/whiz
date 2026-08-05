@@ -21,8 +21,13 @@ import org.jsoup.nodes.Document;
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
 import dev.tamboui.style.Color;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.toolkit.event.EventResult;
@@ -34,6 +39,8 @@ import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
     private static final TextInputState SEARCHSTATE = new TextInputState();
+    private static final int SUGGESTIONS_ITEM_COUNT = 15;
+    private static final int SUGGESTIONS_HEIGHT = 12;
     private static File file = new File(
         "app/src/main/java/com/example/functions.html"
     );
@@ -44,20 +51,18 @@ public final class Main extends ToolkitApp {
     private static String match;
     private static ListElement<?> sidebar = createSidebar();
     private static ListElement<?> suggestions = createSuggestions();
-    private static boolean showSuggestions = false;
     private Indexer indexer = new Indexer();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(
         markupTextArea(content), currentdoc
-    ).onMouseEvent((event -> {
-        if (event.isClick()) {
-            showSuggestions = false;
-        }
-        return EventResult.UNHANDLED;
-    }));
+    );
+
+    private static Element suggestionsPanel = panel(suggestions)
+        .rounded();
 
     private final Element searchbar =
             textInput(SEARCHSTATE)
+                .id("searchbar")
                 .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
                     String input = SEARCHSTATE.text();
@@ -89,13 +94,7 @@ public final class Main extends ToolkitApp {
                     } catch (Exception err) {
                         throw new RuntimeException(err);
                     }
-                })
-                .onMouseEvent((event -> {
-                    if (event.isClick()) {
-                        showSuggestions = true;
-                    }
-                    return EventResult.UNHANDLED;
-                }));
+                });
 
 
     @Override
@@ -134,13 +133,6 @@ public final class Main extends ToolkitApp {
 
             return EventResult.HANDLED;
         });
-
-        newsidebar.onMouseEvent((event -> {
-            if (event.isClick()) {
-                showSuggestions = false;
-            }
-            return EventResult.UNHANDLED;
-        }));
 
         return newsidebar;
     }
@@ -198,7 +190,7 @@ public final class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                newsuggestions.selectNext(14);
+                newsuggestions.selectNext(SUGGESTIONS_ITEM_COUNT);
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
@@ -206,6 +198,42 @@ public final class Main extends ToolkitApp {
 
         return newsuggestions;
 
+    }
+
+    private Element focusedSuggestions() {
+        return new Element() {
+            private boolean isSearchbarFocused(RenderContext context) {
+                return context != null
+                    && context.isFocused(searchbar.id());
+            }
+
+            @Override
+            public void render(Frame frame, Rect area, RenderContext context) {
+                if (isSearchbarFocused(context)) {
+                    context.renderChild(suggestionsPanel, frame, area);
+                }
+            }
+
+            @Override
+            public Size preferredSize(
+                    int availableWidth,
+                    int availableHeight,
+                    RenderContext context
+            ) {
+                if (!isSearchbarFocused(context)) {
+                    return Size.ZERO;
+                }
+                Size panelSize = suggestionsPanel.preferredSize(
+                    availableWidth, availableHeight, context
+                );
+                return Size.of(panelSize.widthOr(0), SUGGESTIONS_HEIGHT);
+            }
+
+            @Override
+            public Constraint constraint() {
+                return null;
+            }
+        };
     }
 
     public void indexEntries() {
@@ -230,28 +258,6 @@ public final class Main extends ToolkitApp {
 
     @Override
     protected Element render() {
-        if (showSuggestions == false) {
-            return panel(
-            title,
-            row(
-                panel(sidebar)
-                    .focusable()
-                    .rounded(),
-                spacer(1),
-                column(
-                    spacer(1),
-                    browser
-                        .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                        .borderType(BorderType.NONE)
-                        .focusable()
-                        .wrapWord(),
-                    panel(searchbar)
-                        .rounded()
-                ).fill()
-            )
-        ).borderType(BorderType.NONE).fill();
-        }
-
         return panel(
             title,
             row(
@@ -266,10 +272,7 @@ public final class Main extends ToolkitApp {
                         .borderType(BorderType.NONE)
                         .focusable()
                         .wrapWord(),
-                    panel(suggestions)
-                        .length(10)
-                        .rounded()
-                        .focusable(),
+                    focusedSuggestions(),
                     panel(searchbar)
                         .rounded()
                 ).fill()
