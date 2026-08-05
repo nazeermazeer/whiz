@@ -13,10 +13,14 @@ import static dev.tamboui.toolkit.Toolkit.textInput;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.management.RuntimeErrorException;
+
 import org.jsoup.nodes.Document;
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
@@ -53,7 +57,7 @@ public final class Main extends ToolkitApp {
     private static ListElement<?> sidebar = createSidebar();
     private static ListElement<?> suggestions = createSuggestions();
     private static Element suggestionsPanel = panel(suggestions).rounded();
-    private Indexer indexer = new Indexer();
+    private static Indexer indexer = new Indexer();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(
         markupTextArea(content), currentdoc
@@ -162,9 +166,15 @@ public final class Main extends ToolkitApp {
     }
 
         public static ListElement<?> createSuggestions(String suggestion) {
+            List<SearchResult> results;
         ListElement<?> newsuggestions = list();
         // for (String suggestion : suggestions) {
-            newsuggestions.add(text(suggestion));
+        try {
+            results = indexer.searchTerm(suggestion);
+        } catch (org.apache.lucene.queryparser.classic.ParseException | IOException err) {
+            throw new RuntimeException(err);
+        }
+        newsuggestions.add(text(results.get(0).term()[0]));
         // }
         newsuggestions
             .highlightColor(Color.CYAN)
