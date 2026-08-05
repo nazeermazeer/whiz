@@ -171,10 +171,14 @@ public final class Main extends ToolkitApp {
         // for (String suggestion : suggestions) {
         try {
             results = indexer.searchTerm(suggestion);
-        } catch (org.apache.lucene.queryparser.classic.ParseException | IOException err) {
+        } catch (org.apache.lucene.queryparser.classic.ParseException err) {
+            results = new ArrayList<>();
+        } catch (IOException err) {
             throw new RuntimeException(err);
         }
-        newsuggestions.add(text(results.get(0).term()[0]));
+        if (results.size() != 0) {
+            newsuggestions.add(text(results.get(0).term()[0]));
+        }
         // }
         newsuggestions
             .highlightColor(Color.CYAN)
