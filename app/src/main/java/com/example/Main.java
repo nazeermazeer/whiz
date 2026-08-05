@@ -187,7 +187,9 @@ public final class Main extends ToolkitApp {
                         .borderType(BorderType.NONE)
                         .focusable()
                         .wrapWord(),
-                    suggestions.focusable(),
+                    panel(suggestions)
+                        .rounded()
+                        .focusable(),
                     panel(searchbar)
                         .rounded()
                 ).fill()
