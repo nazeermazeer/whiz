@@ -42,13 +42,19 @@ public final class Main extends ToolkitApp {
     private static Document currentdoc = Viewer.stylizeText(unstylizeddoc);
     private static String content = currentdoc.body().wholeText();
     private static String match;
-    private static MarkupTextAreaElement browser = Viewer.registerActions(
-        markupTextArea(content), currentdoc
-    );
     private static ListElement<?> sidebar = createSidebar();
     private static ListElement<?> suggestions = createSuggestions();
-
+    private static boolean showSuggestions = false;
     private Indexer indexer = new Indexer();
+
+    private static MarkupTextAreaElement browser = Viewer.registerActions(
+        markupTextArea(content), currentdoc
+    ).onMouseEvent((event -> {
+        if (event.isClick()) {
+            showSuggestions = false;
+        }
+        return EventResult.UNHANDLED;
+    }));
 
     private final Element searchbar =
             textInput(SEARCHSTATE)
@@ -83,7 +89,13 @@ public final class Main extends ToolkitApp {
                     } catch (Exception err) {
                         throw new RuntimeException(err);
                     }
-                });
+                })
+                .onMouseEvent((event -> {
+                    if (event.isClick()) {
+                        showSuggestions = true;
+                    }
+                    return EventResult.UNHANDLED;
+                }));
 
 
     @Override
@@ -122,6 +134,13 @@ public final class Main extends ToolkitApp {
 
             return EventResult.HANDLED;
         });
+
+        newsidebar.onMouseEvent((event -> {
+            if (event.isClick()) {
+                showSuggestions = false;
+            }
+            return EventResult.UNHANDLED;
+        }));
 
         return newsidebar;
     }
@@ -211,6 +230,28 @@ public final class Main extends ToolkitApp {
 
     @Override
     protected Element render() {
+        if (showSuggestions == false) {
+            return panel(
+            title,
+            row(
+                panel(sidebar)
+                    .focusable()
+                    .rounded(),
+                spacer(1),
+                column(
+                    spacer(1),
+                    browser
+                        .scrollbar(ScrollBarPolicy.AS_NEEDED)
+                        .borderType(BorderType.NONE)
+                        .focusable()
+                        .wrapWord(),
+                    panel(searchbar)
+                        .rounded()
+                ).fill()
+            )
+        ).borderType(BorderType.NONE).fill();
+        }
+
         return panel(
             title,
             row(
