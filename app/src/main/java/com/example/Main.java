@@ -194,7 +194,7 @@ public final class Main extends ToolkitApp {
                     }
                 }
 
-                suggestionsPanelHeight = Math.min(suggestionsCount, 15);
+                suggestionsPanelHeight = Math.min(suggestionsCount + 2, 15);
             }
         }
 
