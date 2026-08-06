@@ -53,6 +53,7 @@ public final class Main extends ToolkitApp {
     private static ListElement<?> suggestions = createSuggestions("");
     private static Element suggestionsPanel = panel(suggestions).rounded();
     private static int suggestionsPanelHeight = 0;
+    private static int suggestionsCount = 0;
     private static Indexer indexer = new Indexer();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(
@@ -166,6 +167,7 @@ public final class Main extends ToolkitApp {
         ListElement<?> newsuggestions = list();
 
         if (query.isBlank()) {
+            suggestionsCount = 0;
             suggestionsPanelHeight = 0;
         } else {
             try {
@@ -176,21 +178,21 @@ public final class Main extends ToolkitApp {
                 throw new RuntimeException(err);
             }
 
-            suggestionsPanelHeight = results.size() + 2;
-            if (suggestionsPanelHeight == 2) {
+            suggestionsCount = 0;
+            if (results.isEmpty()) {
                 newsuggestions.add(text("No results found"));
                 newsuggestions.displayOnly();
+                suggestionsCount = 1;
                 suggestionsPanelHeight = 3;
             } else { 
                 for (SearchResult result : results) {
                     for (String term : result.term()) {
                         newsuggestions.add(text(term));
+                        suggestionsCount++;
                     }
                 }
 
-                if (suggestionsPanelHeight > 15) {
-                    suggestionsPanelHeight = 15;
-                }
+                suggestionsPanelHeight = Math.min(suggestionsCount, 15);
             }
         }
 
@@ -205,7 +207,7 @@ public final class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                newsuggestions.selectNext(suggestionsPanelHeight);
+                newsuggestions.selectNext(suggestionsCount);
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
