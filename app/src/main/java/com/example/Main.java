@@ -176,14 +176,18 @@ public final class Main extends ToolkitApp {
                 throw new RuntimeException(err);
             }
 
-            suggestionsPanelHeight = results.size();
-            if (suggestionsPanelHeight == 0) {
+            suggestionsPanelHeight = results.size() + 2;
+            if (suggestionsPanelHeight == 2) {
                 newsuggestions.add(text("No results found"));
                 newsuggestions.displayOnly();
                 suggestionsPanelHeight = 3;
             } else { 
                 for (SearchResult result : results) {
                     newsuggestions.add(text(result.term()[0]));
+                }
+
+                if (suggestionsPanelHeight > 15) {
+                    suggestionsPanelHeight = 15;
                 }
             }
         }
