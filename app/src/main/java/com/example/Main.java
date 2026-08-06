@@ -165,23 +165,25 @@ public final class Main extends ToolkitApp {
         List<SearchResult> results;
         ListElement<?> newsuggestions = list();
 
-        try {
-            results = indexer.searchTerm(suggestion);
-        } catch (org.apache.lucene.queryparser.classic.ParseException err) {
-            results = new ArrayList<>();
-        } catch (IOException err) {
-            throw new RuntimeException(err);
-        }
+        if (query.isBlank()) {
+            suggestionsPanelHeight = 0;
+        } else {
+            try {
+                results = indexer.searchTerm(suggestion);
+            } catch (org.apache.lucene.queryparser.classic.ParseException err) {
+                results = new ArrayList<>();
+            } catch (IOException err) {
+                throw new RuntimeException(err);
+            }
 
-        suggestionsPanelHeight = results.size();
-        if (suggestionsPanelHeight == 0) {
-            if (!query.isBlank()) {
+            suggestionsPanelHeight = results.size();
+            if (suggestionsPanelHeight == 0) {
                 newsuggestions.add(text("No results found"));
                 suggestionsPanelHeight = 3;
-            }
-        } else { 
-            for (SearchResult result : results) {
-                newsuggestions.add(text(result.term()[0]));
+            } else { 
+                for (SearchResult result : results) {
+                    newsuggestions.add(text(result.term()[0]));
+                }
             }
         }
 
