@@ -183,7 +183,9 @@ public final class Main extends ToolkitApp {
                 suggestionsPanelHeight = 3;
             } else { 
                 for (SearchResult result : results) {
-                    newsuggestions.add(text(result.term()[0]));
+                    for (String term : result.term()) {
+                        newsuggestions.add(text(term));
+                    }
                 }
 
                 if (suggestionsPanelHeight > 15) {
