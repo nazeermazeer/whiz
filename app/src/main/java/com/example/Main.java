@@ -184,9 +184,11 @@ public final class Main extends ToolkitApp {
                 newsuggestions.displayOnly();
                 suggestionsCount = 1;
                 suggestionsPanelHeight = 3;
-            } else { 
-                for (SearchResult result : results) {
-                    for (String term : result.term()) {
+            } else {
+                for (int numresult = results.size() - 1; numresult >= 0; numresult--) {
+                    String[] terms = results.get(numresult).term();
+                    for (int numterm = terms.length - 1; numterm >= 0; numterm--) {
+                        String term = terms[numterm];
                         newsuggestions.add(text(term));
                         suggestionsCount++;
                     }
@@ -199,7 +201,8 @@ public final class Main extends ToolkitApp {
         newsuggestions
             .highlightColor(Color.CYAN)
             .scrollbar(ScrollBarPolicy.AS_NEEDED)
-            .autoScroll();
+            .autoScroll()
+            .selectLast(suggestionsCount);
 
         newsuggestions.onMouseEvent(event -> {
             if (event.kind() == MouseEventKind.SCROLL_UP) {
