@@ -179,6 +179,7 @@ public final class Main extends ToolkitApp {
             suggestionsPanelHeight = results.size();
             if (suggestionsPanelHeight == 0) {
                 newsuggestions.add(text("No results found"));
+                newsuggestions.displayOnly();
                 suggestionsPanelHeight = 3;
             } else { 
                 for (SearchResult result : results) {
