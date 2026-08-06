@@ -13,13 +13,10 @@ import static dev.tamboui.toolkit.Toolkit.textInput;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.management.RuntimeErrorException;
 
 import org.jsoup.nodes.Document;
 import com.example.Indexer.SearchResult;
@@ -53,7 +50,7 @@ public final class Main extends ToolkitApp {
     private static String content = currentdoc.body().wholeText();
     private static String match;
     private static ListElement<?> sidebar = createSidebar();
-    private static ListElement<?> suggestions = createSuggestions();
+    private static ListElement<?> suggestions = createSuggestions("");
     private static Element suggestionsPanel = panel(suggestions).rounded();
     private static int suggestionsPanelHeight = 0;
     private static Indexer indexer = new Indexer();
@@ -164,69 +161,31 @@ public final class Main extends ToolkitApp {
         return list;
     }
 
-        public static ListElement<?> createSuggestions(String suggestion) {
-            List<SearchResult> results;
-            ListElement<?> newsuggestions = list();
-
-            try {
-                results = indexer.searchTerm(suggestion);
-            } catch (org.apache.lucene.queryparser.classic.ParseException err) {
-                results = new ArrayList<>();
-            } catch (IOException err) {
-                throw new RuntimeException(err);
-            }
-
-            suggestionsPanelHeight = results.size();
-            if (suggestionsPanelHeight == 0) {
-                if (!query.isBlank()) {
-                    newsuggestions.add(text("No results found"));
-                    suggestionsPanelHeight = 3;
-                }
-            } else { 
-                for (SearchResult result : results) {
-                    newsuggestions.add(text(result.term()[0]));
-                }
-            }
-
-            newsuggestions
-                .highlightColor(Color.CYAN)
-                .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                .autoScroll();
-
-            newsuggestions.onMouseEvent(event -> {
-                if (event.kind() == MouseEventKind.SCROLL_UP) {
-                    newsuggestions.selectPrevious();
-                    return EventResult.HANDLED;
-                }
-                if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                    newsuggestions.selectNext(suggestionsPanelHeight);
-                    return EventResult.HANDLED;
-                }
-                return EventResult.UNHANDLED;
-            });
-
-            return newsuggestions;
-
-    }
-
-    public static ListElement<?> createSuggestions() {
+    public static ListElement<?> createSuggestions(String suggestion) {
+        List<SearchResult> results;
         ListElement<?> newsuggestions = list();
+
+        try {
+            results = indexer.searchTerm(suggestion);
+        } catch (org.apache.lucene.queryparser.classic.ParseException err) {
+            results = new ArrayList<>();
+        } catch (IOException err) {
+            throw new RuntimeException(err);
+        }
+
+        suggestionsPanelHeight = results.size();
+        if (suggestionsPanelHeight == 0) {
+            if (!query.isBlank()) {
+                newsuggestions.add(text("No results found"));
+                suggestionsPanelHeight = 3;
+            }
+        } else { 
+            for (SearchResult result : results) {
+                newsuggestions.add(text(result.term()[0]));
+            }
+        }
+
         newsuggestions
-            .add(text("Pariatur laborum incididunt id cillum proident ipsum."))
-            .add(text("Consequat nulla esse nostrud."))
-            .add(text("Labore nulla eiusmod ullamco culpa officia ex ullamco ea adipisicing esse Lorem."))
-            .add(text("Eiusmod ex ut excepteur sunt duis exercitation aute irure quis do anim laboris aliqua."))
-            .add(text("Eu velit laboris cillum."))
-            .add(text("Eiusmod incididunt magna id ut enim sit nulla nisi esse."))
-            .add(text("Laboris laborum mollit minim ut deserunt est eiusmod laboris consequat veniam ad dolor ea magna laborum."))
-            .add(text("Nulla qui elit mollit."))
-            .add(text("Velit ad qui irure nostrud non id aute ea excepteur ea."))
-            .add(text("Excepteur deserunt aliquip do fugiat nisi labore dolor incididunt dolor."))
-            .add(text("Pariatur reprehenderit Lorem pariatur deserunt voluptate aliqua cillum eu et duis sunt aliquip culpa."))
-            .add(text("Velit aliquip nulla fugiat veniam eu ex sunt quis ad anim cillum qui."))
-            .add(text("Enim ipsum tempor ea ut pariatur excepteur irure sunt."))
-            .add(text("Voluptate laborum commodo non laborum non eu consequat est."))
-            .add(text("Mollit ea eu aliquip aliquip excepteur ad occaecat laborum."))
             .highlightColor(Color.CYAN)
             .scrollbar(ScrollBarPolicy.AS_NEEDED)
             .autoScroll();
@@ -237,7 +196,7 @@ public final class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                newsuggestions.selectNext(15);
+                newsuggestions.selectNext(suggestionsPanelHeight);
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
@@ -246,6 +205,7 @@ public final class Main extends ToolkitApp {
         return newsuggestions;
 
     }
+
 
     private Element focusedSuggestions() {
         return new Element() {
