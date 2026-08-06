@@ -205,11 +205,11 @@ public final class Main extends ToolkitApp {
             .selectLast(suggestionsCount);
 
         newsuggestions.onMouseEvent(event -> {
-            if (event.kind() == MouseEventKind.SCROLL_UP) {
+            if (event.kind() == MouseEventKind.SCROLL_DOWN) {
                 newsuggestions.selectPrevious();
                 return EventResult.HANDLED;
             }
-            if (event.kind() == MouseEventKind.SCROLL_DOWN) {
+            if (event.kind() == MouseEventKind.SCROLL_UP) {
                 newsuggestions.selectNext(suggestionsCount);
                 return EventResult.HANDLED;
             }
