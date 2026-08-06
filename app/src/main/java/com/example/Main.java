@@ -178,8 +178,10 @@ public final class Main extends ToolkitApp {
 
             suggestionsPanelHeight = results.size();
             if (suggestionsPanelHeight == 0) {
-                newsuggestions.add(text("No results found"));
-                suggestionsPanelHeight = 3;
+                if (!query.isBlank()) {
+                    newsuggestions.add(text("No results found"));
+                    suggestionsPanelHeight = 3;
+                }
             } else { 
                 for (SearchResult result : results) {
                     newsuggestions.add(text(result.term()[0]));
