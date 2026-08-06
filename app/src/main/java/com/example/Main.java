@@ -43,8 +43,6 @@ import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
     private static final TextInputState SEARCHSTATE = new TextInputState();
-    private static final int SUGGESTIONS_ITEM_COUNT = 15;
-    private static final int SUGGESTIONS_HEIGHT = 12;
     private static File file = new File(
         "app/src/main/java/com/example/functions.html"
     );
@@ -57,6 +55,7 @@ public final class Main extends ToolkitApp {
     private static ListElement<?> sidebar = createSidebar();
     private static ListElement<?> suggestions = createSuggestions();
     private static Element suggestionsPanel = panel(suggestions).rounded();
+    private static int suggestionsPanelHeight = 0;
     private static Indexer indexer = new Indexer();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(
@@ -177,7 +176,8 @@ public final class Main extends ToolkitApp {
                 throw new RuntimeException(err);
             }
 
-            if (results.size() != 0) {
+            suggestionsPanelHeight = results.size();
+            if (suggestionsPanelHeight != 0) {
                 for (SearchResult result : results) {
                     newsuggestions.add(text(result.term()[0]));
                 }
@@ -194,7 +194,7 @@ public final class Main extends ToolkitApp {
                     return EventResult.HANDLED;
                 }
                 if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                    newsuggestions.selectNext(1);
+                    newsuggestions.selectNext(suggestionsPanelHeight);
                     return EventResult.HANDLED;
                 }
                 return EventResult.UNHANDLED;
@@ -232,7 +232,7 @@ public final class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                newsuggestions.selectNext(SUGGESTIONS_ITEM_COUNT);
+                newsuggestions.selectNext(15);
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
@@ -268,7 +268,7 @@ public final class Main extends ToolkitApp {
                 Size panelSize = suggestionsPanel.preferredSize(
                     availableWidth, availableHeight, context
                 );
-                return Size.of(panelSize.widthOr(0), SUGGESTIONS_HEIGHT);
+                return Size.of(panelSize.widthOr(0), suggestionsPanelHeight);
             }
 
             @Override
