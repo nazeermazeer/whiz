@@ -1,125 +1,79 @@
 package com.example;
 
-import static dev.tamboui.toolkit.Toolkit.*;
 
+import static dev.tamboui.toolkit.Toolkit.column;
+import static dev.tamboui.toolkit.Toolkit.list;
+import static dev.tamboui.toolkit.Toolkit.markupTextArea;
+import static dev.tamboui.toolkit.Toolkit.panel;
+import static dev.tamboui.toolkit.Toolkit.row;
+import static dev.tamboui.toolkit.Toolkit.spacer;
+import static dev.tamboui.toolkit.Toolkit.text;
+import static dev.tamboui.toolkit.Toolkit.textInput;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jsoup.nodes.Document;
+import com.example.Indexer.SearchResult;
+import com.example.Sidebar.Item;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
-
-import java.io.File;
-
-import com.example.Indexer.SearchResult;
-import com.example.Sidebar.Item;
-
 import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.common.ScrollBarPolicy; 
-
+import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.jsoup.nodes.Document;
-
-
-public class Main extends ToolkitApp {
-    private static final TextInputState searchState = new TextInputState();
-    private static File file = new File("app/src/main/java/com/example/functions.html");
+public final class Main extends ToolkitApp {
+    private static final TextInputState SEARCHSTATE = new TextInputState();
+    private static File file = new File(
+        "app/src/main/java/com/example/functions.html"
+    );
     private static String title = Viewer.getTitle(file);
     private static Document unstylizeddoc = Viewer.getText(file);
     private static Document currentdoc = Viewer.stylizeText(unstylizeddoc);
-
     private static String content = currentdoc.body().wholeText();
     private static String match;
-
-    public Indexer indexer = new Indexer();
-
-    private static MarkupTextAreaElement browser = Viewer.registerActions(markupTextArea(content), currentdoc);
+    private static MarkupTextAreaElement browser = Viewer.registerActions(
+        markupTextArea(content), currentdoc
+    );
     private static ListElement<?> sidebar = createSidebar();
 
-    private static ListElement<?> createSidebar() {
-        List<Item> items = Sidebar.getItems(new File("app/src/main/java/com/example/entries.json"), file.getName());
-        List<String> anchors = new ArrayList<>();
-        for (Item item : items) 
-            anchors.add(item.anchor());
-        ListElement<?> sidebar = getSidebarElement(anchors);
+    private Indexer indexer = new Indexer();
 
-        sidebar.onKeyEvent(event -> {
-            if (!event.isConfirm()) {
-                return EventResult.UNHANDLED;
-            }
-
-            String anchor = anchors.get(sidebar.selected());
-            String signature = items.stream()
-                .filter(r -> r.anchor().equals(anchor))
-                .map(Item::signature)
-                .findFirst()
-                .orElse(null);
-            int line = Viewer.getLine(unstylizeddoc.body().wholeText(), signature);
-            browser.state().scrollToLine(line);
-
-            return EventResult.HANDLED;
-        });
-
-        return sidebar;
-    }
-            
-
-    @Override
-    protected TuiConfig configure() {
-        return TuiConfig.builder()
-                .mouseCapture(true)
-                .build();
-    }
-
-    @Override
-    protected Element render() {
-        return panel(
-            title,
-            row(
-                panel(sidebar)
-                    .focusable()
-                    .rounded(), 
-                spacer(1),
-                column(
-                    spacer(1),
-                    browser
-                        .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                        .borderType(BorderType.NONE)
-                        .focusable()
-                        .wrapWord(),
-                    panel(searchbar)
-                        .rounded()
-                ).fill()
-            )
-        ).borderType(BorderType.NONE).fill();
-    }
-
-    private final Element searchbar = 
-            textInput(searchState)
+    private final Element searchbar =
+            textInput(SEARCHSTATE)
                 .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
-                    String input = searchState.text();  
+                    String input = SEARCHSTATE.text();
                     match = "";
                     content = "";
                     try {
                         List<SearchResult> results = indexer.searchTerm(input);
                         for (SearchResult result : results) {
-                            if (match == "") { 
+                            if (match.equals("")) {
                                 match = result.term()[0];
-                                file = new File("app/src/main/java/com/example/" + String.join(" ", result.location()));
-                                unstylizeddoc = Viewer.getText(file);  
+                                file = new File(
+                                    "app/src/main/java/com/example/"
+                                    + String.join(" ", result.location())
+                                );
+                                unstylizeddoc = Viewer.getText(file);
                                 title = Viewer.getTitle(file);
                             }
                         }
-                        int line = Viewer.getLine(unstylizeddoc.body().wholeText(), String.join(" ", match));
+                        int line = Viewer.getLine(
+                            unstylizeddoc.body().wholeText(),
+                            String.join(" ", match)
+                        );
+
                         currentdoc = Viewer.stylizeText(unstylizeddoc);
                         browser = Viewer.registerActions(browser, currentdoc);
                         browser.markup(currentdoc.body().wholeText());
@@ -130,8 +84,45 @@ public class Main extends ToolkitApp {
                     }
                 });
 
-    public void indexEntries() throws Exception {
-        indexer.indexEntries();
+
+    @Override
+    protected TuiConfig configure() {
+        return TuiConfig.builder()
+                .mouseCapture(true)
+                .build();
+    }
+
+    private static ListElement<?> createSidebar() {
+        List<Item> items = Sidebar.getItems(
+            new File("app/src/main/java/com/example/entries.json"),
+            file.getName()
+        );
+        List<String> anchors = new ArrayList<>();
+        for (Item item : items) {
+            anchors.add(item.anchor());
+        }
+        ListElement<?> newsidebar = getSidebarElement(anchors);
+
+        newsidebar.onKeyEvent(event -> {
+            if (!event.isConfirm()) {
+                return EventResult.UNHANDLED;
+            }
+
+            String anchor = anchors.get(newsidebar.selected());
+            String signature = items.stream()
+                .filter(r -> r.anchor().equals(anchor))
+                .map(item -> item.signature())
+                .findFirst()
+                .orElse(null);
+            int line = Viewer.getLine(
+                unstylizeddoc.body().wholeText(), signature
+            );
+            browser.state().scrollToLine(line);
+
+            return EventResult.HANDLED;
+        });
+
+        return newsidebar;
     }
 
     public static ListElement<?> getSidebarElement(List<String> anchors) {
@@ -139,7 +130,9 @@ public class Main extends ToolkitApp {
             .highlightColor(Color.CYAN)
             .autoScroll();
         for (String anchor : anchors) {
-            list.add(text(anchor));
+            list.add(
+                text(anchor)
+            );
         }
 
         list.onMouseEvent(event -> {
@@ -157,6 +150,14 @@ public class Main extends ToolkitApp {
         return list;
     }
 
+    public void indexEntries() {
+        try {
+            indexer.indexEntries();
+        } catch (IOException err) {
+            throw new UncheckedIOException(err);
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         Logger logger = Logger.getLogger("org.apache.lucene");
         logger.setLevel(Level.OFF);
@@ -167,5 +168,28 @@ public class Main extends ToolkitApp {
 
 
         main.run();
+    }
+
+    @Override
+    protected Element render() {
+        return panel(
+            title,
+            row(
+                panel(sidebar)
+                    .focusable()
+                    .rounded(),
+                spacer(1),
+                column(
+                    spacer(1),
+                    browser
+                        .scrollbar(ScrollBarPolicy.AS_NEEDED)
+                        .borderType(BorderType.NONE)
+                        .focusable()
+                        .wrapWord(),
+                    panel(searchbar)
+                        .rounded()
+                ).fill()
+            )
+        ).borderType(BorderType.NONE).fill();
     }
 }
