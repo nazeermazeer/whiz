@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,6 +56,7 @@ public final class Main extends ToolkitApp {
     private static int suggestionsPanelHeight = 0;
     private static int suggestionsCount = 0;
     private static Indexer indexer = new Indexer();
+    private static List<SearchResult> results = new ArrayList<>();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(
         markupTextArea(content), currentdoc
@@ -69,18 +71,19 @@ public final class Main extends ToolkitApp {
                     match = "";
                     content = "";
                     try {
-                        List<SearchResult> results = indexer.searchTerm(input);
-                        for (SearchResult result : results) {
-                            if (match.equals("")) {
-                                match = result.term()[0];
-                                file = new File(
-                                    "app/src/main/java/com/example/"
-                                    + String.join(" ", result.location())
-                                );
-                                unstylizeddoc = Viewer.getText(file);
-                                title = Viewer.getTitle(file);
-                            }
+                        int selected = suggestions.selected();
+                        SearchResult result = results.get(selected);
+
+                        if (match.equals("")) {
+                            match = result.term()[0];
+                            file = new File(
+                                "app/src/main/java/com/example/"
+                                + String.join(" ", result.location())
+                            );
+                            unstylizeddoc = Viewer.getText(file);
+                            title = Viewer.getTitle(file);
                         }
+                        
                         int line = Viewer.getLine(
                             unstylizeddoc.body().wholeText(),
                             String.join(" ", match)
@@ -163,7 +166,7 @@ public final class Main extends ToolkitApp {
     }
 
     public static ListElement<?> createSuggestions(String suggestion) {
-        List<SearchResult> results;
+        List<SearchResult> newresults = new ArrayList<>();
         ListElement<?> newsuggestions = list();
 
         if (query.isBlank()) {
@@ -172,8 +175,8 @@ public final class Main extends ToolkitApp {
         } else {
             try {
                 results = indexer.searchTerm(suggestion);
+                Collections.reverse(results);
             } catch (org.apache.lucene.queryparser.classic.ParseException err) {
-                results = new ArrayList<>();
             } catch (IOException err) {
                 throw new RuntimeException(err);
             }
@@ -185,8 +188,8 @@ public final class Main extends ToolkitApp {
                 suggestionsCount = 1;
                 suggestionsPanelHeight = 3;
             } else {
-                for (int numresult = results.size() - 1; numresult >= 0; numresult--) {
-                    String[] terms = results.get(numresult).term();
+                for (SearchResult result : results) {
+                    String[] terms = result.term();
                     for (int numterm = terms.length - 1; numterm >= 0; numterm--) {
                         String term = terms[numterm];
                         newsuggestions.add(text(term));
