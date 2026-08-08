@@ -56,7 +56,7 @@ public final class Main extends ToolkitApp {
     private static int suggestionsPanelHeight = 0;
     private static int suggestionsCount = 0;
     private static Indexer indexer = new Indexer();
-    private static List<SearchResult> results = new ArrayList<>();
+    private static List<SearchResult> searchedresults = new ArrayList<>();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(
         markupTextArea(content), currentdoc
@@ -67,23 +67,20 @@ public final class Main extends ToolkitApp {
                 .id("searchbar")
                 .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
-                    String input = SEARCHSTATE.text();
                     match = "";
                     content = "";
                     try {
                         int selected = suggestions.selected();
-                        SearchResult result = results.get(selected);
+                        SearchResult result = searchedresults.get(selected);
 
-                        if (match.equals("")) {
-                            match = result.term()[0];
-                            file = new File(
-                                "app/src/main/java/com/example/"
-                                + String.join(" ", result.location())
-                            );
-                            unstylizeddoc = Viewer.getText(file);
-                            title = Viewer.getTitle(file);
-                        }
-                        
+                        match = result.term()[0];
+                        file = new File(
+                            "app/src/main/java/com/example/"
+                            + String.join(" ", result.location())
+                        );
+                        unstylizeddoc = Viewer.getText(file);
+                        title = Viewer.getTitle(file);
+
                         int line = Viewer.getLine(
                             unstylizeddoc.body().wholeText(),
                             String.join(" ", match)
@@ -166,7 +163,6 @@ public final class Main extends ToolkitApp {
     }
 
     public static ListElement<?> createSuggestions(String suggestion) {
-        List<SearchResult> newresults = new ArrayList<>();
         ListElement<?> newsuggestions = list();
 
         if (query.isBlank()) {
@@ -174,21 +170,21 @@ public final class Main extends ToolkitApp {
             suggestionsPanelHeight = 0;
         } else {
             try {
-                results = indexer.searchTerm(suggestion);
-                Collections.reverse(results);
+                searchedresults = indexer.searchTerm(suggestion);
+                Collections.reverse(searchedresults);
             } catch (org.apache.lucene.queryparser.classic.ParseException err) {
             } catch (IOException err) {
                 throw new RuntimeException(err);
             }
 
             suggestionsCount = 0;
-            if (results.isEmpty()) {
+            if (searchedresults.isEmpty()) {
                 newsuggestions.add(text("No results found"));
                 newsuggestions.displayOnly();
                 suggestionsCount = 1;
                 suggestionsPanelHeight = 3;
             } else {
-                for (SearchResult result : results) {
+                for (SearchResult result : searchedresults) {
                     String[] terms = result.term();
                     for (int numterm = terms.length - 1; numterm >= 0; numterm--) {
                         String term = terms[numterm];
