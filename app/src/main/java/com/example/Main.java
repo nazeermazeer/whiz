@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -171,7 +170,6 @@ public final class Main extends ToolkitApp {
         } else {
             try {
                 searchedresults = indexer.searchTerm(suggestion);
-                Collections.reverse(searchedresults);
             } catch (org.apache.lucene.queryparser.classic.ParseException err) {
             } catch (IOException err) {
                 throw new RuntimeException(err);
@@ -184,12 +182,14 @@ public final class Main extends ToolkitApp {
                 suggestionsCount = 1;
                 suggestionsPanelHeight = 3;
             } else {
-                for (SearchResult result : searchedresults) {
+                for (int numresult = searchedresults.size() - 1; numresult >= 0; numresult--) {
+                    SearchResult result = searchedresults.get(numresult);
                     String[] terms = result.term();
                     for (int numterm = terms.length - 1; numterm >= 0; numterm--) {
                         String term = terms[numterm];
                         newsuggestions.add(text(term));
                         suggestionsCount++;
+                        searchedresults.add(numresult, result);
                     }
                 }
 
