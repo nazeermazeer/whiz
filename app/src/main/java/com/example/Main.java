@@ -57,6 +57,7 @@ public final class Main extends ToolkitApp {
     private static int suggestionsCount = 0;
     private static Indexer indexer = new Indexer();
     private static List<SearchResult> searchedresults = new ArrayList<>();
+    private static List<SearchResult> suggestionResults = new ArrayList<>();
 
     private static MarkupTextAreaElement browser = Viewer.registerActions(
         markupTextArea(content), currentdoc
@@ -71,7 +72,10 @@ public final class Main extends ToolkitApp {
                     content = "";
                     try {
                         int selected = suggestions.selected();
-                        SearchResult result = searchedresults.get(selected);
+                        if (selected < 0 || selected >= suggestionResults.size()) {
+                            return;
+                        }
+                        SearchResult result = suggestionResults.get(selected);
 
                         match = result.term()[0];
                         file = new File(
@@ -164,6 +168,7 @@ public final class Main extends ToolkitApp {
 
     public static ListElement<?> createSuggestions(String suggestion) {
         ListElement<?> newsuggestions = list();
+        suggestionResults = new ArrayList<>();
 
         if (query.isBlank()) {
             suggestionsCount = 0;
@@ -189,6 +194,7 @@ public final class Main extends ToolkitApp {
                     for (int numterm = terms.length - 1; numterm >= 0; numterm--) {
                         String term = terms[numterm];
                         newsuggestions.add(text(term));
+                        suggestionResults.add(result);
                         suggestionsCount++;
                     }
                 }
