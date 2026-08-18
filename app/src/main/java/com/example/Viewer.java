@@ -128,6 +128,12 @@ public final class Viewer {
         doc.body().empty();
         doc.body().appendChild(section.clone());
 
+        for (Element element : doc.body().getAllElements()) {
+            for (TextNode textNode : element.textNodes()) {
+                textNode.text(textNode.getWholeText().replace("¶", ""));
+            }
+        }
+
         Elements openings = doc.select("*:containsOwn([)");
         openings.forEach(element -> {
             for (TextNode textNode : element.textNodes()) {
