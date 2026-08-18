@@ -71,7 +71,7 @@ public final class Parser {
                                 if (!element.attr("id").isBlank()) {
                                     anchor = element.attr("id");
                                 }
-                                terms.add(element.text());
+                                terms.add(element.text().replace("¶", ""));
                             } else if (element.tagName().equals("dd")) {
                                 def = element.text();
                             }
