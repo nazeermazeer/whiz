@@ -63,7 +63,7 @@ public final class Main extends ToolkitApp {
         markupTextArea(content), currentdoc
     );
 
-    private final Element searchbar =
+    private static final Element searchbar =
             textInput(SEARCHSTATE)
                 .id("searchbar")
                 .placeholder(Viewer.getRubbishText() + "...")
@@ -141,7 +141,7 @@ public final class Main extends ToolkitApp {
         return newsidebar;
     }
 
-    public static ListElement<?> getSidebarElement(List<String> anchors) {
+    private static ListElement<?> getSidebarElement(List<String> anchors) {
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
             .autoScroll();
@@ -166,7 +166,7 @@ public final class Main extends ToolkitApp {
         return list;
     }
 
-    public static ListElement<?> createSuggestions(String suggestion) {
+    private static ListElement<?> createSuggestions(String suggestion) {
         ListElement<?> newsuggestions = list();
         suggestionResults = new ArrayList<>();
 
@@ -226,7 +226,7 @@ public final class Main extends ToolkitApp {
     }
 
 
-    private Element focusedSuggestions() {
+    private static Element focusedSuggestions() {
         return new Element() {
             private boolean isSearchbarFocused(RenderContext context) {
                 return context != null
@@ -262,7 +262,7 @@ public final class Main extends ToolkitApp {
         };
     }
 
-    public void indexEntries() {
+    private void indexEntries() {
         try {
             indexer.indexEntries();
         } catch (IOException err) {
