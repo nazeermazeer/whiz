@@ -66,7 +66,7 @@ public class Indexer {
         }
     }
     private static final int MULTIPLER = 31;
-    private static final int NUMRESULTS = 10;
+    private static final int NUMRESULTS = 100;
 
     private IndexResult index;
 
@@ -92,9 +92,20 @@ public class Indexer {
                 for (String term : def.getSignature()) {
                     doc.add(new TextField("term", term, Field.Store.YES));
                 }
-                doc.add(
-                    new TextField("definition", def.getDefinition(), Field.Store.YES)
-                );
+                for (String keyword : def.getKeywords()) {
+                    doc.add(new TextField("keyword", keyword, Field.Store.YES));
+                }
+
+                doc.add(new TextField("definition", def.getDefinition(), Field.Store.YES));
+                doc.add(new StringField("id_exact", def.getId(), Field.Store.YES));
+                doc.add(new TextField("id", def.getId(), Field.Store.YES));
+                doc.add(new StringField("type", def.getType(), Field.Store.YES));
+
+                if (def.getParent() != null) {
+                    doc.add(new StringField("parent_exact", def.getParent(), Field.Store.YES));
+                    doc.add(new TextField("parent", def.getParent(), Field.Store.YES));
+                }
+
                 writer.addDocument(doc);
             }
             writer.commit();
