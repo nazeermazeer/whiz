@@ -40,30 +40,24 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
+    private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
+
     private static final TextInputState SEARCHSTATE = new TextInputState();
-    private static File file = new File(
-        "app/src/main/java/com/example/functions.html"
-    );
+    private static File file = new File("app/src/main/java/com/example/functions.html");
     private static String title = Viewer.getTitle(file);
     private static String query = "";
     private static Document unstylizeddoc = Viewer.getText(file);
     private static Document currentdoc = Viewer.stylizeText(unstylizeddoc);
-    private static String content = currentdoc.body().wholeText();
     private static String match;
     private static ListElement<?> sidebar = createSidebar();
-    private static ListElement<?> suggestions = createSuggestions("");
-    private static Element suggestionsPanel = panel(suggestions).rounded();
-    private static int suggestionsPanelHeight = 0;
-    private static int suggestionsCount = 0;
+    private static SuggestionState suggestions = createSuggestions("");
+    private static Element suggestionsPanel = panel(suggestions.element()).rounded();
     private static Indexer indexer = new Indexer();
-    private static List<SearchResult> searchedresults = new ArrayList<>();
-    private static List<SearchResult> suggestionResults = new ArrayList<>();
 
     private static MarkupTextAreaElement createBrowser(Document document) {
         String content = document.body().wholeText();
         return Viewer.registerActions(markupTextArea(content), document);
     }
-
 
     private static MarkupTextAreaElement browser = createBrowser(currentdoc);
 
@@ -73,13 +67,12 @@ public final class Main extends ToolkitApp {
                 .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
                     match = "";
-                    content = "";
                     try {
-                        int selected = suggestions.selected();
-                        if (selected < 0 || selected >= suggestionResults.size()) {
+                        int selected = suggestions.element().selected();
+                        if (selected < 0 || selected >= suggestions.results().size()) {
                             return;
                         }
-                        SearchResult result = suggestionResults.get(selected);
+                        SearchResult result = suggestions.results().get(selected);
 
                         match = result.term()[0];
                         file = new File(
@@ -170,48 +163,53 @@ public final class Main extends ToolkitApp {
         return list;
     }
 
-    private static ListElement<?> createSuggestions(String suggestion) {
+    private static SuggestionState createSuggestions(String query) {
         ListElement<?> newsuggestions = list();
-        suggestionResults = new ArrayList<>();
+        List<SearchResult> suggestionResults = new ArrayList<>();
+        List<SearchResult> searchedresults = new ArrayList<>();
+        final int resultCount;
 
         if (query.isBlank()) {
-            suggestionsCount = 0;
-            suggestionsPanelHeight = 0;
+            resultCount = 0;
         } else {
             try {
-                searchedresults = indexer.searchTerm(suggestion);
+                searchedresults = indexer.searchTerm(query);
                 Collections.reverse(searchedresults);
             } catch (org.apache.lucene.queryparser.classic.ParseException err) {
             } catch (IOException err) {
                 throw new RuntimeException(err);
             }
 
-            suggestionsCount = 0;
             if (searchedresults.isEmpty()) {
                 newsuggestions.add(text("No results found"));
                 newsuggestions.displayOnly();
-                suggestionsCount = 1;
-                suggestionsPanelHeight = 3;
+                resultCount = 1;
             } else {
                 for (SearchResult result : searchedresults) {
-                    String[] terms = result.term();
-                    for (int numterm = terms.length - 1; numterm >= 0; numterm--) {
-                        String term = terms[numterm];
+                    for (String term : result.term()) {
                         newsuggestions.add(text(term));
                         suggestionResults.add(result);
-                        suggestionsCount++;
                     }
                 }
 
-                suggestionsPanelHeight = Math.min(suggestionsCount + 2, 15);
+                resultCount = suggestionResults.size();
             }
         }
+        int panelHeight;
+        if (resultCount == 0) {
+            panelHeight = 0;
+        } else if (resultCount == 1 && searchedresults.isEmpty()) {
+            panelHeight = 3;
+        } else {
+            panelHeight = Math.min(resultCount + 2, 15);
+        }
+
 
         newsuggestions
             .highlightColor(Color.CYAN)
             .scrollbar(ScrollBarPolicy.AS_NEEDED)
             .autoScroll()
-            .selectLast(suggestionsCount);
+            .selectLast(resultCount);
 
         newsuggestions.onMouseEvent(event -> {
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
@@ -219,18 +217,18 @@ public final class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.SCROLL_UP) {
-                newsuggestions.selectNext(suggestionsCount);
+                newsuggestions.selectNext(resultCount);
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
         });
 
-        return newsuggestions;
+        return new SuggestionState(newsuggestions, suggestionResults, resultCount, panelHeight);
 
     }
 
 
-    private static Element focusedSuggestions() {
+    private static Element focusedSuggestions(int height) {
         return new Element() {
             private boolean isSearchbarFocused(RenderContext context) {
                 return context != null
@@ -256,7 +254,7 @@ public final class Main extends ToolkitApp {
                 Size panelSize = suggestionsPanel.preferredSize(
                     availableWidth, availableHeight, context
                 );
-                return Size.of(panelSize.widthOr(0), suggestionsPanelHeight);
+                return Size.of(panelSize.widthOr(0), height);
             }
 
             @Override
@@ -292,7 +290,7 @@ public final class Main extends ToolkitApp {
         if (!currentQuery.equals(query)) {
             query = currentQuery;
             suggestions = createSuggestions(query);
-            suggestionsPanel = panel(suggestions).rounded();
+            suggestionsPanel = panel(suggestions.element()).rounded();
         }
 
         return panel(
@@ -309,7 +307,7 @@ public final class Main extends ToolkitApp {
                         .borderType(BorderType.NONE)
                         .focusable()
                         .wrapWord(),
-                    focusedSuggestions(),
+                    focusedSuggestions(suggestions.height()),
                     panel(searchbar)
                         .rounded()
                 ).fill()
