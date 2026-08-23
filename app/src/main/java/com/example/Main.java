@@ -40,14 +40,28 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
+    private static final class Page {
+        public final File file;
+        public final String title;
+        public final Document rawdoc;
+        public final Document styleddoc;
+
+        public Page(File file) {
+            this.file = file;
+            this.title = Viewer.getTitle(file);
+            this.rawdoc = Viewer.getText(file);
+            this.styleddoc = Viewer.stylizeText(rawdoc);
+        }
+
+        public String getContent() {
+            return styleddoc.body().wholeText();
+        }
+    }
     private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
 
     private static final TextInputState SEARCHSTATE = new TextInputState();
-    private static File file = new File("app/src/main/java/com/example/functions.html");
-    private static String title = Viewer.getTitle(file);
+    private static Page page = new Page(new File("app/src/main/java/com/example/functions.html"));
     private static String query = "";
-    private static Document unstylizeddoc = Viewer.getText(file);
-    private static Document currentdoc = Viewer.stylizeText(unstylizeddoc);
     private static String match;
     private static ListElement<?> sidebar = createSidebar();
     private static SuggestionState suggestions = createSuggestions("");
@@ -59,7 +73,7 @@ public final class Main extends ToolkitApp {
         return Viewer.registerActions(markupTextArea(content), document);
     }
 
-    private static MarkupTextAreaElement browser = createBrowser(currentdoc);
+    private static MarkupTextAreaElement browser = createBrowser(page.styleddoc);
 
     private static final Element searchbar =
             textInput(SEARCHSTATE)
@@ -75,21 +89,19 @@ public final class Main extends ToolkitApp {
                         SearchResult result = suggestions.results().get(selected);
 
                         match = result.term()[0];
-                        file = new File(
+                        File file = new File(
                             "app/src/main/java/com/example/"
                             + String.join(" ", result.location())
                         );
-                        unstylizeddoc = Viewer.getText(file);
-                        title = Viewer.getTitle(file);
 
                         int line = Viewer.getLine(
-                            unstylizeddoc.body().wholeText(),
+                            page.rawdoc.body().wholeText(),
                             String.join(" ", match)
                         );
 
-                        currentdoc = Viewer.stylizeText(unstylizeddoc);
-                        browser = Viewer.registerActions(browser, currentdoc);
-                        browser.markup(currentdoc.body().wholeText());
+                        page = new Page(file);
+                        browser = Viewer.registerActions(browser, page.styleddoc);
+                        browser.markup(page.getContent());
                         browser.state().scrollToLine(line);
                         sidebar = createSidebar();
                     } catch (Exception err) {
@@ -108,7 +120,7 @@ public final class Main extends ToolkitApp {
     private static ListElement<?> createSidebar() {
         List<Item> items = Sidebar.getItems(
             new File("app/src/main/java/com/example/entries.json"),
-            file.getName()
+            page.file.getName()
         );
         List<String> anchors = new ArrayList<>();
         for (Item item : items) {
@@ -128,7 +140,7 @@ public final class Main extends ToolkitApp {
                 .findFirst()
                 .orElse(null);
             int line = Viewer.getLine(
-                unstylizeddoc.body().wholeText(), signature
+                page.rawdoc.body().wholeText(), signature
             );
             browser.state().scrollToLine(line);
 
@@ -294,7 +306,7 @@ public final class Main extends ToolkitApp {
         }
 
         return panel(
-            title,
+            page.title,
             row(
                 panel(sidebar)
                     .focusable()
