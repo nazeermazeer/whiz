@@ -59,9 +59,13 @@ public final class Main extends ToolkitApp {
     private static List<SearchResult> searchedresults = new ArrayList<>();
     private static List<SearchResult> suggestionResults = new ArrayList<>();
 
-    private static MarkupTextAreaElement browser = Viewer.registerActions(
-        markupTextArea(content), currentdoc
-    );
+    private static MarkupTextAreaElement createBrowser(Document document) {
+        String content = document.body().wholeText();
+        return Viewer.registerActions(markupTextArea(content), document);
+    }
+
+
+    private static MarkupTextAreaElement browser = createBrowser(currentdoc);
 
     private static final Element searchbar =
             textInput(SEARCHSTATE)
