@@ -66,7 +66,6 @@ public class Indexer {
         }
     }
     private static final int MULTIPLER = 31;
-    private static final String DEFSTR = "definition";
     private static final int NUMRESULTS = 10;
 
     private IndexResult index;
@@ -94,7 +93,7 @@ public class Indexer {
                     doc.add(new TextField("term", term, Field.Store.YES));
                 }
                 doc.add(
-                    new TextField(DEFSTR, def.getDefinition(), Field.Store.YES)
+                    new TextField("definition", def.getDefinition(), Field.Store.YES)
                 );
                 writer.addDocument(doc);
             }
@@ -123,7 +122,7 @@ public class Indexer {
         DirectoryReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);
         MultiFieldQueryParser parser = new MultiFieldQueryParser(
-            new String[]{"term", DEFSTR}, analyzer
+            new String[]{"term", "definition"}, analyzer
         );
 
         Query query = parser.parse(search);
@@ -135,7 +134,7 @@ public class Indexer {
 
             searchresults.add(
                 new SearchResult(doc.getValues("location"),
-                doc.getValues("term"), doc.getValues(DEFSTR)
+                doc.getValues("term"), doc.getValues("definition")
             ));
 
             }
