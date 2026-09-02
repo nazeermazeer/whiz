@@ -62,7 +62,6 @@ public final class Main extends ToolkitApp {
     private static final TextInputState SEARCHSTATE = new TextInputState();
     private static Page page = new Page(new File("app/src/main/java/com/example/functions.html"));
     private static String query = "";
-    private static String match;
     private static ListElement<?> sidebar = createSidebar();
     private static SuggestionState suggestions = createSuggestions("");
     private static Element suggestionsPanel = panel(suggestions.element()).rounded();
@@ -80,7 +79,7 @@ public final class Main extends ToolkitApp {
                 .id("searchbar")
                 .placeholder(Viewer.getRubbishText() + "...")
                 .onSubmit(() -> {
-                    match = "";
+                    String match = "";
                     try {
                         int selected = suggestions.element().selected();
                         if (selected < 0 || selected >= suggestions.results().size()) {
