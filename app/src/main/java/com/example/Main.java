@@ -12,7 +12,6 @@ import static dev.tamboui.toolkit.Toolkit.textInput;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -126,35 +125,12 @@ public final class Main extends ToolkitApp {
             new File("app/src/main/java/com/example/entries.json"),
             page.file.getName()
         );
+
         List<String> anchors = new ArrayList<>();
         for (Item item : items) {
             anchors.add(item.anchor());
         }
-        ListElement<?> newsidebar = getSidebarElement(anchors);
 
-        newsidebar.onKeyEvent(event -> {
-            if (!event.isConfirm()) {
-                return EventResult.UNHANDLED;
-            }
-
-            String anchor = anchors.get(newsidebar.selected());
-            String signature = items.stream()
-                .filter(r -> r.anchor().equals(anchor))
-                .map(item -> item.signature())
-                .findFirst()
-                .orElse(null);
-            int line = Viewer.getLine(
-                page.rawdoc.body().wholeText(), signature
-            );
-            browser.state().scrollToLine(line);
-
-            return EventResult.HANDLED;
-        });
-
-        return newsidebar;
-    }
-
-    private static ListElement<?> getSidebarElement(List<String> anchors) {
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
             .autoScroll();
@@ -174,6 +150,25 @@ public final class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
+        });
+
+        list.onKeyEvent(event -> {
+            if (!event.isConfirm()) {
+                return EventResult.UNHANDLED;
+            }
+
+            String anchor = anchors.get(list.selected());
+            String signature = items.stream()
+                .filter(r -> r.anchor().equals(anchor))
+                .map(item -> item.signature())
+                .findFirst()
+                .orElse(null);
+            int line = Viewer.getLine(
+                page.rawdoc.body().wholeText(), signature
+            );
+            browser.state().scrollToLine(line);
+
+            return EventResult.HANDLED;
         });
 
         return list;
