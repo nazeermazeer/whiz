@@ -40,6 +40,12 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
+    private static Indexer indexer;
+
+    public Main(Indexer newindexer) {
+        indexer = newindexer;
+    }
+
     private static final class Page {
         public final File file;
         public final String title;
@@ -63,9 +69,8 @@ public final class Main extends ToolkitApp {
     private static Page page = new Page(new File("app/src/main/java/com/example/functions.html"));
     private static String query = "";
     private static ListElement<?> sidebar = createSidebar();
-    private static SuggestionState suggestions = createSuggestions("");
+    private static SuggestionState suggestions = createSuggestions("", null);
     private static Element suggestionsPanel = panel(suggestions.element()).rounded();
-    private static Indexer indexer = new Indexer();
 
     private static MarkupTextAreaElement createBrowser(Document document) {
         String content = document.body().wholeText();
@@ -174,7 +179,7 @@ public final class Main extends ToolkitApp {
         return list;
     }
 
-    private static SuggestionState createSuggestions(String query) {
+    private static SuggestionState createSuggestions(String query, Indexer indexer) {
         ListElement<?> newsuggestions = list();
         List<SearchResult> suggestionResults = new ArrayList<>();
         List<SearchResult> searchedresults = new ArrayList<>();
@@ -275,22 +280,15 @@ public final class Main extends ToolkitApp {
         };
     }
 
-    private void indexEntries() {
-        try {
-            indexer.indexEntries();
-        } catch (IOException err) {
-            throw new UncheckedIOException(err);
-        }
-    }
-
     public static void main(String[] args) throws Exception {
         Logger logger = Logger.getLogger("org.apache.lucene");
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
 
-        Main main = new Main();
-        main.indexEntries();
+        Indexer myindexer = new Indexer();
+        myindexer.indexEntries();
 
+        Main main = new Main(myindexer);
 
         main.run();
     }
@@ -300,7 +298,7 @@ public final class Main extends ToolkitApp {
         String currentQuery = SEARCHSTATE.text();
         if (!currentQuery.equals(query)) {
             query = currentQuery;
-            suggestions = createSuggestions(query);
+            suggestions = createSuggestions(query, indexer);
             suggestionsPanel = panel(suggestions.element()).rounded();
         }
 
