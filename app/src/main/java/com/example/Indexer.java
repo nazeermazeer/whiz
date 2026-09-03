@@ -21,6 +21,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.ByteBuffersDirectory;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,8 +73,12 @@ public class Indexer {
 
 
     public final void indexEntries() throws IOException {
-        List<Definition> entries = readJSON();
-        index = readIndex(entries);
+        try {
+            List<Definition> entries = readJSON();
+            index = readIndex(entries);
+        } catch (IOException exc) {
+            throw new UncheckedIOException(exc);
+        }
     }
 
     private IndexResult readIndex(List<Definition> entries) throws IOException {
