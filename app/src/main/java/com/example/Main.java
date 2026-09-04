@@ -39,7 +39,7 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
-    private static Indexer indexer;
+    private Indexer indexer;
 
     public Main(Indexer newindexer) {
         indexer = newindexer;
@@ -64,21 +64,21 @@ public final class Main extends ToolkitApp {
     }
     private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
 
-    private static final TextInputState SEARCHSTATE = new TextInputState();
-    private static Page page = new Page(new File("app/src/main/java/com/example/functions.html"));
-    private static String query = "";
-    private static ListElement<?> sidebar = createSidebar();
-    private static SuggestionState suggestions = createSuggestions("", null);
-    private static Element suggestionsPanel = panel(suggestions.element()).rounded();
+    private final TextInputState SEARCHSTATE = new TextInputState();
+    private Page page = new Page(new File("app/src/main/java/com/example/functions.html"));
+    private String query = "";
+    private ListElement<?> sidebar = createSidebar();
+    private SuggestionState suggestions = createSuggestions("", null);
+    private Element suggestionsPanel = panel(suggestions.element()).rounded();
 
-    private static MarkupTextAreaElement createBrowser(Document document) {
+    private MarkupTextAreaElement createBrowser(Document document) {
         String content = document.body().wholeText();
         return Viewer.registerActions(markupTextArea(content), document);
     }
 
-    private static MarkupTextAreaElement browser = createBrowser(page.styleddoc);
+    private MarkupTextAreaElement browser = createBrowser(page.styleddoc);
 
-    private static final Element searchbar =
+    private final Element searchbar =
             textInput(SEARCHSTATE)
                 .id("searchbar")
                 .placeholder(Viewer.getRubbishText() + "...")
@@ -120,7 +120,7 @@ public final class Main extends ToolkitApp {
                 .build();
     }
 
-    private static ListElement<?> createSidebar() {
+    private ListElement<?> createSidebar() {
         List<Item> items = Sidebar.getItems(
             new File("app/src/main/java/com/example/entries.json"),
             page.file.getName()
@@ -239,7 +239,7 @@ public final class Main extends ToolkitApp {
     }
 
 
-    private static Element focusedSuggestions(int height) {
+    private Element focusedSuggestions(int height) {
         return new Element() {
             private boolean isSearchbarFocused(RenderContext context) {
                 return context != null
