@@ -179,6 +179,7 @@ public final class Main extends ToolkitApp {
         List<SearchResult> suggestionResults = new ArrayList<>();
         List<SearchResult> searchedresults = new ArrayList<>();
         final int resultCount;
+        int panelHeight;
 
         if (query.isBlank()) {
             resultCount = 0;
@@ -206,7 +207,7 @@ public final class Main extends ToolkitApp {
                 resultCount = suggestionResults.size();
             }
         }
-        int panelHeight;
+
         if (resultCount == 0) {
             panelHeight = 0;
         } else if (resultCount == 1 && searchedresults.isEmpty()) {
