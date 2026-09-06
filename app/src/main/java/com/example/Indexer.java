@@ -31,13 +31,9 @@ import com.example.model.Definition;
 
 public class Indexer {
 
-    public record IndexResult(
-        ByteBuffersDirectory directory, StandardAnalyzer analyzer
-    ) { }
+    public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
 
-    public record SearchResult(
-        String[] location, String[] term, String[] definition
-    ) {
+    public record SearchResult(String[] location, String[] term, String[] definition) {
         @Override
         public boolean equals(Object o) {
             if (o == null || getClass() != o.getClass()) {
@@ -66,6 +62,7 @@ public class Indexer {
                 + "]";
         }
     }
+    
     private static final int MULTIPLER = 31;
     private static final int NUMRESULTS = 10;
 
