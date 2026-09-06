@@ -26,11 +26,7 @@ import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 public final class Viewer {
     public record Style(String color, String bgcolor, String display) { }
     private static final Map<String, Runnable> ACTIONS = new HashMap<>();
-    private Viewer() {
-        throw new UnsupportedOperationException(
-            "This is a utility class and cannot be instantiated"
-        );
-    }
+    private Document doc;
 
     public static int getLine(String text, String search) {
         String[] lines = text.split("\\R");
@@ -63,7 +59,16 @@ public final class Viewer {
         return line;
     }
 
-    private static String getTableText(Element table) {
+    public void loadDocument(File html) {
+        try {
+            doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
+            doc.outputSettings().prettyPrint(false);
+        } catch (IOException err) {
+            throw new RuntimeException(err);
+        }
+    }
+
+    private String getTableText(Element table) {
         List<List<String>> rows = new ArrayList<>();
         int maxColumns = 0;
 
@@ -114,27 +119,19 @@ public final class Viewer {
         return at.render();
     }
 
-    public static Document getText(File html) {
-        Document doc;
-
-        try {
-            doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
-            doc.outputSettings().prettyPrint(false);
-        } catch (IOException err) {
-            throw new RuntimeException(err);
-        }
-
+    public Document getRawDocument() {
+        Document newdoc = doc; 
         Element section = doc.selectFirst("section");
-        doc.body().empty();
-        doc.body().appendChild(section.clone());
+        newdoc.body().empty();
+        newdoc.body().appendChild(section.clone());
 
-        for (Element element : doc.body().getAllElements()) {
+        for (Element element : newdoc.body().getAllElements()) {
             for (TextNode textNode : element.textNodes()) {
                 textNode.text(textNode.getWholeText().replace("¶", ""));
             }
         }
 
-        Elements openings = doc.select("*:containsOwn([)");
+        Elements openings = newdoc.select("*:containsOwn([)");
         openings.forEach(element -> {
             for (TextNode textNode : element.textNodes()) {
                 String text = textNode.text();
@@ -144,7 +141,7 @@ public final class Viewer {
             }
         });
 
-        Elements closings = doc.select("*:containsOwn(])");
+        Elements closings = newdoc.select("*:containsOwn(])");
         closings.forEach(element -> {
             for (TextNode textNode : element.textNodes()) {
                 String text = textNode.text();
@@ -154,30 +151,20 @@ public final class Viewer {
             }
         });
 
-        Elements tables = doc.select("table");
+        Elements tables = newdoc.select("table");
         for (Element table : tables) {
             String renderedTable = getTableText(table);
             table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
         }
 
-        return doc;
+        return newdoc;
     }
 
-    public static String getTitle(File html) {
-        String title;
-        try {
-            Document doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
-            title = doc.title();
-        } catch (IOException err) {
-            throw new RuntimeException(err);
-        }
-
-        return title;
+    public String getDocumentTitle() {
+        return doc.title();
     }
 
-    public static MarkupTextAreaElement registerActions(
-        MarkupTextAreaElement element, Document doc
-    ) {
+    public MarkupTextAreaElement registerElementActions(MarkupTextAreaElement element) {
         Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
         Matcher matcher = pattern.matcher(doc.body().wholeText());
 
@@ -201,39 +188,38 @@ public final class Viewer {
         return element;
     }
 
-    public static Document stylizeText(Document input) {
-        Document doc = Jsoup.parse(input.outerHtml(), input.baseUri());
-        doc.outputSettings().prettyPrint(false);
+    public Document stylizeDocument() {
+        Document newdoc = doc;
 
-        Elements ems = doc.select("em");
+        Elements ems = newdoc.select("em");
         for (Element em : ems) {
             em.before(new TextNode("[italic]"));
             em.after(new TextNode("[/italic]"));
             em.unwrap();
         }
 
-        Elements bs = doc.select("b");
+        Elements bs = newdoc.select("b");
         for (Element b : bs) {
             b.before(new TextNode("[bold]"));
             b.after(new TextNode("[/bold]"));
             b.unwrap();
         }
 
-        Elements strongs = doc.select("strong");
+        Elements strongs = newdoc.select("strong");
         for (Element strong : strongs) {
             strong.before(new TextNode("[bold]"));
             strong.after(new TextNode("[/bold]"));
             strong.unwrap();
         }
 
-        Elements as = doc.select("a");
+        Elements as = newdoc.select("a");
         for (Element a : as) {
             a.before(new TextNode("[action=" + a.attr("href") + "]"));
             a.after(new TextNode("[/action]"));
             a.unwrap();
         }
 
-        Elements uls = doc.select("ul");
+        Elements uls = newdoc.select("ul");
         for (Element ul : uls) {
             Elements lis = ul.select("li");
             for (Element li : lis) {
@@ -242,7 +228,7 @@ public final class Viewer {
             }
         }
 
-        Elements ols = doc.select("ol");
+        Elements ols = newdoc.select("ol");
         for (Element ol : ols) {
             Elements lis = ol.select("li");
             for (int i = 0; i < lis.size(); i++) {
@@ -252,9 +238,9 @@ public final class Viewer {
         }
 
         try {
-            Colorizer.ColorOutput color = Colorizer.getColorOutput(doc);
+            Colorizer.ColorOutput color = Colorizer.getColorOutput(newdoc);
 
-            Elements spans = doc.select("span");
+            Elements spans = newdoc.select("span");
             for (Element span : spans) {
                 String rgb = Colorizer.resolveColor(
                     span, color.rules(), color.colors()
@@ -267,6 +253,6 @@ public final class Viewer {
             throw new RuntimeException(err);
         }
 
-        return doc;
+        return newdoc;
     }
 }

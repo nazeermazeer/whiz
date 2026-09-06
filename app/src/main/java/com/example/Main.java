@@ -40,12 +40,27 @@ import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
     private Indexer indexer;
+    private Viewer viewer;
+    
+    private ListElement<?> sidebar;
+    private SuggestionState suggestions;
+    private MarkupTextAreaElement browser;
 
-    public Main(Indexer newindexer) {
+    private Page page;
+    private String query = "";
+    private final TextInputState SEARCHSTATE = new TextInputState();
+
+    public Main(Indexer newindexer, Viewer newviewer) {
         indexer = newindexer;
+        viewer = newviewer;
+
+        page = new Page(new File("app/src/main/java/com/example/functions.html"));
+        sidebar = createSidebar();
+        suggestions = createSuggestions("");
+        browser = createBrowser(page.styleddoc);
     }
 
-    private static final class Page {
+    private final class Page {
         public final File file;
         public final String title;
         public final Document rawdoc;
@@ -53,29 +68,25 @@ public final class Main extends ToolkitApp {
 
         public Page(File file) {
             this.file = file;
-            this.title = Viewer.getTitle(file);
-            this.rawdoc = Viewer.getText(file);
-            this.styleddoc = Viewer.stylizeText(rawdoc);
+
+            viewer.loadDocument(file);
+            this.title = viewer.getDocumentTitle();
+            this.rawdoc = viewer.getRawDocument();
+            this.styleddoc = viewer.stylizeDocument();
         }
 
         public String getContent() {
             return styleddoc.body().wholeText();
         }
     }
-    private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
 
-    private final TextInputState SEARCHSTATE = new TextInputState();
-    private Page page = new Page(new File("app/src/main/java/com/example/functions.html"));
-    private String query = "";
-    private ListElement<?> sidebar = createSidebar();
-    private SuggestionState suggestions = createSuggestions("");
+    private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
 
     private MarkupTextAreaElement createBrowser(Document document) {
         String content = document.body().wholeText();
-        return Viewer.registerActions(markupTextArea(content), document);
+        return viewer.registerElementActions(markupTextArea(content));
     }
 
-    private MarkupTextAreaElement browser = createBrowser(page.styleddoc);
 
     private final Element searchbar =
             textInput(SEARCHSTATE)
@@ -102,7 +113,7 @@ public final class Main extends ToolkitApp {
                         );
 
                         page = new Page(file);
-                        browser = Viewer.registerActions(browser, page.styleddoc);
+                        browser = viewer.registerElementActions(browser);
                         browser.markup(page.getContent());
                         browser.state().scrollToLine(line);
                         sidebar = createSidebar();
@@ -283,7 +294,9 @@ public final class Main extends ToolkitApp {
         Indexer myindexer = new Indexer();
         myindexer.indexEntries();
 
-        Main main = new Main(myindexer);
+        Viewer myviewer = new Viewer();
+
+        Main main = new Main(myindexer, myviewer);
 
         main.run();
     }
