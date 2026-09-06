@@ -69,7 +69,6 @@ public final class Main extends ToolkitApp {
     private String query = "";
     private ListElement<?> sidebar = createSidebar();
     private SuggestionState suggestions = createSuggestions("", null);
-    private Element suggestionsPanel = panel(suggestions.element()).rounded();
 
     private MarkupTextAreaElement createBrowser(Document document) {
         String content = document.body().wholeText();
@@ -240,7 +239,7 @@ public final class Main extends ToolkitApp {
     }
 
 
-    private Element focusedSuggestions(int height) {
+    private Element focusedSuggestions(int height, Element panel) {
         return new Element() {
             private boolean isSearchbarFocused(RenderContext context) {
                 return context != null
@@ -250,7 +249,7 @@ public final class Main extends ToolkitApp {
             @Override
             public void render(Frame frame, Rect area, RenderContext context) {
                 if (isSearchbarFocused(context)) {
-                    context.renderChild(suggestionsPanel, frame, area);
+                    context.renderChild(panel, frame, area);
                 }
             }
 
@@ -263,7 +262,7 @@ public final class Main extends ToolkitApp {
                 if (!isSearchbarFocused(context)) {
                     return Size.ZERO;
                 }
-                Size panelSize = suggestionsPanel.preferredSize(
+                Size panelSize = panel.preferredSize(
                     availableWidth, availableHeight, context
                 );
                 return Size.of(panelSize.widthOr(0), height);
@@ -295,7 +294,6 @@ public final class Main extends ToolkitApp {
         if (!currentQuery.equals(query)) {
             query = currentQuery;
             suggestions = createSuggestions(query, indexer);
-            suggestionsPanel = panel(suggestions.element()).rounded();
         }
 
         return panel(
@@ -312,7 +310,7 @@ public final class Main extends ToolkitApp {
                         .borderType(BorderType.NONE)
                         .focusable()
                         .wrapWord(),
-                    focusedSuggestions(suggestions.height()),
+                    focusedSuggestions(suggestions.height(), panel(suggestions.element()).rounded()),
                     panel(searchbar)
                         .rounded()
                 ).fill()
