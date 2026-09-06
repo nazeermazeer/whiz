@@ -59,7 +59,7 @@ public final class Main extends ToolkitApp {
         sidebar = createSidebarPanel();
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);
-        searchbar = createSearchbarPanel();
+        searchbar = createSearchbarPanel(searchbarstate);
     }
 
     private final class Page {
@@ -89,8 +89,8 @@ public final class Main extends ToolkitApp {
         return viewer.registerElementActions(markupTextArea(content));
     }            
 
-    private Element createSearchbarPanel() {
-        return textInput(searchbarstate)
+    private Element createSearchbarPanel(TextInputState state) {
+        return textInput(state)
             .id("searchbar")
             .placeholder(Viewer.getRubbishText() + "...")
             .onSubmit(() -> {
