@@ -55,9 +55,9 @@ public final class Main extends ToolkitApp {
         viewer = newviewer;
 
         page = new Page(new File("app/src/main/java/com/example/functions.html"));
-        sidebar = createSidebar();
-        suggestions = createSuggestions("");
-        browser = createBrowser(page.styleddoc);
+        sidebar = createSidebarPanel();
+        suggestions = createSuggestionsPanel("");
+        browser = createBrowserPanel(page.styleddoc);
     }
 
     private final class Page {
@@ -82,11 +82,10 @@ public final class Main extends ToolkitApp {
 
     private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
 
-    private MarkupTextAreaElement createBrowser(Document document) {
+    private MarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
         return viewer.registerElementActions(markupTextArea(content));
     }
-
 
     private final Element searchbar =
             textInput(SEARCHSTATE)
@@ -116,7 +115,7 @@ public final class Main extends ToolkitApp {
                         browser = viewer.registerElementActions(browser);
                         browser.markup(page.getContent());
                         browser.state().scrollToLine(line);
-                        sidebar = createSidebar();
+                        sidebar = createSidebarPanel();
                     } catch (Exception err) {
                         throw new RuntimeException(err);
                     }
@@ -130,7 +129,7 @@ public final class Main extends ToolkitApp {
                 .build();
     }
 
-    private ListElement<?> createSidebar() {
+    private ListElement<?> createSidebarPanel() {
         List<Item> items = Sidebar.getItems(
             new File("app/src/main/java/com/example/entries.json"),
             page.file.getName()
@@ -184,7 +183,7 @@ public final class Main extends ToolkitApp {
         return list;
     }
 
-    private SuggestionState createSuggestions(String query) {
+    private SuggestionState createSuggestionsPanel(String query) {
         ListElement<?> newsuggestions = list();
         List<SearchResult> suggestionResults = new ArrayList<>();
         List<SearchResult> searchedresults = new ArrayList<>();
@@ -307,7 +306,7 @@ public final class Main extends ToolkitApp {
         String currentQuery = SEARCHSTATE.text();
         if (!currentQuery.equals(query)) {
             query = currentQuery;
-            suggestions = createSuggestions(query);
+            suggestions = createSuggestionsPanel(query);
         }
 
         return panel(
