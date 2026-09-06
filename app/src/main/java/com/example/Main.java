@@ -42,9 +42,14 @@ public final class Main extends ToolkitApp {
     private Indexer indexer;
     private Viewer viewer;
 
+    private ListElement<?> sidebar;
+    private SuggestionState suggestions;
+    private MarkupTextAreaElement browser;
+    private Element searchbar;
+
     private Page page;
     private String query = "";
-    private final TextInputState SEARCHSTATE = new TextInputState();
+    private final TextInputState searchbarstate = new TextInputState();
 
     public Main(Indexer newindexer, Viewer newviewer) {
         indexer = newindexer;
@@ -54,6 +59,7 @@ public final class Main extends ToolkitApp {
         sidebar = createSidebarPanel();
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);
+        searchbar = createSearchbarPanel();
     }
 
     private final class Page {
@@ -81,51 +87,42 @@ public final class Main extends ToolkitApp {
     private MarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
         return viewer.registerElementActions(markupTextArea(content));
-    }
+    }            
 
-    private ListElement<?> sidebar;
-    private SuggestionState suggestions;
-    private MarkupTextAreaElement browser;
-    private final Element searchbar =
-            textInput(SEARCHSTATE)
-                .id("searchbar")
-                .placeholder(Viewer.getRubbishText() + "...")
-                .onSubmit(() -> {
-                    String match = "";
-                    try {
-                        int selected = suggestions.element().selected();
-                        if (selected < 0 || selected >= suggestions.results().size()) {
-                            return;
-                        }
-                        SearchResult result = suggestions.results().get(selected);
-
-                        match = result.term()[0];
-                        File file = new File(
-                            "app/src/main/java/com/example/"
-                            + String.join(" ", result.location())
-                        );
-
-                        int line = Viewer.getLine(
-                            page.rawdoc.body().wholeText(),
-                            String.join(" ", match)
-                        );
-
-                        page = new Page(file);
-                        browser = viewer.registerElementActions(browser);
-                        browser.markup(page.getContent());
-                        browser.state().scrollToLine(line);
-                        sidebar = createSidebarPanel();
-                    } catch (Exception err) {
-                        throw new RuntimeException(err);
+    private Element createSearchbarPanel() {
+        return textInput(searchbarstate)
+            .id("searchbar")
+            .placeholder(Viewer.getRubbishText() + "...")
+            .onSubmit(() -> {
+                String match = "";
+                try {
+                    int selected = suggestions.element().selected();
+                    if (selected < 0 || selected >= suggestions.results().size()) {
+                        return;
                     }
-                });
+                    SearchResult result = suggestions.results().get(selected);
 
+                    match = result.term()[0];
+                    File file = new File(
+                        "app/src/main/java/com/example/"
+                        + String.join(" ", result.location())
+                    );
 
-    @Override
-    protected TuiConfig configure() {
-        return TuiConfig.builder()
-                .mouseCapture(true)
-                .build();
+                    int line = Viewer.getLine(
+                        page.rawdoc.body().wholeText(),
+                        String.join(" ", match)
+                    );
+
+                    page = new Page(file);
+                    browser = viewer.registerElementActions(browser);
+                    browser.markup(page.getContent());
+                    browser.state().scrollToLine(line);
+                    sidebar = createSidebarPanel();
+                } catch (Exception err) {
+                    throw new RuntimeException(err);
+                }
+            }
+        );
     }
 
     private ListElement<?> createSidebarPanel() {
@@ -301,7 +298,7 @@ public final class Main extends ToolkitApp {
 
     @Override
     protected Element render() {
-        String currentQuery = SEARCHSTATE.text();
+        String currentQuery = searchbarstate.text();
         if (!currentQuery.equals(query)) {
             query = currentQuery;
             suggestions = createSuggestionsPanel(query);
@@ -327,5 +324,12 @@ public final class Main extends ToolkitApp {
                 ).fill()
             )
         ).borderType(BorderType.NONE).fill();
+    }
+
+    @Override
+    protected TuiConfig configure() {
+        return TuiConfig.builder()
+                .mouseCapture(true)
+                .build();
     }
 }
