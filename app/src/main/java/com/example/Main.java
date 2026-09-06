@@ -68,7 +68,7 @@ public final class Main extends ToolkitApp {
     private Page page = new Page(new File("app/src/main/java/com/example/functions.html"));
     private String query = "";
     private ListElement<?> sidebar = createSidebar();
-    private SuggestionState suggestions = createSuggestions("", null);
+    private SuggestionState suggestions = createSuggestions("");
 
     private MarkupTextAreaElement createBrowser(Document document) {
         String content = document.body().wholeText();
@@ -173,7 +173,7 @@ public final class Main extends ToolkitApp {
         return list;
     }
 
-    private static SuggestionState createSuggestions(String query, Indexer indexer) {
+    private SuggestionState createSuggestions(String query) {
         ListElement<?> newsuggestions = list();
         List<SearchResult> suggestionResults = new ArrayList<>();
         List<SearchResult> searchedresults = new ArrayList<>();
@@ -293,7 +293,7 @@ public final class Main extends ToolkitApp {
         String currentQuery = SEARCHSTATE.text();
         if (!currentQuery.equals(query)) {
             query = currentQuery;
-            suggestions = createSuggestions(query, indexer);
+            suggestions = createSuggestions(query);
         }
 
         return panel(
