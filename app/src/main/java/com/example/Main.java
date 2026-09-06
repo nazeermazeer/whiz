@@ -41,10 +41,6 @@ import dev.tamboui.widgets.input.TextInputState;
 public final class Main extends ToolkitApp {
     private Indexer indexer;
     private Viewer viewer;
-    
-    private ListElement<?> sidebar;
-    private SuggestionState suggestions;
-    private MarkupTextAreaElement browser;
 
     private Page page;
     private String query = "";
@@ -87,6 +83,9 @@ public final class Main extends ToolkitApp {
         return viewer.registerElementActions(markupTextArea(content));
     }
 
+    private ListElement<?> sidebar;
+    private SuggestionState suggestions;
+    private MarkupTextAreaElement browser;
     private final Element searchbar =
             textInput(SEARCHSTATE)
                 .id("searchbar")
