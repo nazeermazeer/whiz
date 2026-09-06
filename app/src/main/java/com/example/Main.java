@@ -296,7 +296,6 @@ public final class Main extends ToolkitApp {
         Viewer myviewer = new Viewer();
 
         Main main = new Main(myindexer, myviewer);
-
         main.run();
     }
 
