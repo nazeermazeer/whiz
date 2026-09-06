@@ -19,7 +19,6 @@ import com.example.model.Definition;
 
 
 public final class Parser {
-    private static final String CLASS = "class";
 
     private Parser() {
         throw new UnsupportedOperationException(
@@ -55,11 +54,11 @@ public final class Parser {
                     String parent = "";
                     List<String> keywords = new ArrayList<>();
 
-                    if (dl.attr(CLASS).equals("py function")) {
+                    if (dl.attr("class").equals("py function")) {
                         type = "function";
-                    } else if (dl.attr(CLASS).equals("py class")) {
-                        type = CLASS;
-                    } else if (dl.attr(CLASS).equals("py method")) {
+                    } else if (dl.attr("class").equals("py class")) {
+                        type = "class";
+                    } else if (dl.attr("class").equals("py method")) {
                         type = "method";
                     }
 
