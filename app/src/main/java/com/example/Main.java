@@ -250,7 +250,7 @@ public final class Main extends ToolkitApp {
     }
 
 
-    private Element focusedSuggestions(int height, Element panel) {
+    private Element renderSuggestionsPanel(int height, Element panel) {
         return new Element() {
             private boolean isSearchbarFocused(RenderContext context) {
                 return context != null
@@ -291,6 +291,7 @@ public final class Main extends ToolkitApp {
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
 
+
         Indexer myindexer = new Indexer();
         myindexer.indexEntries();
 
@@ -323,7 +324,7 @@ public final class Main extends ToolkitApp {
                         .borderType(BorderType.NONE)
                         .focusable()
                         .wrapWord(),
-                    focusedSuggestions(suggestions.height(), panel(suggestions.element()).rounded()),
+                    renderSuggestionsPanel(suggestions.height(), panel(suggestions.element()).rounded()),
                     panel(searchbar)
                         .rounded()
                 ).fill()
