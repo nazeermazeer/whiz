@@ -72,8 +72,11 @@ public final class Viewer {
         List<List<String>> rows = new ArrayList<>();
         int maxColumns = 0;
 
+        // iterate based off every row
         for (Element row : table.select("tr")) {
             List<String> cells = new ArrayList<>();
+
+            // iterate based off every cell in row
             for (Element cell : row.select("th, td")) {
                 int colspan = 1;
                 String colspanValue = cell.attr("colspan");
@@ -85,6 +88,7 @@ public final class Viewer {
                     }
                 }
 
+                // set table as string so we can store it
                 String text = cell.wholeText().trim();
                 for (int i = 0; i < colspan; i++) {
                     cells.add(i == 0 ? text : "");
@@ -131,6 +135,7 @@ public final class Viewer {
             }
         }
 
+        // escape all of the [ contained in the doc
         Elements openings = newdoc.select("*:containsOwn([)");
         openings.forEach(element -> {
             for (TextNode textNode : element.textNodes()) {
@@ -141,6 +146,7 @@ public final class Viewer {
             }
         });
 
+        // and do the same for the ]
         Elements closings = newdoc.select("*:containsOwn(])");
         closings.forEach(element -> {
             for (TextNode textNode : element.textNodes()) {
@@ -151,6 +157,7 @@ public final class Viewer {
             }
         });
 
+        // render tables in doc as plaintext
         Elements tables = newdoc.select("table");
         for (Element table : tables) {
             String renderedTable = getTableText(table);
@@ -191,6 +198,7 @@ public final class Viewer {
     public Document stylizeDocument() {
         Document newdoc = doc;
 
+        // italicize all italicized text elements
         Elements ems = newdoc.select("em");
         for (Element em : ems) {
             em.before(new TextNode("[italic]"));
@@ -198,6 +206,7 @@ public final class Viewer {
             em.unwrap();
         }
 
+        // bold all bold text elements
         Elements bs = newdoc.select("b");
         for (Element b : bs) {
             b.before(new TextNode("[bold]"));
@@ -205,6 +214,7 @@ public final class Viewer {
             b.unwrap();
         }
 
+        // idk if this does anything but especially bold the strong text elements
         Elements strongs = newdoc.select("strong");
         for (Element strong : strongs) {
             strong.before(new TextNode("[bold]"));
@@ -212,6 +222,7 @@ public final class Viewer {
             strong.unwrap();
         }
 
+        // add actions for page links
         Elements as = newdoc.select("a");
         for (Element a : as) {
             a.before(new TextNode("[action=" + a.attr("href") + "]"));
@@ -219,6 +230,7 @@ public final class Viewer {
             a.unwrap();
         }
 
+        // add those little bubbles to unordered list elements
         Elements uls = newdoc.select("ul");
         for (Element ul : uls) {
             Elements lis = ul.select("li");
@@ -228,6 +240,7 @@ public final class Viewer {
             }
         }
 
+        // add those little numbers to ordered list elements
         Elements ols = newdoc.select("ol");
         for (Element ol : ols) {
             Elements lis = ol.select("li");
@@ -237,6 +250,7 @@ public final class Viewer {
             }
         }
 
+        // very very weird way to try to get color rendering in [] tags
         try {
             Colorizer.ColorOutput color = Colorizer.getColorOutput(newdoc);
 
