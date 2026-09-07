@@ -49,7 +49,7 @@ public final class Main extends ToolkitApp {
 
     private Page page;
     private String query = "";
-    private final TextInputState searchbarstate = new TextInputState();
+    private TextInputState searchbarstate = new TextInputState();
 
     public Main(Indexer newindexer, Viewer newviewer) {
         indexer = newindexer;
