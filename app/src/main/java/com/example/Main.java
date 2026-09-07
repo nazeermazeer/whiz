@@ -74,7 +74,7 @@ public final class Main extends ToolkitApp {
             viewer.loadDocument(file);
             this.title = viewer.getDocumentTitle();
             this.rawdoc = viewer.getRawDocument();
-            this.styleddoc = viewer.stylizeDocument();
+            this.styleddoc = viewer.getStylizedDocument();
         }
 
         public String getContent() {

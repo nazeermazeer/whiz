@@ -195,7 +195,7 @@ public final class Viewer {
         return element;
     }
 
-    public Document stylizeDocument() {
+    public Document getStylizedDocument() {
         Document newdoc = getRawDocument().clone();
 
         // italicize all italicized text elements
