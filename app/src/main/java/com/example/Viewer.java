@@ -124,7 +124,7 @@ public final class Viewer {
     }
 
     public Document getRawDocument() {
-        Document newdoc = doc; 
+        Document newdoc = doc.clone(); 
         Element section = doc.selectFirst("section");
         newdoc.body().empty();
         newdoc.body().appendChild(section.clone());
@@ -164,7 +164,7 @@ public final class Viewer {
             table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
         }
 
-        return newdoc;
+        return newdoc.clone();
     }
 
     public String getDocumentTitle() {
@@ -196,7 +196,7 @@ public final class Viewer {
     }
 
     public Document stylizeDocument() {
-        Document newdoc = doc;
+        Document newdoc = getRawDocument().clone();
 
         // italicize all italicized text elements
         Elements ems = newdoc.select("em");
@@ -267,6 +267,6 @@ public final class Viewer {
             throw new RuntimeException(err);
         }
 
-        return newdoc;
+        return newdoc.clone();
     }
 }
