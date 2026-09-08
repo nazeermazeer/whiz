@@ -16,6 +16,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Selector.SelectorParseException;
 
+import com.example.Constants.ColorizerConstants;
+
 
 public final class Colorizer {
     // The strongest color declaration found for one element so far.
@@ -29,11 +31,7 @@ public final class Colorizer {
     public record Rule(String selector, String color, boolean important,
                         int specificity, int order) { }
 
-    // Matches a CSS color declaration in either a stylesheet rule or an
-    // element's inline style attribute.
-    private static final Pattern DECLARATION = Pattern.compile(
-    "(?i)(?:^|;)\\s*color\\s*:\\s*([^;]+)"
-    );
+
     private Colorizer() {
         throw new UnsupportedOperationException("Utility class");
     }
@@ -51,7 +49,7 @@ public final class Colorizer {
             }
 
             String selectorText = block.substring(0, openingBrace).trim();
-            Matcher declaration = DECLARATION.matcher(
+            Matcher declaration = ColorizerConstants.CSSDeclaration.matcher(
                 block.substring(openingBrace + 1)
             );
             if (!declaration.find() || selectorText.startsWith("@")) {
@@ -104,7 +102,7 @@ public final class Colorizer {
     }
 
     private static String inlineColor(String style) {
-        Matcher matcher = DECLARATION.matcher(style);
+        Matcher matcher = ColorizerConstants.CSSDeclaration.matcher(style);
         return matcher.find() ? normalizeColor(matcher.group(1).trim()) : null;
     }
 
