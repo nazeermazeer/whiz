@@ -34,6 +34,16 @@ public final class Parser {
         return entry.attr("id");
     }
 
+    private String parseDefinition(Element entry) {
+        for (Element element : entry.children()) {
+            if (element.tagName().equals("dd")) {
+                return element.text();
+            }
+        }
+
+        return "";
+    }
+
 
     public void parseFiles() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -57,7 +67,6 @@ public final class Parser {
                 for (int i = 0; i < dls.size(); i++) {
                     dl = dls.get(i);
                     List<String> terms = new ArrayList<>();
-                    String def = "";
                     String parent = "";
                     List<String> keywords = new ArrayList<>();
 
@@ -72,11 +81,10 @@ public final class Parser {
                                     anchor = element.attr("id");
                                 }
                                 terms.add(element.text().replace("¶", ""));
-                            } else if (element.tagName().equals("dd")) {
-                                def = element.text();
-                            }
                         }
                     }
+
+                    String def = parseDefinition(dl);
 
                     try {
                         parent = anchor.substring(0, anchor.indexOf("."));
@@ -109,6 +117,7 @@ public final class Parser {
                         );
                     }
                 }
+            }
         }
 
         try {
