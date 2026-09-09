@@ -20,13 +20,7 @@ import com.example.model.Definition;
 
 public final class Parser {
 
-    private Parser() {
-        throw new UnsupportedOperationException(
-            "This is a utility class and cannot be instantiated"
-        );
-    }
-
-    public static void main(String[] args) throws IOException {
+    public void parseFiles() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         List<Definition> jsonvalues = new ArrayList<>();
 
@@ -120,6 +114,11 @@ public final class Parser {
         } catch (IOException err) {
             throw new UncheckedIOException(err);
         }
+    }  
+
+    public static void main(String[] args) throws IOException {
+        Parser myparser = new Parser();
+        myparser.parseFiles();
     }
 }
 
