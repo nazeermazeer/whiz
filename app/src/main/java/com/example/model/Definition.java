@@ -8,7 +8,7 @@ public final class Definition {
     private String id;
     private String anchor;
     private String parent;
-    private List<String> keywords;
+    private String[] keywords;
     private List<String> signature;
     private String definition;
 
@@ -20,7 +20,7 @@ public final class Definition {
         String newid,
         String newanchor,
         String newparent,
-        List<String> newkeywords,
+        String[] newkeywords,
         List<String> newsignatures,
         String newdef
     ) {
@@ -54,7 +54,7 @@ public final class Definition {
         this.parent = newparent;
     }
 
-    public void setKeywords(List<String> newkeywords) {
+    public void setKeywords(String[] newkeywords) {
         this.keywords = newkeywords;
     }
 
@@ -86,7 +86,7 @@ public final class Definition {
         return this.parent;
     }
 
-    public List<String> getKeywords() {
+    public String[] getKeywords() {
         return this.keywords;
     }
 
