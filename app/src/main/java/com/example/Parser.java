@@ -19,6 +19,17 @@ import com.example.model.Definition;
 
 
 public final class Parser {
+    public String parseType(Element entry) {
+        if (entry.attr("class").equals("py function")) {
+            return "function";
+        } else if (entry.attr("class").equals("py class")) {
+            return "class";
+        } else if (entry.attr("class").equals("py method")) {
+            return "method";
+        }
+        return "";
+    }
+
 
     public void parseFiles() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -43,18 +54,11 @@ public final class Parser {
                     dl = dls.get(i);
                     List<String> terms = new ArrayList<>();
                     String def = "";
-                    String type = "";
                     String anchor = "";
                     String parent = "";
                     List<String> keywords = new ArrayList<>();
 
-                    if (dl.attr("class").equals("py function")) {
-                        type = "function";
-                    } else if (dl.attr("class").equals("py class")) {
-                        type = "class";
-                    } else if (dl.attr("class").equals("py method")) {
-                        type = "method";
-                    }
+                    String type = parseType(dl);
 
                     anchor = dl.attr("id");
 
