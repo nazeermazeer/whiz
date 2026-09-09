@@ -30,6 +30,10 @@ public final class Parser {
         return "";
     }
 
+    private String parseAnchor(Element entry) {
+        return entry.attr("id");
+    }
+
 
     public void parseFiles() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -54,13 +58,12 @@ public final class Parser {
                     dl = dls.get(i);
                     List<String> terms = new ArrayList<>();
                     String def = "";
-                    String anchor = "";
                     String parent = "";
                     List<String> keywords = new ArrayList<>();
 
                     String type = parseType(dl);
 
-                    anchor = dl.attr("id");
+                    String anchor = parseAnchor(dl);
 
                     if (dl != null) {
                         for (Element element : dl.children()) {
