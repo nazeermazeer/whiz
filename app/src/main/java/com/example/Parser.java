@@ -44,6 +44,19 @@ public final class Parser {
         return "";
     }
 
+    private String getParent(String anchor) {
+        String parent;
+        try {
+            parent = anchor.substring(0, anchor.indexOf("."));
+        } catch (StringIndexOutOfBoundsException err) {
+            // no parent exists for this element
+            parent = "";
+        }
+
+        return parent;
+
+    }
+
 
     public void parseFiles() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -67,7 +80,6 @@ public final class Parser {
                 for (int i = 0; i < dls.size(); i++) {
                     dl = dls.get(i);
                     List<String> terms = new ArrayList<>();
-                    String parent = "";
                     List<String> keywords = new ArrayList<>();
 
                     String type = parseType(dl);
@@ -86,13 +98,9 @@ public final class Parser {
 
                     String def = parseDefinition(dl);
 
-                    try {
-                        parent = anchor.substring(0, anchor.indexOf("."));
-                    } catch (StringIndexOutOfBoundsException err) {
-                        parent = null;
-                    }
+                    String parent = getParent(anchor);
 
-                    if (parent != null) {
+                    if (parent != "") {
                         keywords.add(anchor);
                     }
 
