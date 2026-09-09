@@ -57,6 +57,21 @@ public final class Parser {
 
     }
 
+    private String[] gatherKeywords(Boolean parentExists, String anchor) {
+        String[] keywords;
+        if (parentExists) {
+            keywords = new String[3];
+            keywords[0] = anchor;
+            keywords[1] = anchor.substring(anchor.lastIndexOf(".") + 1);
+            keywords[2] = anchor.substring(anchor.lastIndexOf(".") + 1) + "()";
+        } else {
+            keywords = new String[2];
+            keywords[0] = anchor.substring(anchor.lastIndexOf(".") + 1);
+            keywords[1] = anchor.substring(anchor.lastIndexOf(".") + 1) + "()";
+        }
+        return keywords;
+    }
+
 
     public void parseFiles() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -80,7 +95,6 @@ public final class Parser {
                 for (int i = 0; i < dls.size(); i++) {
                     dl = dls.get(i);
                     List<String> terms = new ArrayList<>();
-                    List<String> keywords = new ArrayList<>();
 
                     String type = parseType(dl);
 
@@ -100,16 +114,7 @@ public final class Parser {
 
                     String parent = getParent(anchor);
 
-                    if (parent != "") {
-                        keywords.add(anchor);
-                    }
-
-                    keywords.add(
-                        anchor.substring(anchor.lastIndexOf(".") + 1)
-                    );
-                    keywords.add(
-                        anchor.substring(anchor.lastIndexOf(".") + 1) + "()"
-                    );
+                    String[] keywords = gatherKeywords(parent != "", anchor);
 
                     if (!anchor.equals("") && !type.equals("")) {
                         jsonvalues.add(
