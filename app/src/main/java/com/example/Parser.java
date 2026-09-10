@@ -89,8 +89,7 @@ public class Parser {
 
 
     public void parseFiles() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        List<Entry> jsonvalues = new ArrayList<>();
+        List<Entry> entries = new ArrayList<>();
 
         for (File file : parseFiles) {
             Document doc = Jsoup.parse(file, "UTF-8");
@@ -109,20 +108,17 @@ public class Parser {
                 String[] keywords = gatherKeywords(parent != "", anchor);
 
                 if (!anchor.equals("") && !type.equals("")) {
-                    jsonvalues.add(
+                    entries.add(
                         new Entry(file.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
                     );
                 }
             }
         }
 
+        File outputfile = new File("app/src/main/java/com/example/entries.json");
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            File outputfile = new File(
-                "app/src/main/java/com/example/entries.json"
-            );
-            mapper.writerWithDefaultPrettyPrinter().writeValue(
-                outputfile, jsonvalues
-            );
+            mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, entries);
         } catch (IOException err) {
             throw new UncheckedIOException(err);
         }
