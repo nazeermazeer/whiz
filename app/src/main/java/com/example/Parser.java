@@ -18,7 +18,7 @@ import com.example.model.Entry;
 
 
 
-public final class Parser {
+public class Parser {
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
             return "function";
