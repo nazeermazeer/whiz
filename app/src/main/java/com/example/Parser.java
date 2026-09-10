@@ -116,15 +116,7 @@ public final class Parser {
 
                 if (!anchor.equals("") && !type.equals("")) {
                     jsonvalues.add(
-                        new Entry(
-                            html.getName(),
-                            type,
-                            ("python:" + anchor),
-                            anchor,
-                            parent,
-                            keywords,
-                            terms,
-                            def)
+                        new Entry(html.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
                     );
                 }
             }
