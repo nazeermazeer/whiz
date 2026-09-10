@@ -128,10 +128,5 @@ public class Parser {
             throw new UncheckedIOException(err);
         }
     }  
-
-    public static void main(String[] args) throws IOException {
-        Parser myparser = new Parser();
-        myparser.parseFiles();
-    }
 }
 

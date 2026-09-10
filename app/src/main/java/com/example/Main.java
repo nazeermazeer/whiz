@@ -39,6 +39,7 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
+    private Parser parser;
     private Indexer indexer;
     private Viewer viewer;
 
@@ -51,7 +52,8 @@ public final class Main extends ToolkitApp {
     private String query = "";
     private TextInputState searchbarstate = new TextInputState();
 
-    public Main(Indexer newindexer, Viewer newviewer) {
+    public Main(Parser newparser, Indexer newindexer, Viewer newviewer) {
+        parser = newparser;
         indexer = newindexer;
         viewer = newviewer;
 
@@ -286,13 +288,15 @@ public final class Main extends ToolkitApp {
         logger.setLevel(Level.OFF);
         logger.setUseParentHandlers(false);
 
-
+        Parser myparser = new Parser();
+        myparser.parseFiles();
+    
         Indexer myindexer = new Indexer();
         myindexer.indexEntries();
 
         Viewer myviewer = new Viewer();
 
-        Main main = new Main(myindexer, myviewer);
+        Main main = new Main(myparser, myindexer, myviewer);
         main.run();
     }
 
