@@ -101,10 +101,7 @@ public final class Parser {
 
             Document doc = Jsoup.parse(html, "UTF-8");
             Elements dls = doc.select("dl");
-            Element dl;
-            for (int i = 0; i < dls.size(); i++) {
-                dl = dls.get(i);
-
+            for (Element dl : dls) {
                 String type = parseType(dl);
 
                 String anchor = parseAnchor(dl);
