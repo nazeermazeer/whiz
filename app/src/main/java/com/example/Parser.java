@@ -36,6 +36,11 @@ public class Parser {
     }
 
     private String parseAnchor(Element entry) {
+        for (Element element : entry.children()) {
+            if (element.tagName().equals("dt")) {
+                return element.attr("id");
+            }
+        }
         return entry.attr("id");
     }
 
