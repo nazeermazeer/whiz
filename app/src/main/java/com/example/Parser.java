@@ -72,6 +72,16 @@ public final class Parser {
         return keywords;
     }
 
+    private List<String> parseSignatures(Element entry) {
+        List<String> terms = new ArrayList<>();
+        for (Element element : entry.children()) {
+            if (element.tagName().equals("dt")) {
+                terms.add(element.text().replace("¶", ""));
+            }
+        }
+        return terms;
+    }
+
 
     public void parseFiles() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -94,21 +104,12 @@ public final class Parser {
                 Element dl;
                 for (int i = 0; i < dls.size(); i++) {
                     dl = dls.get(i);
-                    List<String> terms = new ArrayList<>();
 
                     String type = parseType(dl);
 
                     String anchor = parseAnchor(dl);
 
-                    if (dl != null) {
-                        for (Element element : dl.children()) {
-                            if (element.tagName().equals("dt")) {
-                                if (!element.attr("id").isBlank()) {
-                                    anchor = element.attr("id");
-                                }
-                                terms.add(element.text().replace("¶", ""));
-                        }
-                    }
+                    List<String> terms = parseSignatures(dl);
 
                     String def = parseDefinition(dl);
 
@@ -131,7 +132,6 @@ public final class Parser {
                     }
                 }
             }
-        }
 
         try {
             File outputfile = new File(
