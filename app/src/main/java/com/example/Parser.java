@@ -89,49 +89,49 @@ public final class Parser {
 
         for (int file = 1; file <= 2; file++) {
             File html;
-                if (file == 1) {
-                    html = new File(
-                        "app/src/main/java/com/example/functions.html"
+            if (file == 1) {
+                html = new File(
+                    "app/src/main/java/com/example/functions.html"
+                );
+            } else {
+                html = new File(
+                    "app/src/main/java/com/example/stdtypes.html"
+                );
+            }
+
+            Document doc = Jsoup.parse(html, "UTF-8");
+            Elements dls = doc.select("dl");
+            Element dl;
+            for (int i = 0; i < dls.size(); i++) {
+                dl = dls.get(i);
+
+                String type = parseType(dl);
+
+                String anchor = parseAnchor(dl);
+
+                List<String> terms = parseSignatures(dl);
+
+                String def = parseDefinition(dl);
+
+                String parent = getParent(anchor);
+
+                String[] keywords = gatherKeywords(parent != "", anchor);
+
+                if (!anchor.equals("") && !type.equals("")) {
+                    jsonvalues.add(
+                        new Entry(
+                            html.getName(),
+                            type,
+                            ("python:" + anchor),
+                            anchor,
+                            parent,
+                            keywords,
+                            terms,
+                            def)
                     );
-                } else {
-                    html = new File(
-                        "app/src/main/java/com/example/stdtypes.html"
-                    );
-                }
-
-                Document doc = Jsoup.parse(html, "UTF-8");
-                Elements dls = doc.select("dl");
-                Element dl;
-                for (int i = 0; i < dls.size(); i++) {
-                    dl = dls.get(i);
-
-                    String type = parseType(dl);
-
-                    String anchor = parseAnchor(dl);
-
-                    List<String> terms = parseSignatures(dl);
-
-                    String def = parseDefinition(dl);
-
-                    String parent = getParent(anchor);
-
-                    String[] keywords = gatherKeywords(parent != "", anchor);
-
-                    if (!anchor.equals("") && !type.equals("")) {
-                        jsonvalues.add(
-                            new Entry(
-                                html.getName(),
-                                type,
-                                ("python:" + anchor),
-                                anchor,
-                                parent,
-                                keywords,
-                                terms,
-                                def)
-                        );
-                    }
                 }
             }
+        }
 
         try {
             File outputfile = new File(
