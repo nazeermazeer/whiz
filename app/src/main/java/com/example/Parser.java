@@ -21,7 +21,8 @@ import com.example.model.Entry;
 public class Parser {
     private static final File[] parseFiles = {
         new File("app/src/main/java/com/example/functions.html"),
-        new File("app/src/main/java/com/example/stdtypes.html")
+        new File("app/src/main/java/com/example/stdtypes.html"),
+        new File("app/src/main/java/com/example/constants.html")
     };
 
     private String parseType(Element entry) {
@@ -29,7 +30,7 @@ public class Parser {
             return "function";
         } else if (entry.attr("class").equals("py class")) {
             return "class";
-        } else if (entry.attr("class").equals("py method")) {
+        } else if (entry.attr("class").equals("py method") || entry.attr("class").equals("py data")) {
             return "method";
         }
         return "";
