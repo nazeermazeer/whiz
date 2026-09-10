@@ -19,6 +19,11 @@ import com.example.model.Entry;
 
 
 public class Parser {
+    private static final File[] parseFiles = {
+        new File("app/src/main/java/com/example/functions.html"),
+        new File("app/src/main/java/com/example/stdtypes.html")
+    };
+
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
             return "function";
@@ -87,19 +92,8 @@ public class Parser {
         ObjectMapper mapper = new ObjectMapper();
         List<Entry> jsonvalues = new ArrayList<>();
 
-        for (int file = 1; file <= 2; file++) {
-            File html;
-            if (file == 1) {
-                html = new File(
-                    "app/src/main/java/com/example/functions.html"
-                );
-            } else {
-                html = new File(
-                    "app/src/main/java/com/example/stdtypes.html"
-                );
-            }
-
-            Document doc = Jsoup.parse(html, "UTF-8");
+        for (File file : parseFiles) {
+            Document doc = Jsoup.parse(file, "UTF-8");
             Elements dls = doc.select("dl");
             for (Element dl : dls) {
                 String type = parseType(dl);
@@ -116,7 +110,7 @@ public class Parser {
 
                 if (!anchor.equals("") && !type.equals("")) {
                     jsonvalues.add(
-                        new Entry(html.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                        new Entry(file.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
                     );
                 }
             }
