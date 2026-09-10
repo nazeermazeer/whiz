@@ -6,7 +6,7 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.model.Definition;
+import com.example.model.Entry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,10 +22,10 @@ public final class Sidebar {
         ObjectMapper mapper = new ObjectMapper();
         List<Item> items = new ArrayList<>();
         try {
-            List<Definition> entries = mapper.readValue(
-                target, new TypeReference<List<Definition>>() { }
+            List<Entry> entries = mapper.readValue(
+                target, new TypeReference<List<Entry>>() { }
             );
-            for (Definition entry : entries) {
+            for (Entry entry : entries) {
                 if (entry.getLocation().equals(filename)) {
                     items.add(
                         new Item(entry.getAnchor(),

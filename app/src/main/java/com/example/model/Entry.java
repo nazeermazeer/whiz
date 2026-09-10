@@ -2,7 +2,7 @@ package com.example.model;
 
 import java.util.List;
 
-public final class Definition {
+public final class Entry {
     private String location;
     private String type;
     private String id;
@@ -12,9 +12,9 @@ public final class Definition {
     private List<String> signature;
     private String definition;
 
-    public Definition() { }
+    public Entry() { }
 
-    public Definition(
+    public Entry(
         String newlocation,
         String newtype,
         String newid,

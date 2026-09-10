@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.example.model.Definition;
+import com.example.model.Entry;
 
 
 
@@ -75,7 +75,7 @@ public final class Parser {
 
     public void parseFiles() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        List<Definition> jsonvalues = new ArrayList<>();
+        List<Entry> jsonvalues = new ArrayList<>();
 
         for (int file = 1; file <= 2; file++) {
             File html;
@@ -118,7 +118,7 @@ public final class Parser {
 
                     if (!anchor.equals("") && !type.equals("")) {
                         jsonvalues.add(
-                            new Definition(
+                            new Entry(
                                 html.getName(),
                                 type,
                                 ("python:" + anchor),

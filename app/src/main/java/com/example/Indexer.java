@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.example.model.Definition;
+import com.example.model.Entry;
 
 public class Indexer {
 
@@ -71,21 +71,21 @@ public class Indexer {
 
     public final void indexEntries() throws IOException {
         try {
-            List<Definition> entries = readJSON();
+            List<Entry> entries = readJSON();
             index = readIndex(entries);
         } catch (IOException exc) {
             throw new UncheckedIOException(exc);
         }
     }
 
-    private IndexResult readIndex(List<Definition> entries) throws IOException {
+    private IndexResult readIndex(List<Entry> entries) throws IOException {
         ByteBuffersDirectory directory = new ByteBuffersDirectory();
         StandardAnalyzer analyzer = new StandardAnalyzer();
 
         try (IndexWriter writer = new IndexWriter(
             directory, new IndexWriterConfig(analyzer)
         )) {
-            for (Definition def : entries) {
+            for (Entry def : entries) {
                 Document doc = new Document();
                 doc.add(
                     new StringField("location", def.getLocation(),
@@ -105,13 +105,13 @@ public class Indexer {
         return new IndexResult(directory, analyzer);
     }
 
-    private List<Definition> readJSON() throws IOException {
+    private List<Entry> readJSON() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
 
         return mapper.readValue(
                 Path.of("app/src/main/java/com/example/entries.json").toFile(),
-                new TypeReference<List<Definition>>() { }
+                new TypeReference<List<Entry>>() { }
         );
     }
 
