@@ -45,6 +45,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:6.1.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")  
 
+    // initialize event log so we can log shirt
+    implementation("com.microsoft.azure:log4j2:2.0.0")
+
     // Jsoup implementation
     implementation("org.jsoup:jsoup:1.22.1")
 
