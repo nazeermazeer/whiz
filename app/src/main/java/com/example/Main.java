@@ -198,6 +198,7 @@ public final class Main extends ToolkitApp {
                 searchedresults = indexer.searchTerm(query);
                 Collections.reverse(searchedresults);
             } catch (org.apache.lucene.queryparser.classic.ParseException err) {
+                logger.error("parse exception occured during suggestions panel creation:", err);
             } catch (IOException err) {
                 throw new RuntimeException(err);
             }
