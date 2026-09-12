@@ -10,7 +10,6 @@
     <Loggers>
         <!-- Root Logger configuration listening for INFO level and above -->
         <Root level="INFO">
-            <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>
         </Root>
     </Loggers>
