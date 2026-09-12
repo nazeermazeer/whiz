@@ -121,6 +121,8 @@ public final class Main extends ToolkitApp {
                     browser.markup(page.getContent());
                     browser.state().scrollToLine(line);
                     sidebar = createSidebarPanel();
+
+                    logger.info("completed search for query\"{}\"", query);
                 } catch (Exception err) {
                     throw new RuntimeException(err);
                 }
@@ -289,7 +291,7 @@ public final class Main extends ToolkitApp {
         lucenelogger.setLevel(Level.OFF);
         lucenelogger.setUseParentHandlers(false);
 
-        logger.info("My balls are thick");
+        logger.info("application started!");
 
         Indexer myindexer = new Indexer();
         myindexer.indexEntries();
