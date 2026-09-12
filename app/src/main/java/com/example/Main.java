@@ -122,7 +122,7 @@ public final class Main extends ToolkitApp {
                     browser.state().scrollToLine(line);
                     sidebar = createSidebarPanel();
 
-                    logger.info("completed search for query \"{}\"", query);
+                    logger.info("redirected user to search result for \"{}\"", match);
                 } catch (Exception err) {
                     throw new RuntimeException(err);
                 }
@@ -177,6 +177,7 @@ public final class Main extends ToolkitApp {
                 page.rawdoc.body().wholeText(), signature
             );
             browser.state().scrollToLine(line);
+            logger.info("redirected user to sidebar item for \"{}\"", signature);
 
             return EventResult.HANDLED;
         });
