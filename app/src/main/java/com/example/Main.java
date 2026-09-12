@@ -122,7 +122,7 @@ public final class Main extends ToolkitApp {
                     browser.state().scrollToLine(line);
                     sidebar = createSidebarPanel();
 
-                    logger.info("completed search for query\"{}\"", query);
+                    logger.info("completed search for query \"{}\"", query);
                 } catch (Exception err) {
                     throw new RuntimeException(err);
                 }
