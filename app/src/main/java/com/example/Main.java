@@ -16,8 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
@@ -50,6 +51,8 @@ public final class Main extends ToolkitApp {
     private Page page;
     private String query = "";
     private TextInputState searchbarstate = new TextInputState();
+
+    private static final Logger logger = LogManager.getLogger(Main.class);
 
     public Main(Indexer newindexer, Viewer newviewer) {
         indexer = newindexer;
@@ -282,10 +285,11 @@ public final class Main extends ToolkitApp {
     }
 
     public static void main(String[] args) throws Exception {
-        Logger logger = Logger.getLogger("org.apache.lucene");
-        logger.setLevel(Level.OFF);
-        logger.setUseParentHandlers(false);
+        java.util.logging.Logger lucenelogger = java.util.logging.Logger.getLogger("org.apache.lucene");
+        lucenelogger.setLevel(Level.OFF);
+        lucenelogger.setUseParentHandlers(false);
 
+        logger.info("My balls are thick");
 
         Indexer myindexer = new Indexer();
         myindexer.indexEntries();
