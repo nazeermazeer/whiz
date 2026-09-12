@@ -173,7 +173,7 @@ public final class Viewer {
 
     public MarkupTextAreaElement registerElementActions(MarkupTextAreaElement element) {
         Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
-        Matcher matcher = pattern.matcher(doc.body().wholeText());
+        Matcher matcher = pattern.matcher(getStylizedDocument().body().wholeText());
 
         while (matcher.find()) {
             String id = matcher.group(1);
