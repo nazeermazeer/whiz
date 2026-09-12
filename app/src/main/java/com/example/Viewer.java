@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -27,6 +29,8 @@ public final class Viewer {
     public record Style(String color, String bgcolor, String display) { }
     private static final Map<String, Runnable> ACTIONS = new HashMap<>();
     private Document doc;
+
+    private static final Logger logger = LogManager.getLogger(Viewer.class);
 
     public static int getLine(String text, String search) {
         String[] lines = text.split("\\R");
@@ -60,6 +64,7 @@ public final class Viewer {
     }
 
     public void loadDocument(File html) {
+        logger.info("loading document \"{}\"", html.getName());
         try {
             doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
             doc.outputSettings().prettyPrint(false);
@@ -184,7 +189,9 @@ public final class Viewer {
                         doc.body().wholeText(),
                         doc.getElementById(id.replaceFirst("^#", "")).text()
                     );
+                    logger.info("redirected user to link element \"{}\"", doc.getElementById(id.replaceFirst("^#", "")).text());
                 } catch (NullPointerException err) {
+                    logger.error("redirection to link element \"{}\" failed:", id, err);
                     line = 0;
                 }
                 element.state().scrollToLine(line);
