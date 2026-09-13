@@ -34,6 +34,7 @@ import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.tui.error.ErrorAction;
 import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
@@ -338,6 +339,10 @@ public final class Main extends ToolkitApp {
     protected TuiConfig configure() {
         return TuiConfig.builder()
                 .mouseCapture(true)
+                .errorHandler((error, context) -> {
+                    logger.fatal("crashed! throwing internal exception error widget...", error.cause());
+                    return ErrorAction.DISPLAY_AND_QUIT;
+                })
                 .build();
     }
 }
