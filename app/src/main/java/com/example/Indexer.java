@@ -116,7 +116,7 @@ public class Indexer {
         ObjectMapper mapper = new ObjectMapper();
 
 
-        List<Definition> entries = mapper.readValue(
+        List<Entry> entries = mapper.readValue(
                 Path.of("app/src/main/java/com/example/entries.json").toFile(),
                 new TypeReference<List<Entry>>() { }
         );
