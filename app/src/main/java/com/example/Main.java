@@ -62,6 +62,13 @@ public final class Main extends ToolkitApp {
         indexer = newindexer;
         viewer = newviewer;
 
+        try {
+            parser.parseFiles();
+            indexer.indexEntries();
+        } catch (IOException err) {
+            throw new RuntimeException(err);
+        }
+
         page = new Page(new File("app/src/main/java/com/example/functions.html"));
         sidebar = createSidebarPanel();
         suggestions = createSuggestionsPanel("");
@@ -300,11 +307,8 @@ public final class Main extends ToolkitApp {
 
         logger.info("application started!");
         Parser myparser = new Parser();
-        myparser.parseFiles();
     
         Indexer myindexer = new Indexer();
-        myindexer.indexEntries();
-        logger.info("search index initialized; launching user interface");
 
         Viewer myviewer = new Viewer();
 
