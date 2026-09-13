@@ -35,38 +35,9 @@ public class Indexer {
 
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
 
-    public record SearchResult(String[] location, String[] term, String[] definition) {
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            SearchResult result = (SearchResult) o;
-            return Arrays.equals(location, result.location)
-                && Arrays.equals(term, result.term)
-                && Arrays.equals(definition, result.definition);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = Arrays.hashCode(location);
-            result = MULTIPLER * result + Arrays.hashCode(term);
-            result = MULTIPLER * result + Arrays.hashCode(definition);
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return "SearchResult["
-                + "location=" + Arrays.toString(location) + ", "
-                + "term=" + Arrays.toString(term) + ", "
-                + "definition=" + Arrays.toString(definition)
-                + "]";
-        }
-    }
+    public record SearchResult(String[] location, String[] term, String[] definition) {}
     
-    private static final int MULTIPLER = 31;
-    private static final int NUMRESULTS = 10;
+    private static final int numresults = 10;
     private static final Logger logger = LogManager.getLogger(Indexer.class);
 
     private IndexResult index;
@@ -137,7 +108,7 @@ public class Indexer {
         );
 
         Query query = parser.parse(search);
-        TopDocs results = searcher.search(query, NUMRESULTS);
+        TopDocs results = searcher.search(query, numresults);
         logger.debug("search '{}' returned {} hits", search, results.totalHits.value);
         StoredFields storedFields = reader.storedFields();
 
