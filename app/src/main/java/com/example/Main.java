@@ -356,4 +356,9 @@ public final class Main extends ToolkitApp {
                 })
                 .build();
     }
+
+    @Override
+    protected void onStop() {
+        logger.info("application stopped");
+    }
 }
