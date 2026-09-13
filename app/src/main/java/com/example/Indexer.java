@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.example.model.Entry;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Indexer {
 
@@ -65,6 +67,7 @@ public class Indexer {
     
     private static final int MULTIPLER = 31;
     private static final int NUMRESULTS = 10;
+    private static final Logger logger = LogManager.getLogger(Indexer.class);
 
     private IndexResult index;
 
@@ -73,7 +76,9 @@ public class Indexer {
         try {
             List<Entry> entries = readJSON();
             index = readIndex(entries);
+            logger.info("indexing finished with {} entries", entries.size());
         } catch (IOException exc) {
+            logger.error("failed to build search index", exc);
             throw new UncheckedIOException(exc);
         }
     }
@@ -102,6 +107,8 @@ public class Indexer {
             writer.commit();
         }
 
+        logger.debug("indexed {} definitions", entries.size());
+
         return new IndexResult(directory, analyzer);
     }
 
@@ -109,10 +116,12 @@ public class Indexer {
         ObjectMapper mapper = new ObjectMapper();
 
 
-        return mapper.readValue(
+        List<Definition> entries = mapper.readValue(
                 Path.of("app/src/main/java/com/example/entries.json").toFile(),
                 new TypeReference<List<Entry>>() { }
         );
+        logger.debug("read entries.json successfully");
+        return entries;
     }
 
 
@@ -129,6 +138,7 @@ public class Indexer {
 
         Query query = parser.parse(search);
         TopDocs results = searcher.search(query, NUMRESULTS);
+        logger.debug("search '{}' returned {} hits", search, results.totalHits.value);
         StoredFields storedFields = reader.storedFields();
 
         for (ScoreDoc hit : results.scoreDocs) {

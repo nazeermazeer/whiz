@@ -15,10 +15,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import com.example.model.Entry;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 
 public class Parser {
+    private static final Logger logger = LogManager.getLogger(Parser.class);
     private static final File[] parseFiles = {
         new File("app/src/main/java/com/example/functions.html"),
         new File("app/src/main/java/com/example/stdtypes.html"),
@@ -96,10 +99,12 @@ public class Parser {
 
     public void parseFiles() throws IOException {
         List<Entry> entries = new ArrayList<>();
+        logger.info("starting documentation parse");
 
         for (File file : parseFiles) {
             Document doc = Jsoup.parse(file, "UTF-8");
             Elements dls = doc.select("dl");
+            logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
             for (Element dl : dls) {
                 String type = parseType(dl);
 
@@ -125,9 +130,10 @@ public class Parser {
         ObjectMapper mapper = new ObjectMapper();
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, entries);
+            logger.info("wrote {} definitions to {}", entries.size(), outputfile);
         } catch (IOException err) {
+            logger.error("failed to write parsed definitions", err);
             throw new UncheckedIOException(err);
         }
     }  
 }
-
