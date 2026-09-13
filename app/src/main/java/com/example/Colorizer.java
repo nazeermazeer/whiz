@@ -15,9 +15,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Selector.SelectorParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public final class Colorizer {
+    private static final Logger logger = LogManager.getLogger(Colorizer.class);
     // The strongest color declaration found for one element so far.
     private record Candidate(String color, boolean important, int specificity,
                              int order) { }
@@ -95,6 +98,7 @@ public final class Colorizer {
     public static ColorOutput getColorOutput(Document doc) throws Exception {
         List<Rule> rules = loadColorRules(doc);
         Map<Element, String> colors = new IdentityHashMap<>();
+        logger.debug("loaded {} color rules", rules.size());
         return new ColorOutput(rules, colors);
     }
 
@@ -159,6 +163,7 @@ public final class Colorizer {
     }
 
     private static String readStylesheet(String location) throws IOException {
+        logger.debug("loading stylesheet {}", location);
         if (location.startsWith("http://") || location.startsWith("https://")) {
             // Fetch remote CSS as text instead of parsing it as HTML.
             return Jsoup.connect(location)
@@ -205,6 +210,7 @@ public final class Colorizer {
             } catch (SelectorParseException ignored) {
                 // Ignore selectors unsupported by Jsoup instead of stopping
                 // analysis of the rest of the page.
+                logger.debug("ignored unsupported selector '{}'", rule.selector());
             }
         }
 

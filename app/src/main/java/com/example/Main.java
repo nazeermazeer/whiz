@@ -200,8 +200,9 @@ public final class Main extends ToolkitApp {
                 searchedresults = indexer.searchTerm(query);
                 Collections.reverse(searchedresults);
             } catch (org.apache.lucene.queryparser.classic.ParseException err) {
-                logger.error("parse exception occured during suggestions panel creation:", err);
+                logger.error("could not parse search query '{}'", query, err);
             } catch (IOException err) {
+                logger.error("could not search for query '{}'", query, err);
                 throw new RuntimeException(err);
             }
 
@@ -298,6 +299,7 @@ public final class Main extends ToolkitApp {
 
         Indexer myindexer = new Indexer();
         myindexer.indexEntries();
+        logger.info("search index initialized; launching user interface");
 
         Viewer myviewer = new Viewer();
 

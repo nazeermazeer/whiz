@@ -64,13 +64,15 @@ public final class Viewer {
     }
 
     public void loadDocument(File html) {
-        logger.info("loading document \"{}\"", html.getName());
         try {
             doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
             doc.outputSettings().prettyPrint(false);
         } catch (IOException err) {
+            logger.error("failed to load document {}", html, err);
             throw new RuntimeException(err);
         }
+        logger.info("loaded document '{}'", html.getName());
+        
     }
 
     private String getTableText(Element table) {
@@ -129,6 +131,8 @@ public final class Viewer {
     }
 
     public Document getRawDocument() {
+        logger.debug("building raw document view for '{}'", doc.title());
+
         Document newdoc = doc.clone(); 
         Element section = doc.selectFirst("section");
         newdoc.body().empty();
@@ -203,6 +207,8 @@ public final class Viewer {
     }
 
     public Document getStylizedDocument() {
+        logger.debug("building stylized document view for '{}'", doc.title());
+        
         Document newdoc = getRawDocument().clone();
 
         // italicize all italicized text elements

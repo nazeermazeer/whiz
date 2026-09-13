@@ -9,8 +9,11 @@ import java.util.List;
 import com.example.model.Definition;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public final class Sidebar {
+    private static final Logger logger = LogManager.getLogger(Sidebar.class);
     private Sidebar() {
         throw new UnsupportedOperationException(
             "This is a utility class and cannot be instantiated"
@@ -33,7 +36,9 @@ public final class Sidebar {
                     );
                 }
             }
+            logger.debug("loaded {} sidebar items for {}", items.size(), filename);
         } catch (IOException err) {
+            logger.error("failed to load sidebar entries from {}", target, err);
             throw new UncheckedIOException(err);
         }
 
