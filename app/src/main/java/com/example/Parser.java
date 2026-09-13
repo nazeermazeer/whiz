@@ -14,118 +14,126 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.example.model.Definition;
+import com.example.model.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
 
-public final class Parser {
+public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
+    private static final File[] parseFiles = {
+        new File("app/src/main/java/com/example/functions.html"),
+        new File("app/src/main/java/com/example/stdtypes.html"),
+        new File("app/src/main/java/com/example/constants.html")
+    };
 
-    private Parser() {
-        throw new UnsupportedOperationException(
-            "This is a utility class and cannot be instantiated"
-        );
+    private String parseType(Element entry) {
+        if (entry.attr("class").equals("py function")) {
+            return "function";
+        } else if (entry.attr("class").equals("py class")) {
+            return "class";
+        } else if (entry.attr("class").equals("py method") || entry.attr("class").equals("py data")) {
+            return "method";
+        }
+        return "";
     }
 
-    public static void main(String[] args) throws IOException {
-        logger.info("starting documentation parse");
-        ObjectMapper mapper = new ObjectMapper();
-        List<Definition> jsonvalues = new ArrayList<>();
+    private String parseAnchor(Element entry) {
+        for (Element element : entry.children()) {
+            if (element.tagName().equals("dt")) {
+                return element.attr("id");
+            }
+        }
+        return entry.attr("id");
+    }
 
-        for (int file = 1; file <= 2; file++) {
-            File html;
-                if (file == 1) {
-                    html = new File(
-                        "app/src/main/java/com/example/functions.html"
-                    );
-                } else {
-                    html = new File(
-                        "app/src/main/java/com/example/stdtypes.html"
-                    );
-                }
-
-                Document doc = Jsoup.parse(html, "UTF-8");
-                Elements dls = doc.select("dl");
-                logger.debug("parsing {} documentation blocks from {}", dls.size(), html);
-                Element dl;
-                for (int i = 0; i < dls.size(); i++) {
-                    dl = dls.get(i);
-                    List<String> terms = new ArrayList<>();
-                    String def = "";
-                    String type = "";
-                    String anchor = "";
-                    String parent = "";
-                    List<String> keywords = new ArrayList<>();
-
-                    if (dl.attr("class").equals("py function")) {
-                        type = "function";
-                    } else if (dl.attr("class").equals("py class")) {
-                        type = "class";
-                    } else if (dl.attr("class").equals("py method")) {
-                        type = "method";
-                    }
-
-                    anchor = dl.attr("id");
-
-                    if (dl != null) {
-                        for (Element element : dl.children()) {
-                            if (element.tagName().equals("dt")) {
-                                if (!element.attr("id").isBlank()) {
-                                    anchor = element.attr("id");
-                                }
-                                terms.add(element.text().replace("¶", ""));
-                            } else if (element.tagName().equals("dd")) {
-                                def = element.text();
-                            }
-                        }
-                    }
-
-                    try {
-                        parent = anchor.substring(0, anchor.indexOf("."));
-                    } catch (StringIndexOutOfBoundsException err) {
-                        parent = null;
-                    }
-
-                    if (parent != null) {
-                        keywords.add(anchor);
-                    }
-
-                    keywords.add(
-                        anchor.substring(anchor.lastIndexOf(".") + 1)
-                    );
-                    keywords.add(
-                        anchor.substring(anchor.lastIndexOf(".") + 1) + "()"
-                    );
-
-                    if (!anchor.equals("") && !type.equals("")) {
-                        jsonvalues.add(
-                            new Definition(
-                                html.getName(),
-                                type,
-                                ("python:" + anchor),
-                                anchor,
-                                parent,
-                                keywords,
-                                terms,
-                                def)
-                        );
-                    }
-                }
+    private String parseDefinition(Element entry) {
+        for (Element element : entry.children()) {
+            if (element.tagName().equals("dd")) {
+                return element.text();
+            }
         }
 
+        return "";
+    }
+
+    private String getParent(String anchor) {
+        String parent;
         try {
-            File outputfile = new File(
-                "app/src/main/java/com/example/entries.json"
-            );
-            mapper.writerWithDefaultPrettyPrinter().writeValue(
-                outputfile, jsonvalues
-            );
-            logger.info("wrote {} definitions to {}", jsonvalues.size(), outputfile);
+            parent = anchor.substring(0, anchor.indexOf("."));
+        } catch (StringIndexOutOfBoundsException err) {
+            // no parent exists for this element
+            parent = "";
+        }
+
+        return parent;
+
+    }
+
+    private String[] gatherKeywords(Boolean parentExists, String anchor) {
+        String[] keywords;
+        if (parentExists) {
+            keywords = new String[3];
+            keywords[0] = anchor;
+            keywords[1] = anchor.substring(anchor.lastIndexOf(".") + 1);
+            keywords[2] = anchor.substring(anchor.lastIndexOf(".") + 1) + "()";
+        } else {
+            keywords = new String[2];
+            keywords[0] = anchor.substring(anchor.lastIndexOf(".") + 1);
+            keywords[1] = anchor.substring(anchor.lastIndexOf(".") + 1) + "()";
+        }
+        return keywords;
+    }
+
+    private List<String> parseSignatures(Element entry) {
+        List<String> terms = new ArrayList<>();
+        for (Element element : entry.children()) {
+            if (element.tagName().equals("dt")) {
+                terms.add(element.text().replace("¶", ""));
+            }
+        }
+        return terms;
+    }
+
+
+    public void parseFiles() throws IOException {
+        List<Entry> entries = new ArrayList<>();
+        logger.info("starting documentation parse");
+
+        for (File file : parseFiles) {
+            Document doc = Jsoup.parse(file, "UTF-8");
+            Elements dls = doc.select("dl");
+            logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
+            for (Element dl : dls) {
+                String type = parseType(dl);
+
+                String anchor = parseAnchor(dl);
+
+                List<String> terms = parseSignatures(dl);
+
+                String def = parseDefinition(dl);
+
+                String parent = getParent(anchor);
+
+                String[] keywords = gatherKeywords(parent != "", anchor);
+
+                if (!anchor.equals("") && !type.equals("")) {
+                    entries.add(
+                        new Entry(file.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                    );
+                }
+            }
+        }
+
+        File outputfile = new File("app/src/main/java/com/example/entries.json");
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, entries);
+            logger.info("wrote {} definitions to {}", entries.size(), outputfile);
         } catch (IOException err) {
             logger.error("failed to write parsed definitions", err);
             throw new UncheckedIOException(err);
         }
-    }
+    }  
 }

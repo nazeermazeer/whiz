@@ -41,6 +41,7 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
+    private Parser parser;
     private Indexer indexer;
     private Viewer viewer;
 
@@ -55,9 +56,18 @@ public final class Main extends ToolkitApp {
 
     private static final Logger logger = LogManager.getLogger(Main.class);
 
-    public Main(Indexer newindexer, Viewer newviewer) {
+
+    public Main(Parser newparser, Indexer newindexer, Viewer newviewer) {
+        parser = newparser;
         indexer = newindexer;
         viewer = newviewer;
+
+        try {
+            parser.parseFiles();
+            indexer.indexEntries();
+        } catch (IOException err) {
+            throw new RuntimeException(err);
+        }
 
         page = new Page(new File("app/src/main/java/com/example/functions.html"));
         sidebar = createSidebarPanel();
@@ -296,14 +306,13 @@ public final class Main extends ToolkitApp {
         lucenelogger.setUseParentHandlers(false);
 
         logger.info("application started!");
-
+        Parser myparser = new Parser();
+    
         Indexer myindexer = new Indexer();
-        myindexer.indexEntries();
-        logger.info("search index initialized; launching user interface");
 
         Viewer myviewer = new Viewer();
 
-        Main main = new Main(myindexer, myviewer);
+        Main main = new Main(myparser, myindexer, myviewer);
         main.run();
     }
 
@@ -346,5 +355,10 @@ public final class Main extends ToolkitApp {
                     return ErrorAction.DISPLAY_AND_QUIT;
                 })
                 .build();
+    }
+
+    @Override
+    protected void onStop() {
+        logger.info("application stopped");
     }
 }
