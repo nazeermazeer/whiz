@@ -16,8 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
@@ -33,6 +34,7 @@ import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.tui.error.ErrorAction;
 import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
@@ -50,6 +52,8 @@ public final class Main extends ToolkitApp {
     private Page page;
     private String query = "";
     private TextInputState searchbarstate = new TextInputState();
+
+    private static final Logger logger = LogManager.getLogger(Main.class);
 
     public Main(Indexer newindexer, Viewer newviewer) {
         indexer = newindexer;
@@ -118,6 +122,8 @@ public final class Main extends ToolkitApp {
                     browser.markup(page.getContent());
                     browser.state().scrollToLine(line);
                     sidebar = createSidebarPanel();
+
+                    logger.info("redirected user to search result for \"{}\"", match);
                 } catch (Exception err) {
                     throw new RuntimeException(err);
                 }
@@ -172,6 +178,7 @@ public final class Main extends ToolkitApp {
                 page.rawdoc.body().wholeText(), signature
             );
             browser.state().scrollToLine(line);
+            logger.info("redirected user to sidebar item for \"{}\"", signature);
 
             return EventResult.HANDLED;
         });
@@ -193,7 +200,9 @@ public final class Main extends ToolkitApp {
                 searchedresults = indexer.searchTerm(query);
                 Collections.reverse(searchedresults);
             } catch (org.apache.lucene.queryparser.classic.ParseException err) {
+                logger.error("could not parse search query '{}'", query, err);
             } catch (IOException err) {
+                logger.error("could not search for query '{}'", query, err);
                 throw new RuntimeException(err);
             }
 
@@ -282,13 +291,15 @@ public final class Main extends ToolkitApp {
     }
 
     public static void main(String[] args) throws Exception {
-        Logger logger = Logger.getLogger("org.apache.lucene");
-        logger.setLevel(Level.OFF);
-        logger.setUseParentHandlers(false);
+        java.util.logging.Logger lucenelogger = java.util.logging.Logger.getLogger("org.apache.lucene");
+        lucenelogger.setLevel(Level.OFF);
+        lucenelogger.setUseParentHandlers(false);
 
+        logger.info("application started!");
 
         Indexer myindexer = new Indexer();
         myindexer.indexEntries();
+        logger.info("search index initialized; launching user interface");
 
         Viewer myviewer = new Viewer();
 
@@ -330,6 +341,10 @@ public final class Main extends ToolkitApp {
     protected TuiConfig configure() {
         return TuiConfig.builder()
                 .mouseCapture(true)
+                .errorHandler((error, context) -> {
+                    logger.fatal("crashed! throwing internal exception error widget...", error.cause());
+                    return ErrorAction.DISPLAY_AND_QUIT;
+                })
                 .build();
     }
 }

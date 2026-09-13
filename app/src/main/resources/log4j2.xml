@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- File Appender -->
+        <File name="FileAppender" fileName="logs/whiz.log" append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %m%n"/>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root Logger configuration listening for INFO level and above -->
+        <Root level="INFO">
+            <AppenderRef ref="FileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
