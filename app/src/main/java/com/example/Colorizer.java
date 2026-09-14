@@ -210,7 +210,6 @@ public final class Colorizer {
             } catch (SelectorParseException ignored) {
                 // Ignore selectors unsupported by Jsoup instead of stopping
                 // analysis of the rest of the page.
-                logger.debug("ignored unsupported selector '{}'", rule.selector());
             }
         }
 
