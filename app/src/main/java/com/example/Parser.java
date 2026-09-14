@@ -23,9 +23,9 @@ import org.apache.logging.log4j.Logger;
 public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
     private static final File[] parseFiles = {
-        new File("app/src/main/java/com/example/functions.html"),
-        new File("app/src/main/java/com/example/stdtypes.html"),
-        new File("app/src/main/java/com/example/constants.html")
+        new File("app/src/main/resources/functions.html"),
+        new File("app/src/main/resources/stdtypes.html"),
+        new File("app/src/main/resources/constants.html")
     };
 
     private String parseType(Element entry) {
@@ -126,7 +126,7 @@ public class Parser {
             }
         }
 
-        File outputfile = new File("app/src/main/java/com/example/entries.json");
+        File outputfile = new File("app/src/main/resources/entries.json");
         ObjectMapper mapper = new ObjectMapper();
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, entries);

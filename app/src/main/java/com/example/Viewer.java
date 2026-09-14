@@ -48,7 +48,7 @@ public final class Viewer {
         List<String> entries = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(
-            new FileReader("app/src/main/java/com/example/rubbish.txt")
+            new FileReader("app/src/main/resources/rubbish.txt")
         )) {
             String line;
             while ((line = br.readLine()) != null) {

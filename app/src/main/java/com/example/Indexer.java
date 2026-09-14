@@ -88,7 +88,7 @@ public class Indexer {
 
 
         List<Entry> entries = mapper.readValue(
-                Path.of("app/src/main/java/com/example/entries.json").toFile(),
+                Path.of("app/src/main/resources/entries.json").toFile(),
                 new TypeReference<List<Entry>>() { }
         );
         logger.debug("read entries.json successfully");

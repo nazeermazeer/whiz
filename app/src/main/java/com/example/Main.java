@@ -69,7 +69,7 @@ public final class Main extends ToolkitApp {
             throw new RuntimeException(err);
         }
 
-        page = new Page(new File("app/src/main/java/com/example/functions.html"));
+        page = new Page(new File("app/src/main/resources/functions.html"));
         sidebar = createSidebarPanel();
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);
@@ -118,7 +118,7 @@ public final class Main extends ToolkitApp {
 
                     match = result.term()[0];
                     File file = new File(
-                        "app/src/main/java/com/example/"
+                        "app/src/main/resources/"
                         + String.join(" ", result.location())
                     );
 
@@ -143,7 +143,7 @@ public final class Main extends ToolkitApp {
 
     private ListElement<?> createSidebarPanel() {
         List<Item> items = Sidebar.getItems(
-            new File("app/src/main/java/com/example/entries.json"),
+            new File("app/src/main/resources/entries.json"),
             page.file.getName()
         );
 
