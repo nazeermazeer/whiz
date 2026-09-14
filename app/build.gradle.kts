@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("dev.tamboui:tamboui-bom:0.5.0-SNAPSHOT"))
+    implementation(platform("dev.tamboui:tamboui-bom:0.5.0"))
 
     // linting and shirt
     implementation("com.puppycrawl.tools:checkstyle:13.9.0")
