@@ -21,6 +21,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.ByteBuffersDirectory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -86,13 +87,14 @@ public class Indexer {
     private List<Entry> readJSON() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
-
-        List<Entry> entries = mapper.readValue(
-                Path.of("app/src/main/resources/entries.json").toFile(),
-                new TypeReference<List<Entry>>() { }
-        );
-        logger.debug("read entries.json successfully");
-        return entries;
+        try (InputStream stream = getClass().getResourceAsStream("/entries.json")) {
+            List<Entry> entries = mapper.readValue(
+                    stream,
+                    new TypeReference<List<Entry>>() { }
+            );
+            logger.debug("read entries.json successfully");
+            return entries;
+        }
     }
 
 
