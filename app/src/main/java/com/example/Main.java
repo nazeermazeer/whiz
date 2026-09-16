@@ -12,6 +12,7 @@ import static dev.tamboui.toolkit.Toolkit.textInput;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -142,10 +143,15 @@ public final class Main extends ToolkitApp {
     }
 
     private ListElement<?> createSidebarPanel() {
-        List<Item> items = Sidebar.getItems(
-            new File("app/src/main/resources/entries.json"),
-            page.file.getName()
-        );
+        List<Item> items;
+        try (InputStream entries = getClass().getResourceAsStream("/entries.json")) {
+            items = Sidebar.getItems(
+                entries,
+                page.file.getName()
+            );
+        } catch (IOException err) {
+            throw new RuntimeException(err);
+        }
 
         List<String> anchors = new ArrayList<>();
         for (Item item : items) {
