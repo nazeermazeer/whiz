@@ -122,12 +122,13 @@ public final class Main extends ToolkitApp {
                         + String.join(" ", result.location())
                     );
 
+                    page = new Page(file);
+
                     int line = Viewer.getLine(
                         page.rawdoc.body().wholeText(),
                         String.join(" ", match)
                     );
 
-                    page = new Page(file);
                     browser = viewer.registerElementActions(browser);
                     browser.markup(page.getContent());
                     browser.state().scrollToLine(line);
