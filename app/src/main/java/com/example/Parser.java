@@ -6,7 +6,9 @@ import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Array;
 
 import org.jsoup.select.Elements;
 
@@ -22,11 +24,19 @@ import org.apache.logging.log4j.Logger;
 
 public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
-    private static final File[] parseFiles = {
-        new File("app/src/main/resources/functions.html"),
-        new File("app/src/main/resources/stdtypes.html"),
-        new File("app/src/main/resources/constants.html")
-    };
+    private static InputStream[] parseFiles;
+    public Parser() {
+        try (
+            InputStream functionsstream = getClass().getResourceAsStream("/functions.html");
+            InputStream stdtypesstream = getClass().getResourceAsStream("/stdtypes.html");
+            InputStream constantsstream = getClass().getResourceAsStream("/constants.html")
+        ) {
+            InputStream[] streams = {functionsstream, stdtypesstream, constantsstream};
+            parseFiles = streams;
+        } catch (IOException err) {
+            throw new RuntimeException(err);
+        }
+    }
 
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
@@ -101,8 +111,8 @@ public class Parser {
         List<Entry> entries = new ArrayList<>();
         logger.info("starting documentation parse");
 
-        for (File file : parseFiles) {
-            Document doc = Jsoup.parse(file, "UTF-8");
+        for (InputStream file : parseFiles) {
+            Document doc = Jsoup.parse(file, "UTF-8", "https://example.com");
             Elements dls = doc.select("dl");
             logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
             for (Element dl : dls) {
