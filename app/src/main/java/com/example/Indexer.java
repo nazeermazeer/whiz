@@ -31,13 +31,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Indexer {
-
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
 
     public record SearchResult(String[] location, String[] term, String[] definition) {}
     
     private static final int numresults = 10;
     private static final Logger logger = LogManager.getLogger(Indexer.class);
+
+    private static final List<String> commands = List.of(
+        "/help"
+    );
 
     private IndexResult index;
 
@@ -124,8 +127,13 @@ public class Indexer {
         return searchresults;
     }
 
-    public final List<SearchResult> searchTerm(String search)
-    throws IOException, ParseException {
+    public final List<SearchResult> searchTerm(String search) throws IOException, ParseException {
         return search(search, index.directory, index.analyzer);
+    }
+
+    public static final List<String> searchCommands(String search) {
+        return commands.stream()
+            .filter(command -> command.startsWith("/"))
+            .toList();
     }
 }
