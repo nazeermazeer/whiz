@@ -6,7 +6,7 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.model.Entry;
+import com.example.Parser.Entry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -29,10 +29,10 @@ public final class Sidebar {
                 target, new TypeReference<List<Entry>>() { }
             );
             for (Entry entry : entries) {
-                if (entry.getLocation().equals(filename)) {
+                if (entry.location().equals(filename)) {
                     items.add(
-                        new Item(entry.getAnchor(),
-                        entry.getSignature().getFirst())
+                        new Item(entry.anchor(),
+                        entry.signature().getFirst())
                     );
                 }
             }

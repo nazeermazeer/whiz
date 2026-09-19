@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.example.model.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +26,11 @@ public class Parser {
         new File("app/src/main/java/com/example/stdtypes.html"),
         new File("app/src/main/java/com/example/constants.html")
     };
+
+    public record Entry(
+        String location, String type, String id, String anchor, String parent, 
+        String[] keywords, List<String> signature, String definition
+    ) {}
 
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
