@@ -115,26 +115,30 @@ public final class Main extends ToolkitApp {
                         return;
                     }
                     SearchResult result = suggestions.results().get(selected);
-
                     match = result.term()[0];
-                    File file = new File(
-                        "app/src/main/java/com/example/"
-                        + String.join(" ", result.location())
-                    );
 
-                    page = new Page(file);
+                    if (match.startsWith("/")) {
+                        browser = Commands.getPanelFromCommand(match);
+                    } else {
+                        File file = new File(
+                            "app/src/main/java/com/example/"
+                            + String.join(" ", result.location())
+                        );
 
-                    int line = Viewer.getLine(
-                        page.rawdoc.body().wholeText(),
-                        String.join(" ", match)
-                    );
+                        page = new Page(file);
 
-                    browser = viewer.registerElementActions(browser);
-                    browser.markup(page.getContent());
-                    browser.state().scrollToLine(line);
-                    sidebar = createSidebarPanel();
+                        int line = Viewer.getLine(
+                            page.rawdoc.body().wholeText(),
+                            String.join(" ", match)
+                        );
 
-                    logger.info("redirected user to search result for \"{}\"", match);
+                        browser = viewer.registerElementActions(browser);
+                        browser.markup(page.getContent());
+                        browser.state().scrollToLine(line);
+                        sidebar = createSidebarPanel();
+
+                        logger.info("redirected user to search result for \"{}\"", match);
+                    }
                 } catch (Exception err) {
                     throw new RuntimeException(err);
                 }
@@ -211,6 +215,7 @@ public final class Main extends ToolkitApp {
             resultCount = commands.size();
             for (String command : commands) {
                 newsuggestions.add(command);
+                suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command}, null));
             }
         } else {
             try {
