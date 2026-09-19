@@ -207,12 +207,11 @@ public final class Main extends ToolkitApp {
         if (query.isBlank()) {
             resultCount = 0;
         } else if (query.startsWith("/"))  {
-            List<String> commands = Indexer.searchCommands(query);
+            List<String> commands = Commands.searchCommands(query);
             resultCount = commands.size();
             for (String command : commands) {
                 newsuggestions.add(command);
             }
-
         } else {
             try {
                 searchedresults = indexer.searchTerm(query);

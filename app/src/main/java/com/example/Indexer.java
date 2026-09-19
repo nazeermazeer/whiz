@@ -38,10 +38,6 @@ public class Indexer {
     private static final int numresults = 10;
     private static final Logger logger = LogManager.getLogger(Indexer.class);
 
-    private static final List<String> commands = List.of(
-        "/help"
-    );
-
     private IndexResult index;
 
 
@@ -129,11 +125,5 @@ public class Indexer {
 
     public final List<SearchResult> searchTerm(String search) throws IOException, ParseException {
         return search(search, index.directory, index.analyzer);
-    }
-
-    public static final List<String> searchCommands(String search) {
-        return commands.stream()
-            .filter(command -> command.startsWith("/"))
-            .toList();
     }
 }
