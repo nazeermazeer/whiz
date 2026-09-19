@@ -119,6 +119,8 @@ public final class Main extends ToolkitApp {
 
                     if (match.startsWith("/")) {
                         browser = Commands.getPanelFromCommand(match);
+
+                        logger.info("redirected user to '{}' panel", match);
                     } else {
                         File file = new File(
                             "app/src/main/java/com/example/"
