@@ -218,7 +218,7 @@ public final class Main extends ToolkitApp {
             List<SlashCommand> commands = Commands.searchCommands(query);
             resultCount = commands.size();
             for (SlashCommand command : commands) {
-                newsuggestions.add(command.name());
+                newsuggestions.add(row(text(command.name()).bold(), text(" " + command.description()).dim()));
                 suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command.name()}, null));
             }
         } else {
