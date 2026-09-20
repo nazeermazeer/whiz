@@ -20,6 +20,8 @@ import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
+
+import com.example.Commands.SlashCommand;
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
 import dev.tamboui.style.Color;
@@ -213,11 +215,11 @@ public final class Main extends ToolkitApp {
         if (query.isBlank()) {
             resultCount = 0;
         } else if (query.startsWith("/"))  {
-            List<String> commands = Commands.searchCommands(query);
+            List<SlashCommand> commands = Commands.searchCommands(query);
             resultCount = commands.size();
-            for (String command : commands) {
-                newsuggestions.add(command);
-                suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command}, null));
+            for (SlashCommand command : commands) {
+                newsuggestions.add(command.name());
+                suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command.name()}, null));
             }
         } else {
             try {
