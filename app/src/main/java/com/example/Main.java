@@ -195,7 +195,7 @@ public final class Main extends ToolkitApp {
                 page.rawdoc.body().wholeText(), signature
             );
             browser.state().scrollToLine(line);
-            logger.info("redirected user to sidebar item for \"{}\"", signature);
+            logger.info("redirected user to sidebar item for '{}'", signature);
 
             return EventResult.HANDLED;
         });
