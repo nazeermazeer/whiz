@@ -34,8 +34,7 @@ public class Commands {
             .sorted((a, b) -> Integer.compare(
                 scoreCommandSearch(b, query),
                 scoreCommandSearch(a, query)
-            ))
-            .toList();
+            )).toList();
     }
 
     public static final MarkupTextAreaElement getPanelFromCommand(String command) {

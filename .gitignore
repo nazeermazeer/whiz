@@ -84,3 +84,5 @@ replay_pid*
 # ignore generated parser files
 app/src/main/java/com/example/entries.json
 app/src/main/resources/entries.json
+
+statistics.json
