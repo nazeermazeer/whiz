@@ -16,6 +16,10 @@ public class Commands {
         "no help for you"
     );
 
+    private static final MarkupTextAreaElement statsPanel = markupTextArea(
+        "no stats for you"
+    );
+
     public static final List<SlashCommand> searchCommands(String search) {
         String query = search.substring(1)
                         .trim()
@@ -37,6 +41,10 @@ public class Commands {
     public static final MarkupTextAreaElement getPanelFromCommand(String command) {
         if (command.equals("/help")) {
             return helpPanel;
+        }
+
+        if (command.equals("/stats")) {
+            return statsPanel;
         }
         return null;
     }
