@@ -10,19 +10,19 @@ public class UserStatistics {
     public UserStatistics() {}
 
     public UserStatistics(int newsearches) {
-        this.totalsearches = newsearches;
+        totalsearches = newsearches;
     }
 
     public void setTotalSearches(int newsearches) { 
-        this.totalsearches = newsearches; 
+        totalsearches = newsearches; 
     }
 
     public void setDocumentSearches(Map<String, Integer> newsearcheddocs) {
-        this.searcheddocs = newsearcheddocs;
+        searcheddocs = newsearcheddocs;
     }
 
     public int getTotalSearches() { 
-        return this.totalsearches; 
+        return totalsearches; 
     }
 
     public Map<String, Integer> getDocumentSearches() {
