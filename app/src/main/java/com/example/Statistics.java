@@ -2,34 +2,32 @@ package com.example;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class Statistics {
-    public static void main(String[] args) {
-        File file = new File("statistics.json");
+    private static final Logger logger = LogManager.getLogger(Main.class);
+    private final File file = new File("statistics.json");
+    private UserStatistics stats;
+
+    public void loadStatistics() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        this.stats = mapper.readValue(file, UserStatistics.class);
+        logger.info("loaded user statistics");
+    }
 
-        UserStatistics stats = new UserStatistics(0);
+    public void increaseSearches() {
+        int searches = this.stats.getSearches();
+        this.stats.setSearches(searches + 1);
+    }
 
-        try {
-            mapper.writeValue(file, stats);
-            System.out.println("Statistics saved successfully!");
-        } catch (IOException e) {
-            System.err.println("Error saving statistics: " + e.getMessage());
-        }
+    public void writeStatistics() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(file, stats);
+        logger.info("statistics saved successfully");
 
-        try {
-            if (file.exists()) {
-                UserStatistics loadedStats = mapper.readValue(file, UserStatistics.class);
-                System.out.println("Loaded Games Played: " + loadedStats.getSearches());
-            }
-        } catch (IOException e) {
-            System.err.println("Error loading statistics: " + e.getMessage());
-        }
     }
 }

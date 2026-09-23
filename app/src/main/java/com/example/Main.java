@@ -46,6 +46,7 @@ public final class Main extends ToolkitApp {
     private Parser parser;
     private Indexer indexer;
     private Viewer viewer;
+    private Statistics statistics;
 
     private ListElement<?> sidebar;
     private SuggestionState suggestions;
@@ -59,14 +60,16 @@ public final class Main extends ToolkitApp {
     private static final Logger logger = LogManager.getLogger(Main.class);
 
 
-    public Main(Parser newparser, Indexer newindexer, Viewer newviewer) {
+    public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Statistics newstatistics) {
         parser = newparser;
         indexer = newindexer;
         viewer = newviewer;
+        statistics = newstatistics;
 
         try {
             parser.parseFiles();
             indexer.indexEntries();
+            statistics.loadStatistics();
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
@@ -140,6 +143,8 @@ public final class Main extends ToolkitApp {
                         browser.markup(page.getContent());
                         browser.state().scrollToLine(line);
                         sidebar = createSidebarPanel();
+
+                        statistics.increaseSearches();
 
                         logger.info("redirected user to search result for \"{}\"", match);
                     }
@@ -328,7 +333,9 @@ public final class Main extends ToolkitApp {
 
         Viewer myviewer = new Viewer();
 
-        Main main = new Main(myparser, myindexer, myviewer);
+        Statistics mystatistics = new Statistics();
+
+        Main main = new Main(myparser, myindexer, myviewer, mystatistics);
         main.run();
     }
 
@@ -376,5 +383,10 @@ public final class Main extends ToolkitApp {
     @Override
     protected void onStop() {
         logger.info("application stopped");
+        try {
+            statistics.writeStatistics();
+        } catch (IOException err) {
+            logger.error("failed to save statistics", err);
+        }
     }
 }
