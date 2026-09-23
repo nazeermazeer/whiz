@@ -25,9 +25,9 @@ import org.apache.logging.log4j.Logger;
 public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
     private static final String[] files = {
-        "/functions.html",
-        "/stdtypes.html",
-        "/constants.html"
+        "functions.html",
+        "stdtypes.html",
+        "constants.html"
     };
 
 
@@ -105,7 +105,7 @@ public class Parser {
         logger.info("starting documentation parse");
 
         for (String file : files) {
-            try (InputStream stream = getClass().getResourceAsStream(file)) {
+            try (InputStream stream = getClass().getResourceAsStream("/" + file)) {
                 Document doc = Jsoup.parse(stream, "UTF-8", "https://docs.python.org/3/");
                 Elements dls = doc.select("dl");
                 logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
@@ -116,10 +116,10 @@ public class Parser {
                     String def = parseDefinition(dl);
                     String parent = getParent(anchor);
                     String[] keywords = gatherKeywords(parent != "", anchor);
-                    
+
                     if (!anchor.equals("") && !type.equals("")) {
                         entries.add(
-                            new Entry(doc.title(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                            new Entry(file, type, ("python:" + anchor), anchor, parent, keywords, terms, def)
                         );
                     }
                 }
