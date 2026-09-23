@@ -2,14 +2,14 @@ package com.example;
 
 import java.util.Map;
 
-public class GameStatistics {
+public class UserStatistics {
     private int gamesPlayed;
     private double winRate;
     private Map<String, Integer> highScores;
 
-    public GameStatistics() {}
+    public UserStatistics() {}
 
-    public GameStatistics(int gamesPlayed, double winRate, Map<String, Integer> highScores) {
+    public UserStatistics(int gamesPlayed, double winRate, Map<String, Integer> highScores) {
         this.gamesPlayed = gamesPlayed;
         this.winRate = winRate;
         this.highScores = highScores;
