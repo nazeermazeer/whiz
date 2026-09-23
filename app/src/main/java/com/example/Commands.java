@@ -41,7 +41,7 @@ public class Commands {
         }
 
         if (command.equals("/stats")) {
-            return markupTextArea("no stats for you" + stats.getSearches());
+            return markupTextArea("total searches: " + stats.getSearches());
         }
         return null;
     }
