@@ -14,11 +14,7 @@ public class Statistics {
         
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        UserStatistics stats = new UserStatistics(
-            150, 
-            64.5, 
-            Map.of("Player1", 2500, "Player2", 1850)
-        );
+        UserStatistics stats = new UserStatistics(0);
 
         try {
             mapper.writeValue(file, stats);
@@ -30,7 +26,7 @@ public class Statistics {
         try {
             if (file.exists()) {
                 UserStatistics loadedStats = mapper.readValue(file, UserStatistics.class);
-                System.out.println("Loaded Games Played: " + loadedStats.getGamesPlayed());
+                System.out.println("Loaded Games Played: " + loadedStats.getSearches());
             }
         } catch (IOException e) {
             System.err.println("Error loading statistics: " + e.getMessage());
