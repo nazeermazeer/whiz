@@ -47,6 +47,7 @@ public final class Main extends ToolkitApp {
     private Indexer indexer;
     private Viewer viewer;
     private Statistics statistics;
+    private Commands commands;
 
     private ListElement<?> sidebar;
     private SuggestionState suggestions;
@@ -59,12 +60,12 @@ public final class Main extends ToolkitApp {
 
     private static final Logger logger = LogManager.getLogger(Main.class);
 
-
-    public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Statistics newstatistics) {
+    public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Statistics newstatistics, Commands newcommands) {
         parser = newparser;
         indexer = newindexer;
         viewer = newviewer;
         statistics = newstatistics;
+        commands = newcommands;
 
         try {
             parser.parseFiles();
@@ -123,7 +124,7 @@ public final class Main extends ToolkitApp {
                     match = result.term()[0];
 
                     if (match.startsWith("/")) {
-                        browser = Commands.getPanelFromCommand(match);
+                        browser = commands.getPanelFromCommand(match);
 
                         logger.info("redirected user to '{}' panel", match);
                     } else {
@@ -220,9 +221,9 @@ public final class Main extends ToolkitApp {
         if (query.isBlank()) {
             resultCount = 0;
         } else if (query.startsWith("/"))  {
-            List<SlashCommand> commands = Commands.searchCommands(query);
-            resultCount = commands.size();
-            for (SlashCommand command : commands) {
+            List<SlashCommand> slashcommands = commands.searchCommands(query);
+            resultCount = slashcommands.size();
+            for (SlashCommand command : slashcommands) {
                 newsuggestions.add(row(text(command.name()).bold(), text(" " + command.description()).dim()));
                 suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command.name()}, null));
             }
@@ -335,7 +336,10 @@ public final class Main extends ToolkitApp {
 
         Statistics mystatistics = new Statistics();
 
-        Main main = new Main(myparser, myindexer, myviewer, mystatistics);
+        Commands mycommands = new Commands(mystatistics);
+
+
+        Main main = new Main(myparser, myindexer, myviewer, mystatistics, mycommands);
         main.run();
     }
 

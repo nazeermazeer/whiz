@@ -7,20 +7,26 @@ import java.util.List;
 
 public class Commands {
     public record SlashCommand(String name, String description) {}
+    private Statistics stats;
+
+    public Commands(Statistics newstats) {
+        this.stats = newstats;
+    }
+
     private static final List<SlashCommand> commands = List.of(
         new SlashCommand("/help", "get help"),
         new SlashCommand("/stats", "get stats")
     );
 
-    private static final MarkupTextAreaElement helpPanel = markupTextArea(
+    private final MarkupTextAreaElement helpPanel = markupTextArea(
         "no help for you"
     );
 
-    private static final MarkupTextAreaElement statsPanel = markupTextArea(
+    private final MarkupTextAreaElement statsPanel = markupTextArea(
         "no stats for you"
     );
 
-    public static final List<SlashCommand> searchCommands(String search) {
+    public final List<SlashCommand> searchCommands(String search) {
         String query = search.substring(1)
                         .trim()
                         .toLowerCase();
@@ -37,13 +43,13 @@ public class Commands {
             )).toList();
     }
 
-    public static final MarkupTextAreaElement getPanelFromCommand(String command) {
+    public final MarkupTextAreaElement getPanelFromCommand(String command) {
         if (command.equals("/help")) {
             return helpPanel;
         }
 
         if (command.equals("/stats")) {
-            return statsPanel;
+            return markupTextArea("no stats for you" + stats.getSearches());
         }
         return null;
     }

@@ -28,7 +28,11 @@ public class Statistics {
 
     public void increaseSearches() {
         int searches = this.stats.getSearches();
-        this.stats.setSearches(searches + 1);
+        stats.setSearches(searches + 1);
+    }
+
+    public int getSearches() {
+        return stats.getSearches();
     }
 
     public void writeStatistics() throws IOException {
