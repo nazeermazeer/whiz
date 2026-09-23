@@ -24,19 +24,12 @@ import org.apache.logging.log4j.Logger;
 
 public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
-    private static InputStream[] parseFiles;
-    public Parser() {
-        try (
-            InputStream functionsstream = getClass().getResourceAsStream("/functions.html");
-            InputStream stdtypesstream = getClass().getResourceAsStream("/stdtypes.html");
-            InputStream constantsstream = getClass().getResourceAsStream("/constants.html")
-        ) {
-            InputStream[] streams = {functionsstream, stdtypesstream, constantsstream};
-            parseFiles = streams;
-        } catch (IOException err) {
-            throw new RuntimeException(err);
-        }
-    }
+    private static final String[] files = {
+        "/functions.html",
+        "/stdtypes.html",
+        "/constants.html"
+    };
+
 
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
@@ -111,27 +104,24 @@ public class Parser {
         List<Entry> entries = new ArrayList<>();
         logger.info("starting documentation parse");
 
-        for (InputStream file : parseFiles) {
-            Document doc = Jsoup.parse(file, "UTF-8", "https://example.com");
-            Elements dls = doc.select("dl");
-            logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
-            for (Element dl : dls) {
-                String type = parseType(dl);
-
-                String anchor = parseAnchor(dl);
-
-                List<String> terms = parseSignatures(dl);
-
-                String def = parseDefinition(dl);
-
-                String parent = getParent(anchor);
-
-                String[] keywords = gatherKeywords(parent != "", anchor);
-
-                if (!anchor.equals("") && !type.equals("")) {
-                    entries.add(
-                        new Entry(file.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
-                    );
+        for (String file : files) {
+            try (InputStream stream = getClass().getResourceAsStream(file)) {
+                Document doc = Jsoup.parse(stream, "UTF-8", "https://docs.python.org/3/");
+                Elements dls = doc.select("dl");
+                logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
+                for (Element dl : dls) {
+                    String type = parseType(dl);
+                    String anchor = parseAnchor(dl);
+                    List<String> terms = parseSignatures(dl);
+                    String def = parseDefinition(dl);
+                    String parent = getParent(anchor);
+                    String[] keywords = gatherKeywords(parent != "", anchor);
+                    
+                    if (!anchor.equals("") && !type.equals("")) {
+                        entries.add(
+                            new Entry(doc.title(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                        );
+                    }
                 }
             }
         }
