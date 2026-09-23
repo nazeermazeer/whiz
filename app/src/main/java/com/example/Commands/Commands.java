@@ -1,4 +1,4 @@
-package com.example;
+package com.example.Commands;
 
 import static dev.tamboui.toolkit.Toolkit.markupTextArea;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;

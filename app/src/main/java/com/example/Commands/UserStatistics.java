@@ -1,4 +1,4 @@
-package com.example;
+package com.example.Commands;
 
 public class UserStatistics {
     private int searches;

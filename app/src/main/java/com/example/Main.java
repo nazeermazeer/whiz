@@ -21,7 +21,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 
-import com.example.Commands.SlashCommand;
+import com.example.Commands.Commands;
+import com.example.Commands.Statistics;
+import com.example.Commands.Commands.SlashCommand;
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
 import dev.tamboui.style.Color;
