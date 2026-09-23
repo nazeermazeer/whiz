@@ -23,7 +23,7 @@ public class Statistics {
         } catch (IOException err) {
             this.stats = new UserStatistics(0);
             this.writeStatistics();
-            logger.warn("statistics file not found; starting from scratch...", err);
+            logger.warn("starting stats file from scratch due to error...", err);
         }
     }
 
