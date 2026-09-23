@@ -27,13 +27,13 @@ public class Statistics {
         }
     }
 
-    public void increaseSearches() {
-        int searches = this.stats.getSearches();
-        stats.setSearches(searches + 1);
+    public void increaseTotalSearches() {
+        int searches = this.stats.getTotalSearches();
+        stats.setTotalSearches(searches + 1);
     }
 
-    public int getSearches() {
-        return stats.getSearches();
+    public int getTotalSearches() {
+        return stats.getTotalSearches();
     }
 
     public void writeStatistics() throws IOException {

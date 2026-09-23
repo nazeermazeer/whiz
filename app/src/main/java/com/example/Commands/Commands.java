@@ -47,7 +47,7 @@ public class Commands {
         }
 
         if (command.equals("/stats")) {
-            return markupTextArea("total searches: " + stats.getSearches());
+            return markupTextArea("total searches: " + stats.getTotalSearches());
         }
         return null;
     }
@@ -72,7 +72,7 @@ public class Commands {
     }
 
     public final void recordSearch() {
-        stats.increaseSearches();
+        stats.increaseTotalSearches();
     }
 
     public final void saveStatistics() throws IOException {
