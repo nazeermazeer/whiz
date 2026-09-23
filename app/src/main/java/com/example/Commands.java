@@ -3,6 +3,7 @@ package com.example;
 import static dev.tamboui.toolkit.Toolkit.markupTextArea;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 
+import java.io.IOException;
 import java.util.List;
 
 public class Commands {
@@ -11,6 +12,11 @@ public class Commands {
 
     public Commands(Statistics newstats) {
         this.stats = newstats;
+        try {
+            stats.loadStatistics();
+        } catch (IOException err) {
+            throw new RuntimeException(err);
+        }
     }
 
     private static final List<SlashCommand> commands = List.of(
@@ -63,5 +69,13 @@ public class Commands {
             return 40;
 
         return 0;
+    }
+
+    public final void recordSearch() {
+        stats.increaseSearches();
+    }
+
+    public final void saveStatistics() throws IOException {
+        stats.writeStatistics();
     }
 }

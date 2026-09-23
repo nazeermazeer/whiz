@@ -46,7 +46,6 @@ public final class Main extends ToolkitApp {
     private Parser parser;
     private Indexer indexer;
     private Viewer viewer;
-    private Statistics statistics;
     private Commands commands;
 
     private ListElement<?> sidebar;
@@ -60,17 +59,15 @@ public final class Main extends ToolkitApp {
 
     private static final Logger logger = LogManager.getLogger(Main.class);
 
-    public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Statistics newstatistics, Commands newcommands) {
+    public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Commands newcommands) {
         parser = newparser;
         indexer = newindexer;
         viewer = newviewer;
-        statistics = newstatistics;
         commands = newcommands;
 
         try {
             parser.parseFiles();
             indexer.indexEntries();
-            statistics.loadStatistics();
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
@@ -145,7 +142,7 @@ public final class Main extends ToolkitApp {
                         browser.state().scrollToLine(line);
                         sidebar = createSidebarPanel();
 
-                        statistics.increaseSearches();
+                        commands.recordSearch();
 
                         logger.info("redirected user to search result for \"{}\"", match);
                     }
@@ -335,11 +332,9 @@ public final class Main extends ToolkitApp {
         Viewer myviewer = new Viewer();
 
         Statistics mystatistics = new Statistics();
-
         Commands mycommands = new Commands(mystatistics);
 
-
-        Main main = new Main(myparser, myindexer, myviewer, mystatistics, mycommands);
+        Main main = new Main(myparser, myindexer, myviewer, mycommands);
         main.run();
     }
 
@@ -388,7 +383,7 @@ public final class Main extends ToolkitApp {
     protected void onStop() {
         logger.info("application stopped");
         try {
-            statistics.writeStatistics();
+            commands.saveStatistics();
         } catch (IOException err) {
             logger.error("failed to save statistics", err);
         }
