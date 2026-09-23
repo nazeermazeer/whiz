@@ -16,8 +16,14 @@ public class Statistics {
 
     public void loadStatistics() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        this.stats = mapper.readValue(file, UserStatistics.class);
-        logger.info("loaded user statistics");
+        try {
+            this.stats = mapper.readValue(file, UserStatistics.class);
+            logger.info("loaded user statistics");
+        } catch (IOException err) {
+            this.stats = new UserStatistics(0);
+            this.writeStatistics();
+            logger.warn("statistics file not found; starting from scratch...", err);
+        }
     }
 
     public void increaseSearches() {
@@ -28,7 +34,7 @@ public class Statistics {
     public void writeStatistics() throws IOException {
         ObjectMapper mapper = new ObjectMapper();        
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        
+
         mapper.writeValue(file, stats);
         logger.info("statistics saved successfully");
 
