@@ -2,6 +2,7 @@ package com.example.Commands;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +31,16 @@ public class Statistics {
     public void increaseTotalSearches() {
         int searches = this.stats.getTotalSearches();
         stats.setTotalSearches(searches + 1);
+    }
+
+    public void increaseDocumentSearches(String doc) {
+        Map<String, Integer> searcheddocs = this.stats.getDocumentSearches();
+        if (searcheddocs.get(doc) == null) {
+            searcheddocs.put(doc, 1);
+        } else {
+            searcheddocs.put(doc, searcheddocs.get(doc) + 1);
+        }
+        stats.setDocumentSearches(searcheddocs);
     }
 
     public int getTotalSearches() {

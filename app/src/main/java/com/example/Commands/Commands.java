@@ -71,8 +71,12 @@ public class Commands {
         return 0;
     }
 
-    public final void recordSearch() {
+    public final void recordTotalSearch() {
         stats.increaseTotalSearches();
+    }
+
+    public final void recordDocumentationSearch(String doc) {
+        stats.increaseDocumentSearches(doc);
     }
 
     public final void saveStatistics() throws IOException {

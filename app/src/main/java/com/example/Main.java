@@ -144,7 +144,8 @@ public final class Main extends ToolkitApp {
                         browser.state().scrollToLine(line);
                         sidebar = createSidebarPanel();
 
-                        commands.recordSearch();
+                        commands.recordTotalSearch();
+                        commands.recordDocumentationSearch("python");
 
                         logger.info("redirected user to search result for \"{}\"", match);
                     }
