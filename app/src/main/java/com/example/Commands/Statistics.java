@@ -2,6 +2,7 @@ package com.example.Commands;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import com.example.Main;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class Statistics {
     private static final Logger logger = LogManager.getLogger(Main.class);
@@ -18,11 +20,14 @@ public class Statistics {
 
     public void loadStatistics() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
         try {
             this.stats = mapper.readValue(file, UserStatistics.class);
             logger.info("loaded user statistics");
         } catch (IOException err) {
-            this.stats = new UserStatistics(0);
+            this.stats = new UserStatistics();
+            this.stats.setCreationDate(LocalDateTime.now().toString());
             this.writeStatistics();
             logger.warn("starting stats file from scratch due to error...", err);
         }
