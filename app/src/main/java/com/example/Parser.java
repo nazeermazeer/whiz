@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import com.example.model.Entry;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,12 +24,13 @@ import org.apache.logging.log4j.Logger;
 
 public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
-    private static final String[] files = {
-        "functions.html",
-        "stdtypes.html",
-        "constants.html"
-    };
 
+    private record ParserItem(String name, InputStream stream) {};
+    private static ParserItem[] items = {
+        new ParserItem("functions", Parser.class.getResourceAsStream("/functions.html")),
+        new ParserItem("stdtypes", Parser.class.getResourceAsStream("/stdtypes.html")),
+        new ParserItem("constants", Parser.class.getResourceAsStream("/constants.html"))
+    };
 
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
@@ -103,11 +105,10 @@ public class Parser {
         List<Entry> entries = new ArrayList<>();
         logger.info("starting documentation parse");
 
-        for (String file : files) {
-            try (InputStream stream = getClass().getResourceAsStream("/" + file)) {
-                Document doc = Jsoup.parse(stream, "UTF-8", "https://docs.python.org/3/");
+        for (ParserItem item : items) {
+                Document doc = Jsoup.parse(item.stream, "UTF-8", "https://docs.python.org/3/");
                 Elements dls = doc.select("dl");
-                logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
+                logger.debug("parsing {} documentation blocks from {}", dls.size(), item.name);
                 for (Element dl : dls) {
                     String type = parseType(dl);
                     String anchor = parseAnchor(dl);
@@ -118,11 +119,10 @@ public class Parser {
 
                     if (!anchor.equals("") && !type.equals("")) {
                         entries.add(
-                            new Entry(file, type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                            new Entry(item.name, type, ("python:" + anchor), anchor, parent, keywords, terms, def)
                         );
                     }
                 }
-            }
         }
 
         File outputfile = new File("app/src/main/resources/entries.json");
