@@ -13,6 +13,10 @@ import static dev.tamboui.toolkit.Toolkit.textInput;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,7 +59,7 @@ public final class Main extends ToolkitApp {
     private String query = "";
     private TextInputState searchbarstate = new TextInputState();
 
-    private static File appdir;
+    private static Path appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
 
 
@@ -314,19 +318,23 @@ public final class Main extends ToolkitApp {
         String os = System.getProperty("os.name").toLowerCase();
 
         if (os.contains("mac")) {
-            appdir = new File(home, "Library/Application Support/whiz");
+            appdir = Paths.get(home, "Library", "Application Support", "whiz");
         } else if (os.contains("win")) {
-            appdir = new File(System.getenv("APPDATA"), "whiz");
+            String appData = System.getenv("APPDATA");
+            appdir = Paths.get(appData != null ? appData : home, "whiz");
         } else {
-            appdir = new File(home, "whiz");
+            appdir = Paths.get(home, ".whiz");
         }
-        if (!appdir.exists()) {
-            appdir.mkdirs();
+
+        try {
+            Files.createDirectories(appdir);
+        } catch (IOException err) {
+            throw new UncheckedIOException(err);
         }
     }
 
-    public static File getAppDirectory() {
-        return appdir;
+    public static String getAppDirectory() {
+        return appdir.toAbsolutePath().toString();
     } 
 
     public static void main(String[] args) throws Exception {
