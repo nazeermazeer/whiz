@@ -3,7 +3,6 @@ package com.example;
 
 import static dev.tamboui.toolkit.Toolkit.column;
 import static dev.tamboui.toolkit.Toolkit.list;
-import static dev.tamboui.toolkit.Toolkit.markupTextArea;
 import static dev.tamboui.toolkit.Toolkit.panel;
 import static dev.tamboui.toolkit.Toolkit.row;
 import static dev.tamboui.toolkit.Toolkit.spacer;
@@ -35,7 +34,7 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.ListElement;
-import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.error.ErrorAction;
@@ -51,7 +50,7 @@ public final class Main extends ToolkitApp {
 
     private ListElement<?> sidebar;
     private SuggestionState suggestions;
-    private MarkupTextAreaElement browser;
+    private ActionableMarkupTextAreaElement browser;
     private Element searchbar;
 
     private Page page;
@@ -105,9 +104,9 @@ public final class Main extends ToolkitApp {
 
     private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
 
-    private MarkupTextAreaElement createBrowserPanel(Document document) {
+    private ActionableMarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
-        return viewer.registerElementActions(markupTextArea(content));
+        return viewer.registerElementActions(new ActionableMarkupTextAreaElement(content));
     }            
 
     private Element createSearchbarPanel(TextInputState state) {

@@ -81,7 +81,7 @@ import dev.tamboui.widgets.scrollbar.ScrollbarState;
  * @see MarkupParser for markup syntax details
  * @see RichTextAreaElement for pre-styled Text rendering
  */
-public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaElement> {
+public final class ActionableMarkupTextAreaElement extends StyledElement<ActionableMarkupTextAreaElement> {
 
     private static final Style DEFAULT_LINE_NUMBER_STYLE = Style.EMPTY.dim();
 
@@ -110,18 +110,18 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     private final RichTextState state;
 
     /**
-     * Creates a MarkupTextAreaElement with empty content.
+     * Creates a ActionableMarkupTextAreaElement with empty content.
      */
-    public MarkupTextAreaElement() {
+    public ActionableMarkupTextAreaElement() {
         this("");
     }
 
     /**
-     * Creates a MarkupTextAreaElement with the given markup content.
+     * Creates a ActionableMarkupTextAreaElement with the given markup content.
      *
      * @param markup the markup text to parse and display
      */
-    public MarkupTextAreaElement(String markup) {
+    public ActionableMarkupTextAreaElement(String markup) {
         this.markup = markup != null ? markup : "";
         this.state = new RichTextState();
     }
@@ -132,7 +132,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param markup the markup text to parse and display
      * @return this element for chaining
      */
-    public MarkupTextAreaElement markup(String markup) {
+    public ActionableMarkupTextAreaElement markup(String markup) {
         this.markup = markup != null ? markup : "";
         this.textDirty = true;
         return this;
@@ -152,7 +152,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param action code to run when the action is clicked
      * @return this element for chaining
      */
-    public MarkupTextAreaElement action(String name, Runnable action) {
+    public ActionableMarkupTextAreaElement action(String name, Runnable action) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Action name cannot be blank");
         }
@@ -169,7 +169,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param resolver the custom resolver
      * @return this element for chaining
      */
-    public MarkupTextAreaElement customResolver(MarkupParser.StyleResolver resolver) {
+    public ActionableMarkupTextAreaElement customResolver(MarkupParser.StyleResolver resolver) {
         this.customResolver = resolver;
         this.textDirty = true;
         return this;
@@ -181,7 +181,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param overflow the overflow mode
      * @return this element for chaining
      */
-    public MarkupTextAreaElement overflow(Overflow overflow) {
+    public ActionableMarkupTextAreaElement overflow(Overflow overflow) {
         this.overflow = overflow;
         return this;
     }
@@ -191,7 +191,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      *
      * @return this element for chaining
      */
-    public MarkupTextAreaElement clip() {
+    public ActionableMarkupTextAreaElement clip() {
         this.overflow = Overflow.CLIP;
         return this;
     }
@@ -201,7 +201,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      *
      * @return this element for chaining
      */
-    public MarkupTextAreaElement wrapWord() {
+    public ActionableMarkupTextAreaElement wrapWord() {
         this.overflow = Overflow.WRAP_WORD;
         return this;
     }
@@ -211,7 +211,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      *
      * @return this element for chaining
      */
-    public MarkupTextAreaElement wrapCharacter() {
+    public ActionableMarkupTextAreaElement wrapCharacter() {
         this.overflow = Overflow.WRAP_CHARACTER;
         return this;
     }
@@ -221,7 +221,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      *
      * @return this element for chaining
      */
-    public MarkupTextAreaElement ellipsis() {
+    public ActionableMarkupTextAreaElement ellipsis() {
         this.overflow = Overflow.ELLIPSIS;
         return this;
     }
@@ -232,7 +232,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param alignment the alignment
      * @return this element for chaining
      */
-    public MarkupTextAreaElement alignment(Alignment alignment) {
+    public ActionableMarkupTextAreaElement alignment(Alignment alignment) {
         this.alignment = alignment;
         return this;
     }
@@ -242,7 +242,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      *
      * @return this element for chaining
      */
-    public MarkupTextAreaElement centered() {
+    public ActionableMarkupTextAreaElement centered() {
         this.alignment = Alignment.CENTER;
         return this;
     }
@@ -252,7 +252,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      *
      * @return this element for chaining
      */
-    public MarkupTextAreaElement right() {
+    public ActionableMarkupTextAreaElement right() {
         this.alignment = Alignment.RIGHT;
         return this;
     }
@@ -262,7 +262,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      *
      * @return this element for chaining
      */
-    public MarkupTextAreaElement showLineNumbers() {
+    public ActionableMarkupTextAreaElement showLineNumbers() {
         this.showLineNumbers = true;
         return this;
     }
@@ -273,7 +273,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param show true to show line numbers
      * @return this element for chaining
      */
-    public MarkupTextAreaElement showLineNumbers(boolean show) {
+    public ActionableMarkupTextAreaElement showLineNumbers(boolean show) {
         this.showLineNumbers = show;
         return this;
     }
@@ -284,7 +284,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param style the style for line numbers
      * @return this element for chaining
      */
-    public MarkupTextAreaElement lineNumberStyle(Style style) {
+    public ActionableMarkupTextAreaElement lineNumberStyle(Style style) {
         this.lineNumberStyle = style;
         return this;
     }
@@ -295,7 +295,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param separator the separator string
      * @return this element for chaining
      */
-    public MarkupTextAreaElement lineNumberSeparator(String separator) {
+    public ActionableMarkupTextAreaElement lineNumberSeparator(String separator) {
         this.lineNumberSeparator = separator != null ? separator : " ";
         return this;
     }
@@ -306,7 +306,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param title the title text
      * @return this element for chaining
      */
-    public MarkupTextAreaElement title(String title) {
+    public ActionableMarkupTextAreaElement title(String title) {
         this.title = title;
         return this;
     }
@@ -316,7 +316,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      *
      * @return this element for chaining
      */
-    public MarkupTextAreaElement rounded() {
+    public ActionableMarkupTextAreaElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
@@ -327,7 +327,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param borderType the border type
      * @return this element for chaining
      */
-    public MarkupTextAreaElement borderType(BorderType borderType) {
+    public ActionableMarkupTextAreaElement borderType(BorderType borderType) {
         this.borderType = borderType;
         return this;
     }
@@ -338,7 +338,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param color the border color
      * @return this element for chaining
      */
-    public MarkupTextAreaElement borderColor(Color color) {
+    public ActionableMarkupTextAreaElement borderColor(Color color) {
         this.borderColor = color;
         return this;
     }
@@ -349,7 +349,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param color the focused border color
      * @return this element for chaining
      */
-    public MarkupTextAreaElement focusedBorderColor(Color color) {
+    public ActionableMarkupTextAreaElement focusedBorderColor(Color color) {
         this.focusedBorderColor = color;
         return this;
     }
@@ -359,7 +359,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      *
      * @return this element for chaining
      */
-    public MarkupTextAreaElement scrollbar() {
+    public ActionableMarkupTextAreaElement scrollbar() {
         this.scrollBarPolicy = ScrollBarPolicy.ALWAYS;
         return this;
     }
@@ -370,7 +370,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param policy the scrollbar display policy
      * @return this element for chaining
      */
-    public MarkupTextAreaElement scrollbar(ScrollBarPolicy policy) {
+    public ActionableMarkupTextAreaElement scrollbar(ScrollBarPolicy policy) {
         this.scrollBarPolicy = policy != null ? policy : ScrollBarPolicy.NONE;
         return this;
     }
@@ -381,7 +381,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param color the thumb color
      * @return this element for chaining
      */
-    public MarkupTextAreaElement scrollbarThumbColor(Color color) {
+    public ActionableMarkupTextAreaElement scrollbarThumbColor(Color color) {
         this.scrollbarThumbColor = color;
         return this;
     }
@@ -392,7 +392,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param color the track color
      * @return this element for chaining
      */
-    public MarkupTextAreaElement scrollbarTrackColor(Color color) {
+    public ActionableMarkupTextAreaElement scrollbarTrackColor(Color color) {
         this.scrollbarTrackColor = color;
         return this;
     }
@@ -403,7 +403,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param line the line number (0-based)
      * @return this element for chaining
      */
-    public MarkupTextAreaElement scrollToLine(int line) {
+    public ActionableMarkupTextAreaElement scrollToLine(int line) {
         state.scrollToLine(line);
         return this;
     }
@@ -414,7 +414,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      * @param line the line number (0-based)
      * @return this element for chaining
      */
-    public MarkupTextAreaElement ensureLineVisible(int line) {
+    public ActionableMarkupTextAreaElement ensureLineVisible(int line) {
         state.ensureLineVisible(line);
         return this;
     }

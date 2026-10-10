@@ -22,7 +22,7 @@ import org.jsoup.nodes.TextNode;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
-import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
 
 
 public final class Viewer {
@@ -180,7 +180,7 @@ public final class Viewer {
         return doc.title();
     }
 
-    public MarkupTextAreaElement registerElementActions(MarkupTextAreaElement element) {
+    public ActionableMarkupTextAreaElement registerElementActions(ActionableMarkupTextAreaElement element) {
         Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
         Matcher matcher = pattern.matcher(getStylizedDocument().body().wholeText());
 
