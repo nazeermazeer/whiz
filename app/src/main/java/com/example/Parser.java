@@ -5,6 +5,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -125,7 +126,13 @@ public class Parser {
                 }
         }
 
-        File outputfile = new File("app/src/main/resources/entries.json");
+        String home = System.getProperty("user.home");
+        File dir = new File(home, ".whiz");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        File outputfile = new File(dir, "entries.json");
         ObjectMapper mapper = new ObjectMapper();
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, entries);
