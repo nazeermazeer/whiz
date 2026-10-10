@@ -3,7 +3,7 @@
     <Appenders>
         <RollingFile name="GeneralFile" fileName="logs/whiz.log" 
                      filePattern="logs/whiz-%d{yyyy-MM-dd}-%i.log.gz">
-            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %m%n"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
