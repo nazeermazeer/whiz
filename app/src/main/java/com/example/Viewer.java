@@ -56,6 +56,7 @@ public final class Viewer {
             }
         } catch (IOException err) {
             entries.add("rubbish is not rubbishing");
+            logger.warn("rubbish is not rubbishing", err);
         }
 
         int randomIndex = myrandom.nextInt(entries.size());
