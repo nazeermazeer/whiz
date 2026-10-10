@@ -26,13 +26,6 @@ import org.apache.logging.log4j.Logger;
 public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
 
-    private record ParserItem(String name, InputStream stream) {};
-    private static ParserItem[] items = {
-        new ParserItem("functions.html", Parser.class.getResourceAsStream("/functions.html")),
-        new ParserItem("stdtypes.html", Parser.class.getResourceAsStream("/stdtypes.html")),
-        new ParserItem("constants.html", Parser.class.getResourceAsStream("/constants.html"))
-    };
-
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
             return "function";
@@ -106,10 +99,16 @@ public class Parser {
         List<Entry> entries = new ArrayList<>();
         logger.info("starting documentation parse");
 
-        for (ParserItem item : items) {
-                Document doc = Jsoup.parse(item.stream, "UTF-8", "https://docs.python.org/3/");
+        File[] files = {
+            new File(Main.getAppDirectory(), "functions.html"),
+            new File(Main.getAppDirectory(), "stdtypes.html"),
+            new File(Main.getAppDirectory(), "constants.html")
+        };
+
+        for (File file : files) {
+                Document doc = Jsoup.parse(file, "UTF-8", "https://docs.python.org/3/");
                 Elements dls = doc.select("dl");
-                logger.debug("parsing {} documentation blocks from {}", dls.size(), item.name);
+                logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
                 for (Element dl : dls) {
                     String type = parseType(dl);
                     String anchor = parseAnchor(dl);
@@ -120,7 +119,7 @@ public class Parser {
 
                     if (!anchor.equals("") && !type.equals("")) {
                         entries.add(
-                            new Entry(item.name, type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                            new Entry(file.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
                         );
                     }
                 }

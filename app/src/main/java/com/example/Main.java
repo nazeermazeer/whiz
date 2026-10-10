@@ -76,7 +76,7 @@ public final class Main extends ToolkitApp {
             throw new RuntimeException(err);
         }
 
-        page = new Page(new File("app/src/main/resources/functions.html"));
+        page = new Page(new File(Main.getAppDirectory(), "functions.html"));
         sidebar = createSidebarPanel();
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);
@@ -122,12 +122,9 @@ public final class Main extends ToolkitApp {
                         return;
                     }
                     SearchResult result = suggestions.results().get(selected);
-
                     match = result.term()[0];
-                    File file = new File(
-                        "app/src/main/resources/"
-                        + String.join(" ", result.location())
-                    );
+
+                    File file = new File(Main.getAppDirectory(), String.join(" ", result.location()));
 
                     int line = Viewer.getLine(
                         page.rawdoc.body().wholeText(),
