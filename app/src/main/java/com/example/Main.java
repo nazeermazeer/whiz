@@ -55,6 +55,7 @@ public final class Main extends ToolkitApp {
     private String query = "";
     private TextInputState searchbarstate = new TextInputState();
 
+    private static File appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
 
 
@@ -62,6 +63,8 @@ public final class Main extends ToolkitApp {
         parser = newparser;
         indexer = newindexer;
         viewer = newviewer;
+
+        createAppDirectory();
 
         try {
             parser.parseFiles();
@@ -305,6 +308,26 @@ public final class Main extends ToolkitApp {
             }
         };
     }
+
+    private static void createAppDirectory() {
+        String home = System.getProperty("user.home");
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("mac")) {
+            appdir = new File(home, "Library/Application Support/whiz");
+        } else if (os.contains("win")) {
+            appdir = new File(System.getenv("APPDATA"), "whiz");
+        } else {
+            appdir = new File(home, "whiz");
+        }
+        if (!appdir.exists()) {
+            appdir.mkdirs();
+        }
+    }
+
+    public static File getAppDirectory() {
+        return appdir;
+    } 
 
     public static void main(String[] args) throws Exception {
         java.util.logging.Logger lucenelogger = java.util.logging.Logger.getLogger("org.apache.lucene");
