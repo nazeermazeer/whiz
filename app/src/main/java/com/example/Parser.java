@@ -127,7 +127,16 @@ public class Parser {
         }
 
         String home = System.getProperty("user.home");
-        File dir = new File(home, ".whiz");
+        String os = System.getProperty("os.name").toLowerCase();
+        File dir;
+
+        if (os.contains("mac")) {
+            dir = new File(home, "Library/Application Support/whiz");
+        } else if (os.contains("win")) {
+            dir = new File(System.getenv("APPDATA"), "whiz");
+        } else {
+            dir = new File(home, "whiz");
+        }
         if (!dir.exists()) {
             dir.mkdirs();
         }
