@@ -150,7 +150,7 @@ public final class Main extends ToolkitApp {
 
     private ListElement<?> createSidebarPanel() {
         List<Item> items = Sidebar.getItems(
-            new File("app/src/main/resources/entries.json"),
+            new File(Main.getAppDirectory(), "entries.json"),
             page.file.getName()
         );
 

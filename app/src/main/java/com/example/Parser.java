@@ -28,9 +28,9 @@ public class Parser {
 
     private record ParserItem(String name, InputStream stream) {};
     private static ParserItem[] items = {
-        new ParserItem("functions", Parser.class.getResourceAsStream("/functions.html")),
-        new ParserItem("stdtypes", Parser.class.getResourceAsStream("/stdtypes.html")),
-        new ParserItem("constants", Parser.class.getResourceAsStream("/constants.html"))
+        new ParserItem("functions.html", Parser.class.getResourceAsStream("/functions.html")),
+        new ParserItem("stdtypes.html", Parser.class.getResourceAsStream("/stdtypes.html")),
+        new ParserItem("constants.html", Parser.class.getResourceAsStream("/constants.html"))
     };
 
     private String parseType(Element entry) {
