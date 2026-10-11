@@ -4,7 +4,6 @@ import static dev.tamboui.toolkit.Toolkit.markupTextArea;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -67,7 +66,7 @@ public class Commands {
                 .withZone(ZoneId.systemDefault())
                 .withLocale(Locale.ENGLISH);
         contents += "since: " + formatter.format(instant) + "\n";
-        
+
         contents += "total searches: " + totsearches + "\n";
 
         for (Map.Entry<String, Integer> doc : docsearches.entrySet()) {
