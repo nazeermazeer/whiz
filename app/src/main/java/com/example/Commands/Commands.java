@@ -1,7 +1,7 @@
 package com.example.Commands;
 
-import static dev.tamboui.toolkit.Toolkit.markupTextArea;
-import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+
+import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -46,13 +46,13 @@ public class Commands {
             )).toList();
     }
 
-    public final MarkupTextAreaElement getPanelFromCommand(String command) {
+    public final ActionableMarkupTextAreaElement getPanelFromCommand(String command) {
         if (command.equals("/help")) {
-            return markupTextArea("no help for you");
+            return new ActionableMarkupTextAreaElement("no help for you");
         }
 
         if (command.equals("/stats")) {
-            return markupTextArea(getStatisticsPanelContents(stats.getCreationDate(), stats.getTotalSearches(), stats.getDocumentSearches()));
+            return new ActionableMarkupTextAreaElement(getStatisticsPanelContents(stats.getCreationDate(), stats.getTotalSearches(), stats.getDocumentSearches()));
         }
         return null;
     }
