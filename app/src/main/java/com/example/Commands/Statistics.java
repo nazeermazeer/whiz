@@ -15,7 +15,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class Statistics {
     private static final Logger logger = LogManager.getLogger(Main.class);
-    private final File file = new File("statistics.json");
+    private final File file = new File(Main.getAppDirectory(), "statistics.json");
     private UserStatistics stats;
 
     public void loadStatistics() throws IOException {
