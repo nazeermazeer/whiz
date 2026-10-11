@@ -71,8 +71,6 @@ public final class Main extends ToolkitApp {
         viewer = newviewer;
         commands = newcommands;
 
-        createAppDirectory();
-
         try {
             parser.parseFiles();
             indexer.indexEntries();
@@ -323,7 +321,7 @@ public final class Main extends ToolkitApp {
         };
     }
 
-    private static void createAppDirectory() {
+    public static String getAppDirectory() {
         String home = System.getProperty("user.home");
         String os = System.getProperty("os.name").toLowerCase();
 
@@ -341,9 +339,7 @@ public final class Main extends ToolkitApp {
         } catch (IOException err) {
             throw new UncheckedIOException(err);
         }
-    }
 
-    public static String getAppDirectory() {
         return appdir.toAbsolutePath().toString();
     } 
 
