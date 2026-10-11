@@ -21,11 +21,6 @@ import org.apache.logging.log4j.Logger;
 
 public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
-    private static final File[] parseFiles = {
-        new File("app/src/main/java/com/example/functions.html"),
-        new File("app/src/main/java/com/example/stdtypes.html"),
-        new File("app/src/main/java/com/example/constants.html")
-    };
 
     public record Entry(
         String location, String type, String id, String anchor, String parent, 
