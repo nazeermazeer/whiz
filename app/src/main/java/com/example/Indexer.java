@@ -26,12 +26,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.model.Entry;
+import com.example.Parser.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Indexer {
-
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
 
     public record SearchResult(String[] location, String[] term, String[] definition) {}
@@ -63,14 +62,14 @@ public class Indexer {
             for (Entry def : entries) {
                 Document doc = new Document();
                 doc.add(
-                    new StringField("location", def.getLocation(),
+                    new StringField("location", def.location(),
                     Field.Store.YES
                 ));
-                for (String term : def.getSignature()) {
+                for (String term : def.signature()) {
                     doc.add(new TextField("term", term, Field.Store.YES));
                 }
                 doc.add(
-                    new TextField("definition", def.getDefinition(), Field.Store.YES)
+                    new TextField("definition", def.definition(), Field.Store.YES)
                 );
                 writer.addDocument(doc);
             }
@@ -123,8 +122,7 @@ public class Indexer {
         return searchresults;
     }
 
-    public final List<SearchResult> searchTerm(String search)
-    throws IOException, ParseException {
+    public final List<SearchResult> searchTerm(String search) throws IOException, ParseException {
         return search(search, index.directory, index.analyzer);
     }
 }

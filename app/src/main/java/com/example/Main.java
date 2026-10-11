@@ -122,21 +122,26 @@ public final class Main extends ToolkitApp {
                     }
                     SearchResult result = suggestions.results().get(selected);
                     match = result.term()[0];
+                    if (match.startsWith("/")) {
+                        browser = Commands.getPanelFromCommand(match);
 
-                    File file = new File(Main.getAppDirectory(), String.join(" ", result.location()));
+                        logger.info("redirected user to '{}' panel", match);
+                    } else {
+                        File file = new File(Main.getAppDirectory(), String.join(" ", result.location()));
 
-                    int line = Viewer.getLine(
-                        page.rawdoc.body().wholeText(),
-                        String.join(" ", match)
-                    );
+                        page = new Page(file);
+                        int line = Viewer.getLine(
+                            page.rawdoc.body().wholeText(),
+                            String.join(" ", match)
+                        );
 
-                    page = new Page(file);
-                    browser = viewer.registerElementActions(browser);
-                    browser.markup(page.getContent());
-                    browser.state().scrollToLine(line);
-                    sidebar = createSidebarPanel();
+                        browser = viewer.registerElementActions(browser);
+                        browser.markup(page.getContent());
+                        browser.state().scrollToLine(line);
+                        sidebar = createSidebarPanel();
 
-                    logger.info("redirected user to search result for \"{}\"", match);
+                        logger.info("redirected user to search result for \"{}\"", match);
+                    }
                 } catch (Exception err) {
                     throw new RuntimeException(err);
                 }
@@ -191,7 +196,7 @@ public final class Main extends ToolkitApp {
                 page.rawdoc.body().wholeText(), signature
             );
             browser.state().scrollToLine(line);
-            logger.info("redirected user to sidebar item for \"{}\"", signature);
+            logger.info("redirected user to sidebar item for '{}'", signature);
 
             return EventResult.HANDLED;
         });
@@ -208,6 +213,13 @@ public final class Main extends ToolkitApp {
 
         if (query.isBlank()) {
             resultCount = 0;
+        } else if (query.startsWith("/"))  {
+            List<String> commands = Commands.searchCommands(query);
+            resultCount = commands.size();
+            for (String command : commands) {
+                newsuggestions.add(command);
+                suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command}, null));
+            }
         } else {
             try {
                 searchedresults = indexer.searchTerm(query);
