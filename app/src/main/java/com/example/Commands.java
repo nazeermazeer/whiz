@@ -1,8 +1,6 @@
 package com.example;
 
-import static dev.tamboui.toolkit.Toolkit.markupTextArea;
-import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
-
+import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
 import java.util.List;
 
 public class Commands {
@@ -10,7 +8,7 @@ public class Commands {
         "/help"
     );
 
-    private static final MarkupTextAreaElement helpPanel = markupTextArea(
+    private static final ActionableMarkupTextAreaElement helpPanel = new ActionableMarkupTextAreaElement(
         "no help for you"
     );
 
@@ -23,7 +21,7 @@ public class Commands {
     public static final boolean CommandExists(String command) {
         return commands.contains(command);
     }
-    public static final MarkupTextAreaElement getPanelFromCommand(String command) {
+    public static final ActionableMarkupTextAreaElement getPanelFromCommand(String command) {
         if (command.equals("/help")) {
             return helpPanel;
         }

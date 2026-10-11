@@ -84,9 +84,8 @@ public class Indexer {
     private List<Entry> readJSON() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
-
         List<Entry> entries = mapper.readValue(
-                Path.of("app/src/main/java/com/example/entries.json").toFile(),
+                Path.of(Main.getAppDirectory(), "entries.json").toFile(),
                 new TypeReference<List<Entry>>() { }
         );
         logger.debug("read entries.json successfully");
