@@ -2,8 +2,10 @@ package com.example;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +24,7 @@ import org.jsoup.nodes.TextNode;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
-import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
 
 
 public final class Viewer {
@@ -47,15 +49,17 @@ public final class Viewer {
         Random myrandom = new Random();
         List<String> entries = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(
-            new FileReader("app/src/main/java/com/example/rubbish.txt")
-        )) {
+        try (InputStream stream = Viewer.class.getResourceAsStream("/rubbish.txt");
+            InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(reader)
+        ) {
             String line;
             while ((line = br.readLine()) != null) {
                 entries.add(line);
             }
         } catch (IOException err) {
             entries.add("rubbish is not rubbishing");
+            logger.warn("rubbish is not rubbishing", err);
         }
 
         int randomIndex = myrandom.nextInt(entries.size());
@@ -180,7 +184,7 @@ public final class Viewer {
         return doc.title();
     }
 
-    public MarkupTextAreaElement registerElementActions(MarkupTextAreaElement element) {
+    public ActionableMarkupTextAreaElement registerElementActions(ActionableMarkupTextAreaElement element) {
         Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
         Matcher matcher = pattern.matcher(getStylizedDocument().body().wholeText());
 

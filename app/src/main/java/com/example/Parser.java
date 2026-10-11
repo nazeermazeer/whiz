@@ -21,11 +21,6 @@ import org.apache.logging.log4j.Logger;
 
 public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
-    private static final File[] parseFiles = {
-        new File("app/src/main/java/com/example/functions.html"),
-        new File("app/src/main/java/com/example/stdtypes.html"),
-        new File("app/src/main/java/com/example/constants.html")
-    };
 
     public record Entry(
         String location, String type, String id, String anchor, String parent, 
@@ -105,32 +100,33 @@ public class Parser {
         List<Entry> entries = new ArrayList<>();
         logger.info("starting documentation parse");
 
-        for (File file : parseFiles) {
-            Document doc = Jsoup.parse(file, "UTF-8");
-            Elements dls = doc.select("dl");
-            logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
-            for (Element dl : dls) {
-                String type = parseType(dl);
+        File[] files = {
+            new File(Main.getAppDirectory(), "functions.html"),
+            new File(Main.getAppDirectory(), "stdtypes.html"),
+            new File(Main.getAppDirectory(), "constants.html")
+        };
 
-                String anchor = parseAnchor(dl);
+        for (File file : files) {
+                Document doc = Jsoup.parse(file, "UTF-8", "https://docs.python.org/3/");
+                Elements dls = doc.select("dl");
+                logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
+                for (Element dl : dls) {
+                    String type = parseType(dl);
+                    String anchor = parseAnchor(dl);
+                    List<String> terms = parseSignatures(dl);
+                    String def = parseDefinition(dl);
+                    String parent = getParent(anchor);
+                    String[] keywords = gatherKeywords(parent != "", anchor);
 
-                List<String> terms = parseSignatures(dl);
-
-                String def = parseDefinition(dl);
-
-                String parent = getParent(anchor);
-
-                String[] keywords = gatherKeywords(parent != "", anchor);
-
-                if (!anchor.equals("") && !type.equals("")) {
-                    entries.add(
-                        new Entry(file.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
-                    );
+                    if (!anchor.equals("") && !type.equals("")) {
+                        entries.add(
+                            new Entry(file.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                        );
+                    }
                 }
-            }
         }
 
-        File outputfile = new File("app/src/main/java/com/example/entries.json");
+        File outputfile = new File(Main.getAppDirectory(), "entries.json");
         ObjectMapper mapper = new ObjectMapper();
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, entries);

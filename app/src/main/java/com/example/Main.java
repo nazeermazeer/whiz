@@ -3,7 +3,6 @@ package com.example;
 
 import static dev.tamboui.toolkit.Toolkit.column;
 import static dev.tamboui.toolkit.Toolkit.list;
-import static dev.tamboui.toolkit.Toolkit.markupTextArea;
 import static dev.tamboui.toolkit.Toolkit.panel;
 import static dev.tamboui.toolkit.Toolkit.row;
 import static dev.tamboui.toolkit.Toolkit.spacer;
@@ -12,6 +11,10 @@ import static dev.tamboui.toolkit.Toolkit.textInput;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +38,7 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.ListElement;
-import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.error.ErrorAction;
@@ -52,13 +55,14 @@ public final class Main extends ToolkitApp {
 
     private ListElement<?> sidebar;
     private SuggestionState suggestions;
-    private MarkupTextAreaElement browser;
+    private ActionableMarkupTextAreaElement browser;
     private Element searchbar;
 
     private Page page;
     private String query = "";
     private TextInputState searchbarstate = new TextInputState();
 
+    private static Path appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
 
     public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Commands newcommands) {
@@ -67,6 +71,8 @@ public final class Main extends ToolkitApp {
         viewer = newviewer;
         commands = newcommands;
 
+        createAppDirectory();
+
         try {
             parser.parseFiles();
             indexer.indexEntries();
@@ -74,7 +80,7 @@ public final class Main extends ToolkitApp {
             throw new RuntimeException(err);
         }
 
-        page = new Page(new File("app/src/main/java/com/example/functions.html"));
+        page = new Page(new File(Main.getAppDirectory(), "functions.html"));
         sidebar = createSidebarPanel();
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);
@@ -103,9 +109,9 @@ public final class Main extends ToolkitApp {
 
     private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
 
-    private MarkupTextAreaElement createBrowserPanel(Document document) {
+    private ActionableMarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
-        return viewer.registerElementActions(markupTextArea(content));
+        return viewer.registerElementActions(new ActionableMarkupTextAreaElement(content));
     }            
 
     private Element createSearchbarPanel(TextInputState state) {
@@ -121,19 +127,14 @@ public final class Main extends ToolkitApp {
                     }
                     SearchResult result = suggestions.results().get(selected);
                     match = result.term()[0];
-
                     if (match.startsWith("/")) {
                         browser = commands.getPanelFromCommand(match);
 
                         logger.info("redirected user to '{}' panel", match);
                     } else {
-                        File file = new File(
-                            "app/src/main/java/com/example/"
-                            + String.join(" ", result.location())
-                        );
+                        File file = new File(Main.getAppDirectory(), String.join(" ", result.location()));
 
                         page = new Page(file);
-
                         int line = Viewer.getLine(
                             page.rawdoc.body().wholeText(),
                             String.join(" ", match)
@@ -158,7 +159,7 @@ public final class Main extends ToolkitApp {
 
     private ListElement<?> createSidebarPanel() {
         List<Item> items = Sidebar.getItems(
-            new File("app/src/main/java/com/example/entries.json"),
+            new File(Main.getAppDirectory(), "entries.json"),
             page.file.getName()
         );
 
@@ -321,6 +322,30 @@ public final class Main extends ToolkitApp {
             }
         };
     }
+
+    private static void createAppDirectory() {
+        String home = System.getProperty("user.home");
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("mac")) {
+            appdir = Paths.get(home, "Library", "Application Support", "whiz");
+        } else if (os.contains("win")) {
+            String appData = System.getenv("APPDATA");
+            appdir = Paths.get(appData != null ? appData : home, "whiz");
+        } else {
+            appdir = Paths.get(home, ".whiz");
+        }
+
+        try {
+            Files.createDirectories(appdir);
+        } catch (IOException err) {
+            throw new UncheckedIOException(err);
+        }
+    }
+
+    public static String getAppDirectory() {
+        return appdir.toAbsolutePath().toString();
+    } 
 
     public static void main(String[] args) throws Exception {
         java.util.logging.Logger lucenelogger = java.util.logging.Logger.getLogger("org.apache.lucene");
