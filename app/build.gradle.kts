@@ -12,6 +12,7 @@ plugins {
     java
     `maven-publish`
     id("com.gradleup.shadow") version "9.0.0"
+    id("org.graalvm.buildtools.native") version "1.1.11"
 }
 
 
@@ -148,4 +149,8 @@ publishing {
             }
         }
     }
+}
+
+graalvmNative {
+    toolchainDetection.set(true)
 }
