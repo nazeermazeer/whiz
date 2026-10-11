@@ -1,0 +1,75 @@
+package com.example.Commands;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.example.Main;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+public class Statistics {
+    private static final Logger logger = LogManager.getLogger(Main.class);
+    private final File file = new File(Main.getAppDirectory(), "statistics.json");
+    private UserStatistics stats;
+
+    public void loadStatistics() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        try {
+            this.stats = mapper.readValue(file, UserStatistics.class);
+            logger.info("loaded user statistics");
+        } catch (IOException err) {
+            this.stats = new UserStatistics();
+            this.stats.setCreationDate(LocalDateTime.now().toString());
+            this.writeStatistics();
+            logger.warn("starting stats file from scratch due to error...", err);
+        }
+    }
+
+    public void increaseTotalSearches() {
+        int searches = this.stats.getTotalSearches();
+        stats.setTotalSearches(searches + 1);
+    }
+
+    public void increaseDocumentSearches(String doc) {
+        Map<String, Integer> searcheddocs = this.stats.getDocumentSearches();
+        int searches;
+        if (searcheddocs.get(doc) == null) {
+            searches = 1;
+        } else {
+            searches = searcheddocs.get(doc) + 1;
+        }
+        searcheddocs.put(doc, searches);
+        stats.setDocumentSearches(searcheddocs);
+        logger.debug("logged search for {} (now {})", doc, searches);
+
+    }
+
+    public String getCreationDate() {
+        return stats.getCreationDate();
+    }
+
+    public int getTotalSearches() {
+        return stats.getTotalSearches();
+    }
+
+    public Map<String, Integer> getDocumentSearches() {
+        return stats.getDocumentSearches();
+    }
+
+    public void writeStatistics() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();        
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        mapper.writeValue(file, stats);
+        logger.info("statistics saved successfully");
+
+    }
+}

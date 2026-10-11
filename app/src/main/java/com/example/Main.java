@@ -23,6 +23,10 @@ import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
+
+import com.example.Commands.Commands;
+import com.example.Commands.Statistics;
+import com.example.Commands.Commands.SlashCommand;
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
 import dev.tamboui.style.Color;
@@ -47,6 +51,7 @@ public final class Main extends ToolkitApp {
     private Parser parser;
     private Indexer indexer;
     private Viewer viewer;
+    private Commands commands;
 
     private ListElement<?> sidebar;
     private SuggestionState suggestions;
@@ -60,13 +65,11 @@ public final class Main extends ToolkitApp {
     private static Path appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
 
-
-    public Main(Parser newparser, Indexer newindexer, Viewer newviewer) {
+    public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Commands newcommands) {
         parser = newparser;
         indexer = newindexer;
         viewer = newviewer;
-
-        createAppDirectory();
+        commands = newcommands;
 
         try {
             parser.parseFiles();
@@ -123,7 +126,7 @@ public final class Main extends ToolkitApp {
                     SearchResult result = suggestions.results().get(selected);
                     match = result.term()[0];
                     if (match.startsWith("/")) {
-                        browser = Commands.getPanelFromCommand(match);
+                        browser = commands.getPanelFromCommand(match);
 
                         logger.info("redirected user to '{}' panel", match);
                     } else {
@@ -139,6 +142,9 @@ public final class Main extends ToolkitApp {
                         browser.markup(page.getContent());
                         browser.state().scrollToLine(line);
                         sidebar = createSidebarPanel();
+
+                        commands.recordTotalSearch();
+                        commands.recordDocumentationSearch("python");
 
                         logger.info("redirected user to search result for \"{}\"", match);
                     }
@@ -214,11 +220,11 @@ public final class Main extends ToolkitApp {
         if (query.isBlank()) {
             resultCount = 0;
         } else if (query.startsWith("/"))  {
-            List<String> commands = Commands.searchCommands(query);
-            resultCount = commands.size();
-            for (String command : commands) {
-                newsuggestions.add(command);
-                suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command}, null));
+            List<SlashCommand> slashcommands = commands.searchCommands(query);
+            resultCount = slashcommands.size();
+            for (SlashCommand command : slashcommands) {
+                newsuggestions.add(row(text(command.name()).bold(), text(" " + command.description()).dim()));
+                suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command.name()}, null));
             }
         } else {
             try {
@@ -315,7 +321,7 @@ public final class Main extends ToolkitApp {
         };
     }
 
-    private static void createAppDirectory() {
+    public static String getAppDirectory() {
         String home = System.getProperty("user.home");
         String os = System.getProperty("os.name").toLowerCase();
 
@@ -333,9 +339,7 @@ public final class Main extends ToolkitApp {
         } catch (IOException err) {
             throw new UncheckedIOException(err);
         }
-    }
 
-    public static String getAppDirectory() {
         return appdir.toAbsolutePath().toString();
     } 
 
@@ -351,7 +355,10 @@ public final class Main extends ToolkitApp {
 
         Viewer myviewer = new Viewer();
 
-        Main main = new Main(myparser, myindexer, myviewer);
+        Statistics mystatistics = new Statistics();
+        Commands mycommands = new Commands(mystatistics);
+
+        Main main = new Main(myparser, myindexer, myviewer, mycommands);
         main.run();
     }
 
@@ -399,5 +406,10 @@ public final class Main extends ToolkitApp {
     @Override
     protected void onStop() {
         logger.info("application stopped");
+        try {
+            commands.saveStatistics();
+        } catch (IOException err) {
+            logger.error("failed to save statistics", err);
+        }
     }
 }
