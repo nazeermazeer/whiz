@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 public class Indexer {
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
 
-    public record SearchResult(String[] location, String[] term, String[] definition) {}
+    public record SearchResult(String[] location, String[] signature, String[] definition) {}
     
     private static final int numresults = 10;
     private static final Logger logger = LogManager.getLogger(Indexer.class);
@@ -62,8 +62,8 @@ public class Indexer {
             for (Entry def : entries) {
                 Document doc = new Document();
                 doc.add(new StringField("location", def.location(), Field.Store.YES));
-                for (String term : def.signature()) {
-                    doc.add(new TextField("term", term, Field.Store.YES));
+                for (String signature : def.signature()) {
+                    doc.add(new TextField("signature", signature, Field.Store.YES));
                 }
                 doc.add(new TextField("definition", def.definition(), Field.Store.YES));
                 writer.addDocument(doc);
@@ -96,7 +96,7 @@ public class Indexer {
         DirectoryReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);
         MultiFieldQueryParser parser = new MultiFieldQueryParser(
-            new String[]{"term", "definition"}, analyzer
+            new String[]{"signature", "definition"}, analyzer
         );
 
         Query query = parser.parse(search);
@@ -109,7 +109,7 @@ public class Indexer {
 
             searchresults.add(
                 new SearchResult(doc.getValues("location"),
-                doc.getValues("term"), doc.getValues("definition")
+                doc.getValues("signature"), doc.getValues("definition")
             ));
 
             }

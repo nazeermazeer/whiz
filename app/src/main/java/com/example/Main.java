@@ -124,7 +124,7 @@ public final class Main extends ToolkitApp {
                         return;
                     }
                     SearchResult result = suggestions.results().get(selected);
-                    match = result.term()[0];
+                    match = result.signature()[0];
                     if (match.startsWith("/")) {
                         browser = commands.getPanelFromCommand(match);
 
@@ -243,7 +243,7 @@ public final class Main extends ToolkitApp {
                 resultCount = 1;
             } else {
                 for (SearchResult result : searchedresults) {
-                    for (String term : result.term()) {
+                    for (String term : result.signature()) {
                         newsuggestions.add(text(term));
                         suggestionResults.add(result);
                     }
