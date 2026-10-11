@@ -40,12 +40,16 @@ public class Statistics {
 
     public void increaseDocumentSearches(String doc) {
         Map<String, Integer> searcheddocs = this.stats.getDocumentSearches();
+        int searches;
         if (searcheddocs.get(doc) == null) {
-            searcheddocs.put(doc, 1);
+            searches = 1;
         } else {
-            searcheddocs.put(doc, searcheddocs.get(doc) + 1);
+            searches = searcheddocs.get(doc) + 1;
         }
+        searcheddocs.put(doc, searches);
         stats.setDocumentSearches(searcheddocs);
+        logger.debug("logged search for {} (now {})", doc, searches);
+
     }
 
     public String getCreationDate() {
