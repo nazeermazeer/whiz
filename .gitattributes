@@ -1,7 +1,2 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-
-# Prevent repo stats from showing other languages caused by documentation
-*.html linguist-detectable=false
-*.css linguist-detectable=false
-*.js linguist-detectable=false
