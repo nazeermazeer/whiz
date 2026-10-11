@@ -5,6 +5,7 @@ import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class Commands {
     public record SlashCommand(String name, String description) {}
@@ -47,9 +48,22 @@ public class Commands {
         }
 
         if (command.equals("/stats")) {
-            return markupTextArea("total searches: " + stats.getTotalSearches());
+            return markupTextArea(getStatisticsPanelContents(stats.getCreationDate(), stats.getTotalSearches(), stats.getDocumentSearches()));
         }
         return null;
+    }
+
+    private static String getStatisticsPanelContents(String creationDate, int totsearches, Map<String, Integer> docsearches) {
+        String contents = "";
+        contents += "since: " + creationDate + "\n";
+        contents += "total searches: " + totsearches + "\n";
+
+        for (Map.Entry<String, Integer> doc : docsearches.entrySet()) {
+            contents += doc.getKey() + " searches: " + doc.getValue();
+        }
+
+        return contents;
+        
     }
 
     private static int scoreCommandSearch(SlashCommand command, String query) {

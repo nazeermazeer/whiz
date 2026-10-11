@@ -48,8 +48,16 @@ public class Statistics {
         stats.setDocumentSearches(searcheddocs);
     }
 
+    public String getCreationDate() {
+        return stats.getCreationDate();
+    }
+
     public int getTotalSearches() {
         return stats.getTotalSearches();
+    }
+
+    public Map<String, Integer> getDocumentSearches() {
+        return stats.getDocumentSearches();
     }
 
     public void writeStatistics() throws IOException {
