@@ -61,16 +61,11 @@ public class Indexer {
         )) {
             for (Entry def : entries) {
                 Document doc = new Document();
-                doc.add(
-                    new StringField("location", def.location(),
-                    Field.Store.YES
-                ));
+                doc.add(new StringField("location", def.location(), Field.Store.YES));
                 for (String term : def.signature()) {
                     doc.add(new TextField("term", term, Field.Store.YES));
                 }
-                doc.add(
-                    new TextField("definition", def.definition(), Field.Store.YES)
-                );
+                doc.add(new TextField("definition", def.definition(), Field.Store.YES));
                 writer.addDocument(doc);
             }
             writer.commit();
