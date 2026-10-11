@@ -65,12 +65,12 @@ public class Commands {
                 .ofPattern("EEEE, MMMM dd, yyyy hh:mm a")
                 .withZone(ZoneId.systemDefault())
                 .withLocale(Locale.ENGLISH);
-        contents += "since: " + formatter.format(instant) + "\n";
 
+        contents += "since: " + formatter.format(instant) + "\n";
         contents += "total searches: " + totsearches + "\n";
 
         for (Map.Entry<String, Integer> doc : docsearches.entrySet()) {
-            contents += doc.getKey() + " searches: " + doc.getValue();
+            contents += "    " + doc.getKey() + " searches: " + doc.getValue();
         }
 
         return contents;
