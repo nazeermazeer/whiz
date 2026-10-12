@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.KeywordField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
@@ -59,20 +60,20 @@ public class Indexer {
         try (IndexWriter writer = new IndexWriter(directory, new IndexWriterConfig(analyzer))) {
             for (Entry def : entries) {
                 Document doc = new Document();
-                doc.add(new StringField("location", def.location(), Field.Store.YES));
-                doc.add(new StringField("id", def.id(), Field.Store.YES));
-                doc.add(new StringField("anchor", def.anchor(), Field.Store.YES));
-                doc.add(new StringField("parent", def.parent(), Field.Store.YES));
+                doc.add(new TextField("location", def.location(), Field.Store.YES));
+                doc.add(new TextField("id", def.id(), Field.Store.YES));
+                doc.add(new TextField("anchor", def.anchor(), Field.Store.YES));
+                doc.add(new TextField("parent", def.parent(), Field.Store.YES));
 
                 for (String keyword : def.keywords()) {
-                    doc.add(new TextField("keyword", keyword, Field.Store.YES));
+                    doc.add(new KeywordField("keyword", keyword, Field.Store.YES));
                 }
 
                 for (String signature : def.signature()) {
                     doc.add(new TextField("signature", signature, Field.Store.YES));
                 }
 
-                doc.add(new TextField("definition", def.definition(), Field.Store.YES));
+                doc.add(new StringField("definition", def.definition(), Field.Store.YES));
                 writer.addDocument(doc);
             }
             writer.commit();
