@@ -62,9 +62,14 @@ public class Indexer {
             for (Entry def : entries) {
                 Document doc = new Document();
                 doc.add(new StringField("location", def.location(), Field.Store.YES));
+                doc.add(new StringField("id", def.id(), Field.Store.YES));
+                doc.add(new StringField("anchor", def.anchor(), Field.Store.YES));
+                doc.add(new StringField("parent", def.parent(), Field.Store.YES));
+
                 for (String signature : def.signature()) {
                     doc.add(new TextField("signature", signature, Field.Store.YES));
                 }
+
                 doc.add(new TextField("definition", def.definition(), Field.Store.YES));
                 writer.addDocument(doc);
             }
