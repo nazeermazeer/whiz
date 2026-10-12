@@ -97,14 +97,13 @@ public class Indexer {
 
 
 
-    private List<SearchResult> search(
-        String search, ByteBuffersDirectory directory, StandardAnalyzer analyzer
-    ) throws IOException, ParseException {
+    private List<SearchResult> search(String search, ByteBuffersDirectory directory, StandardAnalyzer analyzer) throws IOException, ParseException {
+
         List<SearchResult> searchresults = new ArrayList<>();
         DirectoryReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);
         MultiFieldQueryParser parser = new MultiFieldQueryParser(
-            new String[]{"signature", "definition"}, analyzer
+            new String[]{"anchor", "parent", "signature", "definition"}, analyzer
         );
 
         Query query = parser.parse(search);
