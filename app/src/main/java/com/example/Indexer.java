@@ -67,9 +67,9 @@ public class Indexer {
                 doc.add(new StringField("parent", def.parent(), Field.Store.YES));
 
                 for (String keyword : def.keywords()) {
-                    doc. add(new TextField("keyword", keyword, Field.Store.YES));
+                    doc.add(new TextField("keyword", keyword, Field.Store.YES));
                 }
-                
+
                 for (String signature : def.signature()) {
                     doc.add(new TextField("signature", signature, Field.Store.YES));
                 }
