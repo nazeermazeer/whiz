@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +44,10 @@ public class Indexer {
     private static final Logger logger = LogManager.getLogger(Indexer.class);
 
     private static final Map<String, Float> boosts = Map.of(
-        "anchor", 1.0f,
-        "parent", 0.25f,
-        "keywords", 3.0f,
-        "signature", 10.0f,
+        "anchor", 2.0f,
+        "parent", 0.5f,
+        "keywords", 5.0f,
+        "signature", 3.0f,
         "definition", 0.5f
     );
 
@@ -134,8 +135,9 @@ public class Indexer {
                 doc.getValues("signature"), doc.getValues("definition")
             ));
 
-            }
+        }
 
+        Collections.rotate(searchresults, -1);
         return searchresults;
     }
 
