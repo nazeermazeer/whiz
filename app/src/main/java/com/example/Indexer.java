@@ -3,6 +3,8 @@ package com.example;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.custom.CustomAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -34,7 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Indexer {
-    public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
+    public record IndexResult(ByteBuffersDirectory directory, Analyzer analyzer) {}
     public record SearchResult(String[] location, String[] signature, String[] definition) {}
     
     private static final int numresults = 10;
@@ -64,7 +66,11 @@ public class Indexer {
 
     private IndexResult readIndex(List<Entry> entries) throws IOException {
         ByteBuffersDirectory directory = new ByteBuffersDirectory();
-        StandardAnalyzer analyzer = new StandardAnalyzer();
+        CustomAnalyzer analyzer = CustomAnalyzer.builder()
+            .withTokenizer("standard")
+            .addTokenFilter("lowercase")
+            .addTokenFilter("edgeNGram", "minGramSize", "1", "maxGramSize", "10")
+            .build();
 
         try (IndexWriter writer = new IndexWriter(directory, new IndexWriterConfig(analyzer))) {
             for (Entry def : entries) {
@@ -106,7 +112,7 @@ public class Indexer {
 
 
 
-    private List<SearchResult> search(String search, ByteBuffersDirectory directory, StandardAnalyzer analyzer) throws IOException, ParseException {
+    private List<SearchResult> search(String search, ByteBuffersDirectory directory, Analyzer analyzer) throws IOException, ParseException {
 
         List<SearchResult> searchresults = new ArrayList<>();
         DirectoryReader reader = DirectoryReader.open(directory);
