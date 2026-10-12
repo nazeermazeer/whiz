@@ -44,11 +44,12 @@ public class Indexer {
     private static final Logger logger = LogManager.getLogger(Indexer.class);
 
     private static final Map<String, Float> boosts = Map.of(
-        "anchor", 2.0f,
-        "parent", 0.5f,
-        "keywords", 5.0f,
-        "signature", 3.0f,
-        "definition", 0.5f
+        "anchor", 3.0f,
+        "name", 4.0f,
+        "parent", 1.5f,
+        "keywords", 2.0f,
+        "signature",1.5f,
+        "definition", 1.0f
     );
 
     private IndexResult index;
@@ -79,6 +80,7 @@ public class Indexer {
                 doc.add(new TextField("location", def.location(), Field.Store.YES));
                 doc.add(new TextField("id", def.id(), Field.Store.YES));
                 doc.add(new TextField("anchor", def.anchor(), Field.Store.YES));
+                doc.add(new TextField("name", def.name(), Field.Store.YES));
                 doc.add(new TextField("parent", def.parent(), Field.Store.YES));
 
                 for (String keyword : def.keywords()) {
@@ -119,7 +121,7 @@ public class Indexer {
         DirectoryReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);
         MultiFieldQueryParser parser = new MultiFieldQueryParser(
-            new String[]{"anchor", "parent", "keywords", "signature", "definition"}, analyzer, boosts
+            new String[]{"anchor", "name", "parent", "keywords", "signature", "definition"}, analyzer, boosts
         );
 
         Query query = parser.parse(search);
@@ -137,7 +139,7 @@ public class Indexer {
 
         }
 
-        Collections.rotate(searchresults, -1);
+        // Collections.rotate(searchresults, -1);
         return searchresults;
     }
 
