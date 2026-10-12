@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.example.Parser.Entry;
 import org.apache.logging.log4j.LogManager;
@@ -33,11 +35,18 @@ import org.apache.logging.log4j.Logger;
 
 public class Indexer {
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
-
     public record SearchResult(String[] location, String[] signature, String[] definition) {}
     
     private static final int numresults = 10;
     private static final Logger logger = LogManager.getLogger(Indexer.class);
+
+    private static final Map<String, Float> boosts = Map.of(
+        "anchor", 1.0f,
+        "parent", 0.5f,
+        "keywords", 1.5f,
+        "signature", 3.0f,
+        "definition", 0.5f
+    );
 
     private IndexResult index;
 
@@ -103,7 +112,7 @@ public class Indexer {
         DirectoryReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);
         MultiFieldQueryParser parser = new MultiFieldQueryParser(
-            new String[]{"anchor", "parent", "signature", "definition"}, analyzer
+            new String[]{"anchor", "parent", "keywords", "signature", "definition"}, analyzer, boosts
         );
 
         Query query = parser.parse(search);

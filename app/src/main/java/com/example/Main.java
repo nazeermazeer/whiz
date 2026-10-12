@@ -229,7 +229,7 @@ public final class Main extends ToolkitApp {
         } else {
             try {
                 searchedresults = indexer.searchTerm(query);
-                Collections.reverse(searchedresults);
+                // Collections.reverse(searchedresults);
             } catch (org.apache.lucene.queryparser.classic.ParseException err) {
                 logger.error("could not parse search query '{}'", query, err);
             } catch (IOException err) {
