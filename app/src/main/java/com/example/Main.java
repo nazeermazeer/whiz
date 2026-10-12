@@ -130,7 +130,9 @@ public final class Main extends ToolkitApp {
 
                         logger.info("redirected user to '{}' panel", match);
                     } else {
-                        File file = new File(Main.getAppDirectory(), String.join(" ", result.location()));
+                        File file = Path.of(
+                            Main.getAppDirectory(), "python-3.14-docs-html", "library", String.join(" ", result.location())
+                        ).toFile();
 
                         page = new Page(file);
                         int line = Viewer.getLine(
