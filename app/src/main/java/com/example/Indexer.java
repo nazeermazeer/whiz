@@ -15,9 +15,14 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.StoredFields;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -30,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.example.Parser.Entry;
@@ -79,9 +85,11 @@ public class Indexer {
                 Document doc = new Document();
                 doc.add(new TextField("location", def.location(), Field.Store.YES));
                 doc.add(new TextField("id", def.id(), Field.Store.YES));
-                doc.add(new TextField("anchor", def.anchor(), Field.Store.YES));
                 doc.add(new TextField("name", def.name(), Field.Store.YES));
                 doc.add(new TextField("parent", def.parent(), Field.Store.YES));
+
+                doc.add(new TextField("anchor", def.anchor(), Field.Store.YES));
+                doc.add(new StringField("anchorExact", def.anchor().toLowerCase(), Field.Store.NO));
 
                 for (String keyword : def.keywords()) {
                     doc.add(new KeywordField("keywords", keyword, Field.Store.YES));
@@ -125,7 +133,19 @@ public class Indexer {
         );
 
         Query query = parser.parse(search);
-        TopDocs results = searcher.search(query, numresults);
+        BooleanQuery.Builder querybuilder = new BooleanQuery.Builder();
+        querybuilder.add(query, BooleanClause.Occur.SHOULD);
+
+        String identifier = search.toLowerCase(Locale.ROOT);
+        querybuilder.add(
+            new BoostQuery(
+                new PrefixQuery(new Term("anchorExact", identifier)),
+                100.0f
+            ),
+            BooleanClause.Occur.SHOULD
+        );
+
+        TopDocs results = searcher.search(querybuilder.build(), numresults);
         logger.debug("search '{}' returned {} hits", search, results.totalHits);
         StoredFields storedFields = reader.storedFields();
 
