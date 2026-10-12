@@ -101,11 +101,8 @@ public class Parser {
         List<Entry> entries = new ArrayList<>();
         logger.info("starting documentation parse");
 
-        File[] files = {
-            Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile(),
-            Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "stdtypes.html").toFile(),
-            Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "constants.html").toFile(),
-        };
+        File folder = Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library").toFile();
+        File[] files = folder.listFiles();
 
         for (File file : files) {
                 Document doc = Jsoup.parse(file, "UTF-8", "https://docs.python.org/3/");
