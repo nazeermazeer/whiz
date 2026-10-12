@@ -44,9 +44,9 @@ public class Indexer {
 
     private static final Map<String, Float> boosts = Map.of(
         "anchor", 1.0f,
-        "parent", 0.5f,
-        "keywords", 1.5f,
-        "signature", 3.0f,
+        "parent", 0.25f,
+        "keywords", 3.0f,
+        "signature", 10.0f,
         "definition", 0.5f
     );
 
@@ -81,7 +81,7 @@ public class Indexer {
                 doc.add(new TextField("parent", def.parent(), Field.Store.YES));
 
                 for (String keyword : def.keywords()) {
-                    doc.add(new KeywordField("keyword", keyword, Field.Store.YES));
+                    doc.add(new KeywordField("keywords", keyword, Field.Store.YES));
                 }
 
                 for (String signature : def.signature()) {
