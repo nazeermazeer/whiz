@@ -78,7 +78,7 @@ public final class Main extends ToolkitApp {
             throw new RuntimeException(err);
         }
 
-        page = new Page(new File(Main.getAppDirectory(), "functions.html"));
+        page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
         sidebar = createSidebarPanel();
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);

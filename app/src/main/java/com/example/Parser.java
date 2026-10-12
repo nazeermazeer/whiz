@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 
 import org.jsoup.select.Elements;
 
@@ -101,9 +102,9 @@ public class Parser {
         logger.info("starting documentation parse");
 
         File[] files = {
-            new File(Main.getAppDirectory(), "functions.html"),
-            new File(Main.getAppDirectory(), "stdtypes.html"),
-            new File(Main.getAppDirectory(), "constants.html")
+            Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile(),
+            Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "stdtypes.html").toFile(),
+            Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "constants.html").toFile(),
         };
 
         for (File file : files) {
