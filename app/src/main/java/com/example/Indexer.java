@@ -18,17 +18,12 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.suggest.InputIterator;
-import org.apache.lucene.search.suggest.analyzing.AnalyzingSuggester;
 import org.apache.lucene.store.ByteBuffersDirectory;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.BytesRef;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.example.Parser.Entry;
@@ -36,7 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Indexer {
-    public record IndexResult(Directory directory, StandardAnalyzer analyzer) {}
+    public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
 
     public record SearchResult(String[] location, String[] signature, String[] definition) {}
     
@@ -58,7 +53,7 @@ public class Indexer {
     }
 
     private IndexResult readIndex(List<Entry> entries) throws IOException {
-        Directory directory = new ByteBuffersDirectory();
+        ByteBuffersDirectory directory = new ByteBuffersDirectory();
         StandardAnalyzer analyzer = new StandardAnalyzer();
 
         try (IndexWriter writer = new IndexWriter(directory, new IndexWriterConfig(analyzer))) {
@@ -83,10 +78,6 @@ public class Indexer {
             writer.commit();
         }
 
-        AnalyzingSuggester suggester = new AnalyzingSuggester(directory, "suggest_index", analyzer);
-        EntryIterator iterator = new EntryIterator(entries.iterator());
-        suggester.build(iterator);
-
         logger.debug("indexed {} definitions", entries.size());
 
         return new IndexResult(directory, analyzer);
@@ -105,7 +96,9 @@ public class Indexer {
 
 
 
-    private List<SearchResult> search(String search, Directory directory, StandardAnalyzer analyzer) throws IOException, ParseException {
+    private List<SearchResult> search(
+        String search, ByteBuffersDirectory directory, StandardAnalyzer analyzer
+    ) throws IOException, ParseException {
         List<SearchResult> searchresults = new ArrayList<>();
         DirectoryReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);
@@ -133,40 +126,5 @@ public class Indexer {
 
     public final List<SearchResult> searchTerm(String search) throws IOException, ParseException {
         return search(search, index.directory, index.analyzer);
-    }
-
-    static class EntryIterator implements InputIterator {
-        private final Iterator<Entry> entryIterator;
-        private Entry currentEntry;
-
-        EntryIterator(Iterator<Entry> entryIterator) {
-            this.entryIterator = entryIterator;
-        }
-
-        @Override
-        public long weight() {
-            return 0;
-        }
-
-        @Override
-        public BytesRef next() throws IOException {
-            if (entryIterator.hasNext()) {
-                currentEntry = entryIterator.next();
-                return new BytesRef(currentEntry.id().getBytes("UTF-8"));
-            }
-            return null;
-        }
-
-        @Override
-        public BytesRef payload() { return null; } // Optional metadata payload
-
-        @Override
-        public boolean hasPayloads() { return false; }
-
-        @Override
-        public java.util.Set<BytesRef> contexts() { return null; } // Optional filtering context
-
-        @Override
-        public boolean hasContexts() { return false; }
     }
 }
