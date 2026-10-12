@@ -56,9 +56,7 @@ public class Indexer {
         ByteBuffersDirectory directory = new ByteBuffersDirectory();
         StandardAnalyzer analyzer = new StandardAnalyzer();
 
-        try (IndexWriter writer = new IndexWriter(
-            directory, new IndexWriterConfig(analyzer)
-        )) {
+        try (IndexWriter writer = new IndexWriter(directory, new IndexWriterConfig(analyzer))) {
             for (Entry def : entries) {
                 Document doc = new Document();
                 doc.add(new StringField("location", def.location(), Field.Store.YES));
@@ -110,7 +108,7 @@ public class Indexer {
 
         Query query = parser.parse(search);
         TopDocs results = searcher.search(query, numresults);
-        logger.debug("search '{}' returned {} hits", search, results.totalHits.value);
+        logger.debug("search '{}' returned {} hits", search, results.totalHits);
         StoredFields storedFields = reader.storedFields();
 
         for (ScoreDoc hit : results.scoreDocs) {
