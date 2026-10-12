@@ -153,4 +153,15 @@ publishing {
 
 graalvmNative {
     toolchainDetection.set(true)
+
+    // Lucene's Java 21 PosixNativeAccess implementation resolves the native
+    // posix_madvise symbol through the Foreign Function & Memory API.  Its
+    // static initializer reaches a JDK-internal NativeLibrary method that
+    // GraalVM cannot analyze at image-build time.  Defer that optional Lucene
+    // optimization until the executable starts; Lucene already handles an
+    // unavailable native function by disabling native access.
+    binaries.configureEach {
+        buildArgs.add("--initialize-at-run-time=org.apache.lucene.store.PosixNativeAccess")
+        buildArgs.add("--report-unsupported-elements-at-runtime")
+    }
 }
