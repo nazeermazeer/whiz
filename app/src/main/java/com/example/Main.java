@@ -62,6 +62,7 @@ public final class Main extends ToolkitApp {
     private Page page;
     private String query = "";
     private TextInputState searchbarstate = new TextInputState();
+    private final StyleEngine style;
 
     private static Path appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
@@ -85,14 +86,14 @@ public final class Main extends ToolkitApp {
         browser = createBrowserPanel(page.styleddoc);
         searchbar = createSearchbarPanel(searchbarstate);
 
-        StyleEngine engine = StyleEngine.create();
+        style = StyleEngine.create();
         try {
-            engine.loadStylesheet("original", "style.tcss");
+            style.loadStylesheet("original", "style.tcss");
         } catch (IOException err) {
             throw new UncheckedIOException(err);
         }
 
-        engine.setActiveStylesheet("original");
+        style.setActiveStylesheet("original");
     }
 
     private final class Page {
@@ -124,7 +125,6 @@ public final class Main extends ToolkitApp {
 
     private Element createSearchbarPanel(TextInputState state) {
         return textInput(state)
-            .id("searchbar")
             .placeholder(Viewer.getRubbishText() + "...")
             .onSubmit(() -> {
                 String match = "";
@@ -396,10 +396,16 @@ public final class Main extends ToolkitApp {
                         .wrapWord(),
                     renderSuggestionsPanel(suggestions.height(), panel(suggestions.element()).rounded()),
                     panel(searchbar)
+                        .id("searchbar")
                         .rounded()
                 ).fill()
             )
         ).borderType(BorderType.NONE).fill();
+    }
+
+    @Override
+    protected void onStart() {
+        runner().styleEngine(style);
     }
 
     @Override
