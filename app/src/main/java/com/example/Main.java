@@ -272,7 +272,6 @@ public final class Main extends ToolkitApp {
 
 
         newsuggestions
-            .highlightColor(Color.CYAN)
             .scrollbar(ScrollBarPolicy.AS_NEEDED)
             .autoScroll()
             .selectLast(resultCount);
@@ -394,7 +393,9 @@ public final class Main extends ToolkitApp {
                         .borderType(BorderType.NONE)
                         .focusable()
                         .wrapWord(),
-                    renderSuggestionsPanel(suggestions.height(), panel(suggestions.element()).rounded()),
+                    renderSuggestionsPanel(suggestions.height(), panel(suggestions.element())
+                        .id("suggestions")
+                        .rounded()),
                     panel(searchbar)
                         .id("searchbar")
                         .rounded()

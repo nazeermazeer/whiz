@@ -2,3 +2,8 @@
     color: #4cd1e0;
     text-style: bold;
 }
+
+#suggestions ListElement-item:selected {
+    color: #4cd1e0;
+    text-style: bold;
+}
