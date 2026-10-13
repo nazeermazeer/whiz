@@ -29,7 +29,6 @@ import com.example.Commands.Statistics;
 import com.example.Commands.Commands.SlashCommand;
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
-import dev.tamboui.style.Color;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
@@ -178,6 +177,7 @@ public final class Main extends ToolkitApp {
 
         ListElement<?> list = list()
             .autoScroll();
+            
         for (String anchor : anchors) {
             list.add(
                 text(anchor)
@@ -232,7 +232,13 @@ public final class Main extends ToolkitApp {
             List<SlashCommand> slashcommands = commands.searchCommands(query);
             resultCount = slashcommands.size();
             for (SlashCommand command : slashcommands) {
-                newsuggestions.add(row(text(command.name()).bold(), text(" " + command.description()).dim()));
+                newsuggestions.add(row(
+                    text(command.name())
+                        .addClass("slashcommand-name"),
+                    text(" " + command.description())
+                        .addClass("slashcommand-desc")
+                ));
+
                 suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command.name()}, null));
             }
         } else {

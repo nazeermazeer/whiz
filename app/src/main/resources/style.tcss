@@ -19,3 +19,10 @@
 #searchbar {
     border-type: rounded;
 }
+
+.slashcommand-name {
+    text-style: bold;
+}
+.slashcommand-desc {
+    text-style: dim;
+}
