@@ -1,23 +1,29 @@
 #sidebar {
     border-type: rounded;
+    border-color: #8d3441;
+    color: #baacb8;
 }
 
 #sidebar ListElement-item:selected {  
-    color: #4cd1e0;
+    color: #ef586f;
     text-style: bold;
 }
 
 #suggestions {
     border-type: rounded;
+    border-color: #8d3441;
+    color: #baacb8;
 }
 
 #suggestions ListElement-item:selected {
-    color: #4cd1e0;
+    color: #ef586f;
     text-style: bold;
 }
 
 #searchbar {
     border-type: rounded;
+    border-color: #8d3441;
+    color: #baacb8;
 }
 
 .slashcommand-name {
