@@ -88,12 +88,12 @@ public final class Main extends ToolkitApp {
         style = StyleEngine.create();
         try {
             style.loadStylesheet("original", "themes/original.tcss");
-            style.loadStylesheet("colors", "themes/colors.tcss");
+            style.loadStylesheet("red", "themes/red.tcss");
         } catch (IOException err) {
             throw new UncheckedIOException(err);
         }
 
-        style.setActiveStylesheet("colors");
+        style.setActiveStylesheet("red");
     }
 
     private final class Page {
