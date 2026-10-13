@@ -389,7 +389,6 @@ public final class Main extends ToolkitApp {
                     spacer(1),
                     browser
                         .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                        .borderType(BorderType.NONE)
                         .focusable()
                         .wrapWord(),
                     renderSuggestionsPanel(suggestions.height(), panel(suggestions.element())
