@@ -122,6 +122,7 @@ public class Indexer {
 
     private List<SearchResult> search(String search, ByteBuffersDirectory directory, Analyzer analyzer) throws IOException, ParseException {
 
+        Query query;
         List<SearchResult> searchresults = new ArrayList<>();
         DirectoryReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);
@@ -129,7 +130,13 @@ public class Indexer {
             new String[]{"anchor", "name", "parent", "keywords", "signature", "definition"}, analyzer, boosts
         );
 
-        Query query = parser.parse(search);
+        try {
+            query = parser.parse(search);
+        } catch (ParseException err) {
+            query = parser.parse(MultiFieldQueryParser.escape(search));
+            logger.debug("fallback to escaped search for query '{}'", search);
+        }
+
         BooleanQuery.Builder querybuilder = new BooleanQuery.Builder();
         querybuilder.add(query, BooleanClause.Occur.SHOULD);
 
@@ -143,7 +150,7 @@ public class Indexer {
         );
 
         TopDocs results = searcher.search(querybuilder.build(), numresults);
-        logger.debug("search '{}' returned {} hits", search, results.totalHits);
+        logger.debug("search '{}' returned {}", search, results.totalHits);
         StoredFields storedFields = reader.storedFields();
 
         for (ScoreDoc hit : results.scoreDocs) {
