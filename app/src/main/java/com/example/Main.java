@@ -383,8 +383,7 @@ public final class Main extends ToolkitApp {
             row(
                 panel(sidebar)
                     .id("sidebar")
-                    .focusable()
-                    .rounded(),
+                    .focusable(),
                 spacer(1),
                 column(
                     spacer(1),
@@ -394,11 +393,9 @@ public final class Main extends ToolkitApp {
                         .focusable()
                         .wrapWord(),
                     renderSuggestionsPanel(suggestions.height(), panel(suggestions.element())
-                        .id("suggestions")
-                        .rounded()),
+                        .id("suggestions")),
                     panel(searchbar)
                         .id("searchbar")
-                        .rounded()
                 ).fill()
             )
         ).borderType(BorderType.NONE).fill();
