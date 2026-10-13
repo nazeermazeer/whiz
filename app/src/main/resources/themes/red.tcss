@@ -13,6 +13,10 @@
     text-style: bold;
 }
 
+#browser {
+    color: #b8b2bf;
+}
+
 #suggestions {
     border-type: rounded;
     border-color: #8d3441;

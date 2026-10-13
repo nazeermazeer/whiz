@@ -120,7 +120,8 @@ public final class Main extends ToolkitApp {
 
     private ActionableMarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
-        return viewer.registerElementActions(new ActionableMarkupTextAreaElement(content));
+        return viewer.registerElementActions(new ActionableMarkupTextAreaElement(content))
+            .id("browser");
     }            
 
     private Element createSearchbarPanel(TextInputState state) {
