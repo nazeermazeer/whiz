@@ -177,7 +177,6 @@ public final class Main extends ToolkitApp {
         }
 
         ListElement<?> list = list()
-            .highlightColor(Color.CYAN)
             .autoScroll();
         for (String anchor : anchors) {
             list.add(
@@ -384,6 +383,7 @@ public final class Main extends ToolkitApp {
             page.title,
             row(
                 panel(sidebar)
+                    .id("sidebar")
                     .focusable()
                     .rounded(),
                 spacer(1),
