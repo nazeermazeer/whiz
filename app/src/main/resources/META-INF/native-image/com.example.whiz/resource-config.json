@@ -1,0 +1,9 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "dev/tamboui/tui/bindings/.*\\.properties"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "resources":{
+  "includes":[{
+    "pattern":"\\QMETA-INF/services/com.sun.source.util.Plugin\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.lang.System$LoggerFinder\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.nio.file.spi.FileSystemProvider\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.time.zone.ZoneRulesProvider\\E"
+  }]},
+  "bundles":[{
+    "name":"com.sun.tools.javac.resources.compiler",
+    "classNames":["com.sun.tools.javac.resources.compiler"]
+  }, {
+    "name":"com.sun.tools.javac.resources.javac",
+    "classNames":["com.sun.tools.javac.resources.javac"]
+  }, {
+    "name":"com.sun.tools.javac.resources.launcher",
+    "classNames":["com.sun.tools.javac.resources.launcher"]
+  }]
+}
