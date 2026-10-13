@@ -1,3 +1,4 @@
 #sidebar ListElement-item:selected {  
-    color: cyan;
+    color: #4cd1e0;
+    text-style: bold;
 }
