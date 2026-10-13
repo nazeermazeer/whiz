@@ -386,7 +386,8 @@ public final class Main extends ToolkitApp {
         }
 
         return panel(
-            page.title,
+            text(page.title)
+                .id("title"),
             row(
                 panel(sidebar)
                     .id("sidebar")
