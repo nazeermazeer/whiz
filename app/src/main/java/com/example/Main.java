@@ -87,7 +87,7 @@ public final class Main extends ToolkitApp {
 
         style = StyleEngine.create();
         try {
-            style.loadStylesheet("original", "style.tcss");
+            style.loadStylesheet("original", "themes/original.tcss");
         } catch (IOException err) {
             throw new UncheckedIOException(err);
         }
