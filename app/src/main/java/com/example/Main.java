@@ -30,6 +30,7 @@ import com.example.Commands.Commands.SlashCommand;
 import com.example.Indexer.SearchResult;
 import com.example.Sidebar.Item;
 import dev.tamboui.style.Color;
+import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
@@ -83,6 +84,15 @@ public final class Main extends ToolkitApp {
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);
         searchbar = createSearchbarPanel(searchbarstate);
+
+        StyleEngine engine = StyleEngine.create();
+        try {
+            engine.loadStylesheet("original", "style.tcss");
+        } catch (IOException err) {
+            throw new UncheckedIOException(err);
+        }
+
+        engine.setActiveStylesheet("original");
     }
 
     private final class Page {
