@@ -8,6 +8,7 @@ import org.apache.lucene.analysis.custom.CustomAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.KeywordField;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
@@ -80,8 +81,9 @@ public class Indexer {
         try (IndexWriter writer = new IndexWriter(directory, new IndexWriterConfig(analyzer))) {
             for (Entry def : entries) {
                 Document doc = new Document();
-                doc.add(new TextField("location", def.location(), Field.Store.YES));
-                doc.add(new TextField("id", def.id(), Field.Store.YES));
+                doc.add(new StoredField("location", def.location()));
+                doc.add(new StoredField("id", def.id()));
+                
                 doc.add(new TextField("name", def.name(), Field.Store.YES));
                 doc.add(new TextField("parent", def.parent(), Field.Store.YES));
 
