@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
@@ -33,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 public class Indexer {
     public record IndexResult(ByteBuffersDirectory directory, StandardAnalyzer analyzer) {}
 
-    public record SearchResult(String[] location, String[] term, String[] definition) {}
+    public record SearchResult(String[] location, String linenum, String[] term, String[] definition) {}
     
     private static final int numresults = 10;
     private static final Logger logger = LogManager.getLogger(Indexer.class);
@@ -65,6 +66,8 @@ public class Indexer {
                     new StringField("location", def.file(),
                     Field.Store.YES
                 ));
+                doc.add(new StoredField("line", def.linenum()));
+
                 for (String term : def.signature()) {
                     doc.add(new TextField("term", term, Field.Store.YES));
                 }
@@ -113,7 +116,7 @@ public class Indexer {
             Document doc = storedFields.document(hit.doc);
 
             searchresults.add(
-                new SearchResult(doc.getValues("location"),
+                new SearchResult(doc.getValues("location"), doc.get("line"), 
                 doc.getValues("term"), doc.getValues("definition")
             ));
 

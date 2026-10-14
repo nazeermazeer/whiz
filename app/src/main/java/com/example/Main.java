@@ -224,7 +224,7 @@ public final class Main extends ToolkitApp {
             resultCount = slashcommands.size();
             for (SlashCommand command : slashcommands) {
                 newsuggestions.add(row(text(command.name()).bold(), text(" " + command.description()).dim()));
-                suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command.name()}, null));
+                suggestionResults.add(new SearchResult(new String[]{"whiz"}, "0", new String[]{command.name()}, null));
             }
         } else {
             try {
