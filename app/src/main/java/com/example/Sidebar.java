@@ -29,7 +29,7 @@ public final class Sidebar {
                 target, new TypeReference<List<Entry>>() { }
             );
             for (Entry entry : entries) {
-                if (entry.location().equals(filename)) {
+                if (entry.file().equals(filename)) {
                     items.add(
                         new Item(entry.anchor(),
                         entry.signature().getFirst())

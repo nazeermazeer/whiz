@@ -23,8 +23,8 @@ public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
 
     public record Entry(
-        String location, String type, String id, String anchor, String parent, 
-        String[] keywords, List<String> signature, String definition
+        String file, int linenum, String type, String id, String anchor, 
+        String parent, String[] keywords, List<String> signature, String definition
     ) {}
 
     private String parseType(Element entry) {
@@ -120,7 +120,7 @@ public class Parser {
 
                     if (!anchor.equals("") && !type.equals("")) {
                         entries.add(
-                            new Entry(file.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                            new Entry(file.getName(), 67, type, ("python:" + anchor), anchor, parent, keywords, terms, def)
                         );
                     }
                 }
