@@ -5,7 +5,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 
 import org.jsoup.select.Elements;
@@ -106,11 +108,16 @@ public class Parser {
             new File(Main.getAppDirectory(), "constants.html")
         };
 
+        org.jsoup.parser.Parser htmlparser = org.jsoup.parser.Parser.htmlParser().setTrackPosition(true);
+
         for (File file : files) {
-                Document doc = Jsoup.parse(file, "UTF-8", "https://docs.python.org/3/");
+            try (InputStream stream = new FileInputStream(file)) {
+                Document doc = Jsoup.parse(stream, "UTF-8", "https://docs.python.org/3/", htmlparser);
                 Elements dls = doc.select("dl");
                 logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
                 for (Element dl : dls) {
+                    int line = dl.sourceRange().start().lineNumber();
+
                     String type = parseType(dl);
                     String anchor = parseAnchor(dl);
                     List<String> terms = parseSignatures(dl);
@@ -120,10 +127,11 @@ public class Parser {
 
                     if (!anchor.equals("") && !type.equals("")) {
                         entries.add(
-                            new Entry(file.getName(), 67, type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                            new Entry(file.getName(), line, type, ("python:" + anchor), anchor, parent, keywords, terms, def)
                         );
                     }
                 }
+            }
         }
 
         File outputfile = new File(Main.getAppDirectory(), "entries.json");
