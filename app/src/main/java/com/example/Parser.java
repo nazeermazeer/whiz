@@ -3,6 +3,8 @@ package com.example;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,11 +13,15 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 
 import org.jsoup.select.Elements;
+import org.jsoup.select.NodeVisitor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +34,45 @@ public class Parser {
         String file, int linenum, String type, String id, String anchor, 
         String parent, String[] keywords, List<String> signature, String definition
     ) {}
+
+    private final Map<Integer, Integer> userToSourceLineMap = new HashMap<>();
+    private final StringBuilder userViewBuilder = new StringBuilder();
+    private int currentUserLine = 1;
+
+    private Map<Integer, Integer> getLineMap(Document doc) {
+        Document newdoc = doc.clone(); 
+        Element section = doc.selectFirst("section");
+        newdoc.body().empty();
+        newdoc.body().appendChild(section.clone());
+
+        newdoc.traverse(new NodeVisitor() {
+            @Override
+            public void head(Node node, int depth) {
+                if (node instanceof TextNode) {
+                    TextNode textNode = (TextNode) node;
+                    String rawText = textNode.getWholeText();
+                    
+                    if (rawText.isEmpty()) return;
+
+                    int htmlSourceLine = textNode.sourceRange().start().lineNumber();
+                    for (int i = 0; i < rawText.length(); i++) {
+                        char c = rawText.charAt(i);
+                        
+                        // Map the current user-facing line to the source HTML line
+                        userToSourceLineMap.putIfAbsent(htmlSourceLine, currentUserLine);
+                        userViewBuilder.append(c);
+
+                        if (c == '\n') {
+                            currentUserLine++;
+                            htmlSourceLine++; 
+                        }
+                    }
+                }
+            }
+        });
+
+        return userToSourceLineMap;
+    }
 
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
@@ -116,7 +161,7 @@ public class Parser {
                 Elements dls = doc.select("dl");
                 logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
                 for (Element dl : dls) {
-                    int line = dl.sourceRange().start().lineNumber();
+                    int line = getLineMap(doc).getOrDefault(dl.sourceRange().start().lineNumber(), -1);
 
                     String type = parseType(dl);
                     String anchor = parseAnchor(dl);
