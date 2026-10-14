@@ -245,7 +245,7 @@ public final class Main extends ToolkitApp {
                 for (Entry result : searchedresults) {
                     newsuggestions.add(row(
                         text(result.type().substring(0, 1).toUpperCase(), " ", result.name()), 
-                        text(" (" + result.type() + ")").dim()
+                        text(" ", result.parent()).dim()
                     ));
 
                     suggestionResults.add(result);
