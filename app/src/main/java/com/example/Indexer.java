@@ -124,7 +124,7 @@ public class Indexer {
             if (id.equals(entry.id())) {
                 return new Entry(
                     entry.location(), entry.type(), entry.id(), entry.anchor(), entry.name(),
-                    entry.name(), entry.keywords(), entry.signature(), entry.definition()
+                    entry.parent(), entry.keywords(), entry.signature(), entry.definition()
                 );
             }
         }
