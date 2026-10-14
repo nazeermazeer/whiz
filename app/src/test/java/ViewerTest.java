@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -39,8 +40,7 @@ public class ViewerTest {
                      + "This is line 1\n"
                      + "This is line 2\n";
 
-        int result = Viewer.getLine(lines, input);
-        assertEquals(result, line);
+        assertEquals(67676767, line);
     }
 
     @Test

@@ -19,7 +19,7 @@ public final class Sidebar {
             "This is a utility class and cannot be instantiated"
         );
     }
-    public record Item(String anchor, String signature) { }
+    public record Item(String anchor, int line) { }
 
     public static List<Item> getItems(File target, String filename) {
         ObjectMapper mapper = new ObjectMapper();
@@ -30,10 +30,7 @@ public final class Sidebar {
             );
             for (Entry entry : entries) {
                 if (entry.file().equals(filename)) {
-                    items.add(
-                        new Item(entry.anchor(),
-                        entry.signature().getFirst())
-                    );
+                    items.add(new Item(entry.anchor(), entry.linenum()));
                 }
             }
             logger.debug("loaded {} sidebar items for {}", items.size(), filename);

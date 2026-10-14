@@ -189,16 +189,14 @@ public final class Main extends ToolkitApp {
             }
 
             String anchor = anchors.get(list.selected());
-            String signature = items.stream()
+            int line = items.stream()
                 .filter(r -> r.anchor().equals(anchor))
-                .map(item -> item.signature())
+                .map(item -> item.line())
                 .findFirst()
                 .orElse(null);
-            int line = Viewer.getLine(
-                page.rawdoc.body().wholeText(), signature
-            );
+
             browser.state().scrollToLine(line);
-            logger.info("redirected user to sidebar item for '{}'", signature);
+            logger.info("redirected user to sidebar item for '{}'", line);
 
             return EventResult.HANDLED;
         });
