@@ -243,7 +243,7 @@ public final class Main extends ToolkitApp {
                 resultCount = 1;
             } else {
                 for (Entry result : searchedresults) {
-                    newsuggestions.add(text(result.name()));
+                    newsuggestions.add(row(text(result.name()), text("    " + result.type()).dim()));
                     suggestionResults.add(result);
                 }
 
