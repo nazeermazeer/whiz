@@ -17,8 +17,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,6 +68,7 @@ public final class Main extends ToolkitApp {
 
     private static Path appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
+    private static final Map<String, Runnable> ACTIONS = new HashMap<>();
 
     public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Commands newcommands) {
         parser = newparser;
@@ -109,7 +114,7 @@ public final class Main extends ToolkitApp {
 
     private ActionableMarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
-        return viewer.registerElementActions(new ActionableMarkupTextAreaElement(content));
+        return registerElementActions(new ActionableMarkupTextAreaElement(content));
     }            
 
     private Element createSearchbarPanel(TextInputState state) {
@@ -140,7 +145,7 @@ public final class Main extends ToolkitApp {
                             String.join(" ", match)
                         );
 
-                        browser = viewer.registerElementActions(browser);
+                        browser = registerElementActions(browser);
                         browser.markup(page.getContent());
                         browser.state().scrollToLine(line);
                         sidebar = createSidebarPanel();
@@ -344,6 +349,32 @@ public final class Main extends ToolkitApp {
 
         return appdir.toAbsolutePath().toString();
     } 
+
+    private ActionableMarkupTextAreaElement registerElementActions(ActionableMarkupTextAreaElement element) {
+        Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
+        Matcher matcher = pattern.matcher(viewer.getStylizedDocument().body().wholeText());
+
+        while (matcher.find()) {
+            String id = matcher.group(1);
+            ACTIONS.put(id, () -> {
+                int line;
+                try {
+                    line = Viewer.getLine(
+                        viewer.getStylizedDocument().body().wholeText(),
+                        viewer.getStylizedDocument().getElementById(id.replaceFirst("^#", "")).text()
+                    );
+                    logger.info("redirected user to link element \"{}\"", viewer.getStylizedDocument().getElementById(id.replaceFirst("^#", "")).text());
+                } catch (NullPointerException err) {
+                    logger.error("redirection to link element \"{}\" failed:", id, err);
+                    line = 0;
+                }
+                element.state().scrollToLine(line);
+            });
+        }
+
+        ACTIONS.forEach(element::action);
+        return element;
+    }
 
     public static void main(String[] args) throws Exception {
         java.util.logging.Logger lucenelogger = java.util.logging.Logger.getLogger("org.apache.lucene");
