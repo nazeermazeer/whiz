@@ -25,7 +25,15 @@ public class Parser {
     public record Entry(
         String location, String type, String id, String anchor, String name, 
         String parent, String[] keywords, List<String> signature, String definition
-    ) {}
+    ) {
+        // entry for slash commands
+        public Entry(String name, String description) {
+            this(
+                "whiz", "slash command", "whiz:" + name, null, name,
+                null, null, List.of(name), description
+            );
+        }
+    }
 
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
