@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
-import javax.naming.directory.SearchResult;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;

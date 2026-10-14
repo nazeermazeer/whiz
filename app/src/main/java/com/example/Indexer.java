@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.naming.directory.SearchResult;
-
 import com.example.Parser.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -135,7 +133,6 @@ public class Indexer {
     }
 
     private List<Entry> search(String search, ByteBuffersDirectory directory, Analyzer analyzer) throws IOException, ParseException {
-
         Query query;
         List<Entry> searchresults = new ArrayList<>();
         DirectoryReader reader = DirectoryReader.open(directory);
@@ -169,9 +166,7 @@ public class Indexer {
 
         for (ScoreDoc hit : results.scoreDocs) {
             Document doc = storedFields.document(hit.doc);
-
             searchresults.add(getEntryFromID(readJSON(), doc.get("id")));
-
         }
 
         // Collections.rotate(searchresults, -1);
