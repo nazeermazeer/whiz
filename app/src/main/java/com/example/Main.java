@@ -243,15 +243,11 @@ public final class Main extends ToolkitApp {
                 resultCount = 1;
             } else {
                 for (Entry result : searchedresults) {
-                    if (result.type().equals("class")) {
-                        newsuggestions.add(row(text("C " + result.name()), text(" (" + result.type() + ")").dim()));
-                    } else if (result.type().equals("method")) {
-                        newsuggestions.add(row(text("M " + result.name()), text(" (" + result.type() + ")").dim()));
-                    } else if (result.type().equals("function")) {
-                        newsuggestions.add(row(text("F " + result.name()), text(" (" + result.type() + ")").dim()));
-                    } else {
-                        newsuggestions.add(row(text(result.name()), text(" (" + result.type() + ")").dim()));
-                    }
+                    newsuggestions.add(row(
+                        text(result.type().substring(0, 1).toUpperCase(), " ", result.name()), 
+                        text(" (" + result.type() + ")").dim()
+                    ));
+
                     suggestionResults.add(result);
                 }
 
