@@ -34,7 +34,7 @@ public final class Viewer {
 
     private static final Logger logger = LogManager.getLogger(Viewer.class);
 
-    public static int getLine(String text, String search) {
+    private static int getLine(String text, String search) {
         String[] lines = text.split("\\R");
         for (int i = 0; i < lines.length; i++) {
             if (lines[i].contains(search)) {

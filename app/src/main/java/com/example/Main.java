@@ -133,14 +133,10 @@ public final class Main extends ToolkitApp {
                         File file = new File(Main.getAppDirectory(), String.join(" ", result.location()));
 
                         page = new Page(file);
-                        int line = Viewer.getLine(
-                            page.rawdoc.body().wholeText(),
-                            String.join(" ", match)
-                        );
 
                         browser = viewer.registerElementActions(browser);
                         browser.markup(page.getContent());
-                        browser.state().scrollToLine(line);
+                        browser.state().scrollToLine(Integer.parseInt(result.linenum()));
                         sidebar = createSidebarPanel();
 
                         commands.recordTotalSearch();
