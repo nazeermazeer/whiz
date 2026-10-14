@@ -36,13 +36,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.naming.directory.SearchResult;
+
 import com.example.Parser.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Indexer {
     public record IndexResult(ByteBuffersDirectory directory, Analyzer analyzer) {}
-    public record SearchResult(String[] location, String[] signature, String[] definition) {}
     
     private static final int numresults = 10;
     private static final Logger logger = LogManager.getLogger(Indexer.class);
@@ -120,12 +121,23 @@ public class Indexer {
         return entries;
     }
 
+    private Entry getEntryFromID(List<Entry> entries, String id) {
+        for (Entry entry : entries) {
+            if (id.equals(entry.id())) {
+                return new Entry(
+                    entry.location(), entry.type(), entry.id(), entry.anchor(), entry.name(),
+                    entry.name(), entry.keywords(), entry.signature(), entry.definition()
+                );
+            }
+        }
 
+        return null;
+    }
 
-    private List<SearchResult> search(String search, ByteBuffersDirectory directory, Analyzer analyzer) throws IOException, ParseException {
+    private List<Entry> search(String search, ByteBuffersDirectory directory, Analyzer analyzer) throws IOException, ParseException {
 
         Query query;
-        List<SearchResult> searchresults = new ArrayList<>();
+        List<Entry> searchresults = new ArrayList<>();
         DirectoryReader reader = DirectoryReader.open(directory);
         IndexSearcher searcher = new IndexSearcher(reader);
         MultiFieldQueryParser parser = new MultiFieldQueryParser(
@@ -158,10 +170,7 @@ public class Indexer {
         for (ScoreDoc hit : results.scoreDocs) {
             Document doc = storedFields.document(hit.doc);
 
-            searchresults.add(
-                new SearchResult(doc.getValues("location"),
-                doc.getValues("signature"), doc.getValues("definition")
-            ));
+            searchresults.add(getEntryFromID(readJSON(), doc.get("id")));
 
         }
 
@@ -169,7 +178,7 @@ public class Indexer {
         return searchresults;
     }
 
-    public final List<SearchResult> searchTerm(String search) throws IOException, ParseException {
+    public final List<Entry> searchTerm(String search) throws IOException, ParseException {
         return search(search, index.directory, index.analyzer);
     }
 }

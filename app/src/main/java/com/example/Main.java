@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
+import javax.naming.directory.SearchResult;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
@@ -27,7 +29,7 @@ import org.jsoup.nodes.Document;
 import com.example.Commands.Commands;
 import com.example.Commands.Statistics;
 import com.example.Commands.Commands.SlashCommand;
-import com.example.Indexer.SearchResult;
+import com.example.Parser.Entry;
 import com.example.Sidebar.Item;
 import dev.tamboui.style.Color;
 import dev.tamboui.layout.Constraint;
@@ -105,7 +107,7 @@ public final class Main extends ToolkitApp {
         }
     }
 
-    private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
+    private record SuggestionState(ListElement<?> element, List<Entry> results, int numresults, int height) {}
 
     private ActionableMarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
@@ -123,8 +125,8 @@ public final class Main extends ToolkitApp {
                     if (selected < 0 || selected >= suggestions.results().size()) {
                         return;
                     }
-                    SearchResult result = suggestions.results().get(selected);
-                    match = result.signature()[0];
+                    Entry result = suggestions.results().get(selected);
+                    match = result.signature().get(0);
                     if (match.startsWith("/")) {
                         browser = commands.getPanelFromCommand(match);
 
@@ -212,8 +214,8 @@ public final class Main extends ToolkitApp {
 
     private SuggestionState createSuggestionsPanel(String query) {
         ListElement<?> newsuggestions = list();
-        List<SearchResult> suggestionResults = new ArrayList<>();
-        List<SearchResult> searchedresults = new ArrayList<>();
+        List<Entry> suggestionResults = new ArrayList<>();
+        List<Entry> searchedresults = new ArrayList<>();
         final int resultCount;
         int panelHeight;
 
@@ -224,7 +226,7 @@ public final class Main extends ToolkitApp {
             resultCount = slashcommands.size();
             for (SlashCommand command : slashcommands) {
                 newsuggestions.add(row(text(command.name()).bold(), text(" " + command.description()).dim()));
-                suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command.name()}, null));
+                // suggestionResults.add(new Entry("whiz", ));
             }
         } else {
             try {
@@ -242,7 +244,7 @@ public final class Main extends ToolkitApp {
                 newsuggestions.displayOnly();
                 resultCount = 1;
             } else {
-                for (SearchResult result : searchedresults) {
+                for (Entry result : searchedresults) {
                     for (String term : result.signature()) {
                         newsuggestions.add(text(term));
                         suggestionResults.add(result);
