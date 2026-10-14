@@ -358,6 +358,17 @@ public final class Main extends ToolkitApp {
             String id = matcher.group(1);
             ACTIONS.put(id, () -> {
                 int line;
+                String document = id.substring(0, id.indexOf('#'));
+                if (!document.isBlank()) {
+                    File file = Path.of(
+                        Main.getAppDirectory(), "python-3.14-docs-html", "library", document
+                    ).toFile();
+                    page = new Page(file);
+
+                    browser = registerElementActions(browser);
+                    browser.markup(page.getContent());
+                    sidebar = createSidebarPanel();
+                }
                 try {
                     line = Viewer.getLine(
                         viewer.getStylizedDocument().body().wholeText(),
