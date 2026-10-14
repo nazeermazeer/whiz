@@ -243,10 +243,8 @@ public final class Main extends ToolkitApp {
                 resultCount = 1;
             } else {
                 for (Entry result : searchedresults) {
-                    for (String term : result.signature()) {
-                        newsuggestions.add(text(term));
-                        suggestionResults.add(result);
-                    }
+                    newsuggestions.add(text(result.name()));
+                    suggestionResults.add(result);
                 }
 
                 resultCount = suggestionResults.size();
