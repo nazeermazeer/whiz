@@ -1,37 +1,44 @@
+$title: #da1e37;
+$list-items: #6e1423;
+$border-color: #a11d33;
+$selected: #ef586f;
+$content: #baacb8;
+
 #title {
-    color: #baacb8;
+    color: $title;
+    text-style: bold;
 }
 
 #sidebar {
     border-type: rounded;
-    border-color: #8d3441;
-    color: #baacb8;
+    border-color: $border-color;
+    color: $list-items;
 }
 
 #sidebar ListElement-item:selected {  
-    color: #ef586f;
+    color: $selected;
     text-style: bold;
 }
 
 #browser {
-    color: #b8b2bf;
+    color: $content;
 }
 
 #suggestions {
     border-type: rounded;
-    border-color: #8d3441;
-    color: #baacb8;
+    border-color: $border-color;
+    color: $list-items;
 }
 
 #suggestions ListElement-item:selected {
-    color: #ef586f;
+    color: $classic-crimson;
     text-style: bold;
 }
 
 #searchbar {
     border-type: rounded;
-    border-color: #8d3441;
-    color: #baacb8;
+    border-color: $border-color;
+    color: $other-text;
 }
 
 .slashcommand-name {
