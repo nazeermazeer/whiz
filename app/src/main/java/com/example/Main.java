@@ -164,7 +164,9 @@ public final class Main extends ToolkitApp {
 
         for (Entry entry : entries) {
             if (entry.location().equals(page.file.getName())) {
-                list.add(text(entry.anchor()));
+                list.add(row(
+                    text(entry.type().substring(0, 1).toUpperCase(), " ", entry.name())
+                ));
             }
         }
 
