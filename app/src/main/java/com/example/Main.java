@@ -185,7 +185,6 @@ public final class Main extends ToolkitApp {
                 return EventResult.UNHANDLED;
             }
 
-            String anchor = entries.get(list.selected()).anchor();
             String signature = entries.get(list.selected()).signature().get(0);
 
             int line = Viewer.getLine(
