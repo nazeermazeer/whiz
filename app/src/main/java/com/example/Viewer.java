@@ -170,13 +170,6 @@ public final class Viewer {
             }
         });
 
-        // render tables in doc as plaintext
-        Elements tables = newdoc.select("table");
-        for (Element table : tables) {
-            String renderedTable = getTableText(table);
-            table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
-        }
-
         return newdoc.clone();
     }
 
@@ -282,6 +275,13 @@ public final class Viewer {
             }
         } catch (Exception err) {
             throw new RuntimeException(err);
+        }
+
+        // render tables in doc as plaintext
+        Elements tables = newdoc.select("table");
+        for (Element table : tables) {
+            String renderedTable = getTableText(table);
+            table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
         }
 
         return newdoc.clone();
