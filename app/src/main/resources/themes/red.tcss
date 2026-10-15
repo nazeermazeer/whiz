@@ -3,6 +3,7 @@ $list-items: #6e1423;
 $border-color: #a11d33;
 $selected: #ef586f;
 $content: #baacb8;
+$placeholder: #370617;
 
 #title {
     color: $title;
@@ -39,6 +40,10 @@ $content: #baacb8;
     border-type: rounded;
     border-color: $border-color;
     color: $other-text;
+}
+
+TextInputElement-placeholder {
+    color: $placeholder;
 }
 
 .slashcommand-name {
