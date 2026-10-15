@@ -169,7 +169,6 @@ public class Indexer {
             searchresults.add(getEntryFromID(readJSON(), doc.get("id")));
         }
 
-        // Collections.rotate(searchresults, -1);
         return searchresults;
     }
 
