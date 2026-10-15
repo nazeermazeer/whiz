@@ -28,7 +28,6 @@ import com.example.Commands.Commands;
 import com.example.Commands.Statistics;
 import com.example.Commands.Commands.SlashCommand;
 import com.example.Parser.Entry;
-import com.example.Sidebar.Item;
 import dev.tamboui.style.Color;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
@@ -71,15 +70,16 @@ public final class Main extends ToolkitApp {
         viewer = newviewer;
         commands = newcommands;
 
+        page = new Page(new File(Main.getAppDirectory(), "functions.html"));
+
         try {
             parser.parseFiles();
             indexer.indexEntries();
+            sidebar = createSidebarPanel();
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
 
-        page = new Page(new File(Main.getAppDirectory(), "functions.html"));
-        sidebar = createSidebarPanel();
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);
         searchbar = createSearchbarPanel(searchbarstate);
@@ -155,24 +155,17 @@ public final class Main extends ToolkitApp {
         );
     }
 
-    private ListElement<?> createSidebarPanel() {
-        List<Item> items = Sidebar.getItems(
-            new File(Main.getAppDirectory(), "entries.json"),
-            page.file.getName()
-        );
-
-        List<String> anchors = new ArrayList<>();
-        for (Item item : items) {
-            anchors.add(item.anchor());
-        }
+    private ListElement<?> createSidebarPanel() throws IOException {
+        List<Entry> entries = indexer.readJSON();
 
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
             .autoScroll();
-        for (String anchor : anchors) {
-            list.add(
-                text(anchor)
-            );
+
+        for (Entry entry : entries) {
+            if (entry.location().equals(page.file.getName())) {
+                list.add(text(entry.anchor()));
+            }
         }
 
         list.onMouseEvent(event -> {
@@ -181,7 +174,7 @@ public final class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                list.selectNext(anchors.size());
+                list.selectNext(entries.size());
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
@@ -192,12 +185,9 @@ public final class Main extends ToolkitApp {
                 return EventResult.UNHANDLED;
             }
 
-            String anchor = anchors.get(list.selected());
-            String signature = items.stream()
-                .filter(r -> r.anchor().equals(anchor))
-                .map(item -> item.signature())
-                .findFirst()
-                .orElse(null);
+            String anchor = entries.get(list.selected()).anchor();
+            String signature = entries.get(list.selected()).signature().get(0);
+
             int line = Viewer.getLine(
                 page.rawdoc.body().wholeText(), signature
             );

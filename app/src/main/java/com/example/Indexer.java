@@ -108,7 +108,7 @@ public class Indexer {
         return new IndexResult(directory, analyzer);
     }
 
-    private List<Entry> readJSON() throws IOException {
+    public List<Entry> readJSON() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         List<Entry> entries = mapper.readValue(
