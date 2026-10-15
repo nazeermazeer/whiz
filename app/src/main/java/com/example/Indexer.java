@@ -49,8 +49,8 @@ public class Indexer {
     private static final Map<String, Float> boosts = Map.of(
         "anchor", 3.0f,
         "name", 4.0f,
-        "parent", 1.5f,
-        "keywords", 2.0f,
+        "parent", 2.0f,
+        "keywords", 2.5f,
         "signature",1.5f,
         "definition", 1.0f
     );
