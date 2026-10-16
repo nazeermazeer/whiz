@@ -97,7 +97,7 @@ public class Indexer {
                     doc.add(new TextField("signature", signature, Field.Store.YES));
                 }
 
-                doc.add(new StringField("definition", def.definition(), Field.Store.YES));
+                doc.add(new TextField("definition", def.definition(), Field.Store.YES));
                 writer.addDocument(doc);
             }
             writer.commit();
