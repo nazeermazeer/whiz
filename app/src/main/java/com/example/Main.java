@@ -31,8 +31,7 @@ import org.jsoup.nodes.Document;
 import com.example.Commands.Commands;
 import com.example.Commands.Statistics;
 import com.example.Commands.Commands.SlashCommand;
-import com.example.Indexer.SearchResult;
-import com.example.Sidebar.Item;
+import com.example.Parser.Entry;
 import dev.tamboui.style.Color;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
@@ -76,15 +75,17 @@ public final class Main extends ToolkitApp {
         viewer = newviewer;
         commands = newcommands;
 
+        page = new Page(new File(Main.getAppDirectory(), "functions.html"));
+
         try {
             parser.parseFiles();
             indexer.indexEntries();
+            sidebar = createSidebarPanel();
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
 
         page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
-        sidebar = createSidebarPanel();
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);
         searchbar = createSearchbarPanel(searchbarstate);
@@ -110,7 +111,7 @@ public final class Main extends ToolkitApp {
         }
     }
 
-    private record SuggestionState(ListElement<?> element, List<SearchResult> results, int numresults, int height) {}
+    private record SuggestionState(ListElement<?> element, List<Entry> results, int numresults, int height) {}
 
     private ActionableMarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
@@ -128,8 +129,8 @@ public final class Main extends ToolkitApp {
                     if (selected < 0 || selected >= suggestions.results().size()) {
                         return;
                     }
-                    SearchResult result = suggestions.results().get(selected);
-                    match = result.term()[0];
+                    Entry result = suggestions.results().get(selected);
+                    match = result.signature().get(0);
                     if (match.startsWith("/")) {
                         browser = commands.getPanelFromCommand(match);
 
@@ -162,24 +163,19 @@ public final class Main extends ToolkitApp {
         );
     }
 
-    private ListElement<?> createSidebarPanel() {
-        List<Item> items = Sidebar.getItems(
-            new File(Main.getAppDirectory(), "entries.json"),
-            page.file.getName()
-        );
-
-        List<String> anchors = new ArrayList<>();
-        for (Item item : items) {
-            anchors.add(item.anchor());
-        }
+    private ListElement<?> createSidebarPanel() throws IOException {
+        List<Entry> entries = indexer.readJSON();
 
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
             .autoScroll();
-        for (String anchor : anchors) {
-            list.add(
-                text(anchor)
-            );
+
+        for (Entry entry : entries) {
+            if (entry.location().equals(page.file.getName())) {
+                list.add(row(
+                    text(entry.type().substring(0, 1).toUpperCase(), " ", entry.name())
+                ));
+            }
         }
 
         list.onMouseEvent(event -> {
@@ -188,7 +184,7 @@ public final class Main extends ToolkitApp {
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
-                list.selectNext(anchors.size());
+                list.selectNext(entries.size());
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
@@ -199,12 +195,8 @@ public final class Main extends ToolkitApp {
                 return EventResult.UNHANDLED;
             }
 
-            String anchor = anchors.get(list.selected());
-            String signature = items.stream()
-                .filter(r -> r.anchor().equals(anchor))
-                .map(item -> item.signature())
-                .findFirst()
-                .orElse(null);
+            String signature = entries.get(list.selected()).signature().get(0);
+
             int line = Viewer.getLine(
                 page.rawdoc.body().wholeText(), signature
             );
@@ -219,8 +211,8 @@ public final class Main extends ToolkitApp {
 
     private SuggestionState createSuggestionsPanel(String query) {
         ListElement<?> newsuggestions = list();
-        List<SearchResult> suggestionResults = new ArrayList<>();
-        List<SearchResult> searchedresults = new ArrayList<>();
+        List<Entry> suggestionResults = new ArrayList<>();
+        List<Entry> searchedresults = new ArrayList<>();
         final int resultCount;
         int panelHeight;
 
@@ -231,7 +223,7 @@ public final class Main extends ToolkitApp {
             resultCount = slashcommands.size();
             for (SlashCommand command : slashcommands) {
                 newsuggestions.add(row(text(command.name()).bold(), text(" " + command.description()).dim()));
-                suggestionResults.add(new SearchResult(new String[]{"whiz"}, new String[]{command.name()}, null));
+                suggestionResults.add(new Entry(command.name(), command.description()));
             }
         } else {
             try {
@@ -249,11 +241,13 @@ public final class Main extends ToolkitApp {
                 newsuggestions.displayOnly();
                 resultCount = 1;
             } else {
-                for (SearchResult result : searchedresults) {
-                    for (String term : result.term()) {
-                        newsuggestions.add(text(term));
-                        suggestionResults.add(result);
-                    }
+                for (Entry result : searchedresults) {
+                    newsuggestions.add(row(
+                        text(result.type().substring(0, 1).toUpperCase(), " ", result.name()), 
+                        text(" ", result.parent()).dim()
+                    ));
+
+                    suggestionResults.add(result);
                 }
 
                 resultCount = suggestionResults.size();
