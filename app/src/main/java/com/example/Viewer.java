@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,13 @@ public final class Viewer {
 
     private static final Logger logger = LogManager.getLogger(Viewer.class);
 
-    private static int getLine(String text, String search) {
-        String[] lines = text.split("\\R");
-        for (int i = 0; i < lines.length; i++) {
-            if (lines[i].contains(search)) {
+    public static int getLine(String text, String search) {
+        String[] textlines = text.split("\\R");
+        String[] searchlines = search.split("\\R");
+        int length = searchlines.length;
+        for (int i = 0; i < textlines.length - length; i++) {
+            String[] viewedlines = Arrays.copyOfRange(textlines, i, i + length);;
+            if (Arrays.equals(viewedlines, searchlines)) {
                 return i;
             }
         }

@@ -74,6 +74,17 @@ public class Parser {
         return userToSourceLineMap;
     }
 
+    private int getLineNumber(Document doc, Element entry) {
+        // String contents = doc.body().wholeOwnText();
+        Document newdoc = doc.clone(); 
+        Element section = doc.selectFirst("section");
+        newdoc.body().empty();
+        newdoc.body().appendChild(section.clone());
+
+        int line = Viewer.getLine(newdoc.body().wholeText(), entry.wholeText());
+        return line;
+    }
+
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
             return "function";
@@ -161,7 +172,7 @@ public class Parser {
                 Elements dls = doc.select("dl");
                 logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
                 for (Element dl : dls) {
-                    int line = getLineMap(doc).getOrDefault(dl.sourceRange().start().lineNumber(), -1);
+                    int line = getLineNumber(doc, dl);
 
                     String type = parseType(dl);
                     String anchor = parseAnchor(dl);
