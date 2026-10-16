@@ -69,7 +69,7 @@ public class Parser {
     private String getParent(String anchor) {
         String parent;
         try {
-            parent = anchor.substring(0, anchor.indexOf("."));
+            parent = anchor.substring(0, anchor.lastIndexOf("."));
         } catch (StringIndexOutOfBoundsException err) {
             // no parent exists for this element
             parent = "";
@@ -82,7 +82,7 @@ public class Parser {
     private String getName(String anchor) {
         String name;
         try {
-            name = anchor.substring(anchor.indexOf(".") + 1);
+            name = anchor.substring(anchor.lastIndexOf(".") + 1);
         } catch (StringIndexOutOfBoundsException err) {
             // no parent exists for this element
             name = anchor;
