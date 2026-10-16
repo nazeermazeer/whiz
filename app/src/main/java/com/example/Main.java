@@ -361,7 +361,12 @@ public final class Main extends ToolkitApp {
 
                     browser = registerElementActions(browser);
                     browser.markup(page.getContent());
-                    sidebar = createSidebarPanel();
+
+                    try {
+                        sidebar = createSidebarPanel();
+                    } catch (IOException err) {
+                        throw new UncheckedIOException(err);
+                    }
                 }
                 try {
                     line = Viewer.getLine(
