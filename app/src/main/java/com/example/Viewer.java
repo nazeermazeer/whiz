@@ -39,7 +39,7 @@ public final class Viewer {
         String[] textlines = text.split("\\R");
         String[] searchlines = search.split("\\R");
         int length = searchlines.length;
-        for (int i = 0; i < textlines.length - length; i++) {
+        for (int i = 0; i < textlines.length - length + 1; i++) {
             String[] viewedlines = Arrays.copyOfRange(textlines, i, i + length);;
             if (Arrays.equals(viewedlines, searchlines)) {
                 return i;
