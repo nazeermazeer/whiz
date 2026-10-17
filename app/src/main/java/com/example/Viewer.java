@@ -72,9 +72,7 @@ public final class Viewer {
         } catch (IOException err) {
             logger.error("failed to load document {}", html, err);
             throw new RuntimeException(err);
-        }
-        logger.info("loaded document '{}'", html.getName());
-        
+        }        
     }
 
     private String getTableText(Element table) {
