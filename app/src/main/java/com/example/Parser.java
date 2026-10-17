@@ -42,13 +42,7 @@ public class Parser {
     }
 
     private int getLineNumber(Document doc, Element entry) {
-        // String contents = doc.body().wholeOwnText();
-        Document newdoc = doc.clone(); 
-        Element section = doc.selectFirst("section");
-        newdoc.body().empty();
-        newdoc.body().appendChild(section.clone());
-
-        int line = Viewer.getLine(newdoc.body().wholeText(), entry.wholeText());
+        int line = Viewer.getLine(doc.body().wholeText(), entry.wholeText());
         return line;
     }
 
