@@ -47,9 +47,9 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
-    private Parser parser;
     private Indexer indexer;
     private Viewer viewer;
+    private Parser parser;
     private Commands commands;
 
     private ListElement<?> sidebar;
@@ -64,10 +64,10 @@ public final class Main extends ToolkitApp {
     private static Path appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
 
-    public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Commands newcommands) {
-        parser = newparser;
+    public Main(Indexer newindexer, Viewer newviewer, Parser newparser, Commands newcommands) {
         indexer = newindexer;
         viewer = newviewer;
+        parser = newparser;
         commands = newcommands;
 
         page = new Page(new File(Main.getAppDirectory(), "functions.html"));
@@ -75,7 +75,7 @@ public final class Main extends ToolkitApp {
         try {
             parser.parseFiles();
             indexer.indexEntries();
-            sidebar = createSidebarPanel();
+            sidebar = createSidebarPanel("");
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
@@ -109,7 +109,7 @@ public final class Main extends ToolkitApp {
 
     private ActionableMarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
-        return viewer.registerElementActions(new ActionableMarkupTextAreaElement(content));
+        return viewer.registerElementActions(new ActionableMarkupTextAreaElement(content), document);
     }            
 
     private Element createSearchbarPanel(TextInputState state) {
@@ -133,15 +133,12 @@ public final class Main extends ToolkitApp {
                         File file = new File(Main.getAppDirectory(), String.join(" ", result.location()));
 
                         page = new Page(file);
-                        int line = Viewer.getLine(
-                            page.rawdoc.body().wholeText(),
-                            String.join(" ", match)
-                        );
 
-                        browser = viewer.registerElementActions(browser);
+                        browser = viewer.registerElementActions(browser, page.styleddoc);
                         browser.markup(page.getContent());
-                        browser.state().scrollToLine(line);
-                        sidebar = createSidebarPanel();
+                        browser.state().scrollToLine(result.linenum());
+
+                        sidebar = createSidebarPanel(result.name());
 
                         commands.recordTotalSearch();
                         commands.recordDocumentationSearch("python");
@@ -155,18 +152,23 @@ public final class Main extends ToolkitApp {
         );
     }
 
-    private ListElement<?> createSidebarPanel() throws IOException {
+    private ListElement<?> createSidebarPanel(String name) throws IOException {
         List<Entry> entries = indexer.readJSON();
 
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
             .autoScroll();
 
+        int index = 0;
         for (Entry entry : entries) {
             if (entry.location().equals(page.file.getName())) {
                 list.add(row(
                     text(entry.type().substring(0, 1).toUpperCase(), " ", entry.name())
                 ));
+                if (!name.isBlank() && entry.name().equals(name)) {
+                    list.selected(index);
+                }
+                index++;
             }
         }
 
@@ -187,13 +189,10 @@ public final class Main extends ToolkitApp {
                 return EventResult.UNHANDLED;
             }
 
-            String signature = entries.get(list.selected()).signature().get(0);
+            int line = entries.get(list.selected()).linenum();
 
-            int line = Viewer.getLine(
-                page.rawdoc.body().wholeText(), signature
-            );
             browser.state().scrollToLine(line);
-            logger.info("redirected user to sidebar item for '{}'", signature);
+            logger.info("redirected user to sidebar item for '{}'", line);
 
             return EventResult.HANDLED;
         });
@@ -342,16 +341,17 @@ public final class Main extends ToolkitApp {
         lucenelogger.setUseParentHandlers(false);
 
         logger.info("application started!");
-        Parser myparser = new Parser();
     
         Indexer myindexer = new Indexer();
 
         Viewer myviewer = new Viewer();
 
+        Parser myparser = new Parser(myviewer);
+
         Statistics mystatistics = new Statistics();
         Commands mycommands = new Commands(mystatistics);
 
-        Main main = new Main(myparser, myindexer, myviewer, mycommands);
+        Main main = new Main(myindexer, myviewer, myparser, mycommands);
         main.run();
     }
 

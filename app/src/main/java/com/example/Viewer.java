@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +36,12 @@ public final class Viewer {
     private static final Logger logger = LogManager.getLogger(Viewer.class);
 
     public static int getLine(String text, String search) {
-        String[] lines = text.split("\\R");
-        for (int i = 0; i < lines.length; i++) {
-            if (lines[i].contains(search)) {
+        String[] textlines = text.split("\\R");
+        String[] searchlines = search.split("\\R");
+        int length = searchlines.length;
+        for (int i = 0; i < textlines.length - length + 1; i++) {
+            String[] viewedlines = Arrays.copyOfRange(textlines, i, i + length);;
+            if (Arrays.equals(viewedlines, searchlines)) {
                 return i;
             }
         }
@@ -184,9 +188,9 @@ public final class Viewer {
         return doc.title();
     }
 
-    public ActionableMarkupTextAreaElement registerElementActions(ActionableMarkupTextAreaElement element) {
+    public ActionableMarkupTextAreaElement registerElementActions(ActionableMarkupTextAreaElement element, Document document) {
         Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
-        Matcher matcher = pattern.matcher(getStylizedDocument().body().wholeText());
+        Matcher matcher = pattern.matcher(document.body().wholeText());
 
         while (matcher.find()) {
             String id = matcher.group(1);
@@ -194,10 +198,10 @@ public final class Viewer {
                 int line;
                 try {
                     line = Viewer.getLine(
-                        doc.body().wholeText(),
-                        doc.getElementById(id.replaceFirst("^#", "")).text()
+                        document.body().wholeText(),
+                        document.getElementById(id.replaceFirst("^#", "")).text()
                     );
-                    logger.info("redirected user to link element \"{}\"", doc.getElementById(id.replaceFirst("^#", "")).text());
+                    logger.info("redirected user to link element \"{}\"", document.getElementById(id.replaceFirst("^#", "")).text());
                 } catch (NullPointerException err) {
                     logger.error("redirection to link element \"{}\" failed:", id, err);
                     line = 0;
