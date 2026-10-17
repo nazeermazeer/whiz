@@ -343,11 +343,12 @@ public final class Main extends ToolkitApp {
         lucenelogger.setUseParentHandlers(false);
 
         logger.info("application started!");
-        Parser myparser = new Parser();
     
         Indexer myindexer = new Indexer();
 
         Viewer myviewer = new Viewer();
+
+        Parser myparser = new Parser(myviewer);
 
         Statistics mystatistics = new Statistics();
         Commands mycommands = new Commands(mystatistics);

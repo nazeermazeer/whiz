@@ -38,6 +38,12 @@ public class Parser {
     private final Map<Integer, Integer> userToSourceLineMap = new HashMap<>();
     private final StringBuilder userViewBuilder = new StringBuilder();
     private int currentUserLine = 1;
+    
+    private Viewer viewer;
+
+    public Parser(Viewer viewer) {
+        this.viewer = viewer;
+    }
 
     private Map<Integer, Integer> getLineMap(Document doc) {
         Document newdoc = doc.clone(); 
@@ -168,7 +174,8 @@ public class Parser {
 
         for (File file : files) {
             try (InputStream stream = new FileInputStream(file)) {
-                Document doc = Jsoup.parse(stream, "UTF-8", "https://docs.python.org/3/", htmlparser);
+                viewer.loadDocument(file);
+                Document doc = viewer.getRawDocument();
                 Elements dls = doc.select("dl");
                 logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
                 for (Element dl : dls) {
