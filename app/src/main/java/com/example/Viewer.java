@@ -146,6 +146,11 @@ public final class Viewer {
         newdoc.body().empty();
         newdoc.body().appendChild(section.clone());
 
+        for (Element element : newdoc.body().getAllElements()) {
+            for (TextNode textNode : element.textNodes()) {
+                textNode.text(textNode.getWholeText().replace("¶", ""));
+            }
+        }
 
         // escape all of the [ contained in the doc
         Elements openings = newdoc.select("*:containsOwn([)");
