@@ -183,11 +183,8 @@ public final class Main extends ToolkitApp {
                 return EventResult.UNHANDLED;
             }
 
-            String signature = entries.get(list.selected()).signature().get(0);
+            int line = entries.get(list.selected()).linenum();
 
-            int line = Viewer.getLine(
-                page.rawdoc.body().wholeText(), signature
-            );
             browser.state().scrollToLine(line);
             logger.info("redirected user to sidebar item for '{}'", line);
 
