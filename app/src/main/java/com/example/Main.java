@@ -75,7 +75,7 @@ public final class Main extends ToolkitApp {
         try {
             parser.parseFiles();
             indexer.indexEntries();
-            sidebar = createSidebarPanel();
+            sidebar = createSidebarPanel("");
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
@@ -137,7 +137,8 @@ public final class Main extends ToolkitApp {
                         browser = viewer.registerElementActions(browser, page.styleddoc);
                         browser.markup(page.getContent());
                         browser.state().scrollToLine(result.linenum());
-                        sidebar = createSidebarPanel();
+
+                        sidebar = createSidebarPanel(result.name());
 
                         commands.recordTotalSearch();
                         commands.recordDocumentationSearch("python");
@@ -151,18 +152,23 @@ public final class Main extends ToolkitApp {
         );
     }
 
-    private ListElement<?> createSidebarPanel() throws IOException {
+    private ListElement<?> createSidebarPanel(String name) throws IOException {
         List<Entry> entries = indexer.readJSON();
 
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
             .autoScroll();
 
+        int index = 0;
         for (Entry entry : entries) {
             if (entry.location().equals(page.file.getName())) {
                 list.add(row(
                     text(entry.type().substring(0, 1).toUpperCase(), " ", entry.name())
                 ));
+                if (!name.isBlank() && entry.name().equals(name)) {
+                    list.selected(index);
+                }
+                index++;
             }
         }
 
