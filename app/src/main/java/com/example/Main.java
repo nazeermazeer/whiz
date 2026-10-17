@@ -161,15 +161,15 @@ public final class Main extends ToolkitApp {
     }
 
     private ListElement<?> createSidebarPanel(String name) throws IOException {
-        List<Entry> entries = indexer.readJSON();
-
         ListElement<?> list = list()
             .highlightColor(Color.CYAN)
             .autoScroll();
 
+        List<Entry> entries = new ArrayList<>();
         int index = 0;
-        for (Entry entry : entries) {
+        for (Entry entry : indexer.readJSON()) {
             if (entry.location().equals(page.file.getName())) {
+                entries.add(entry);
                 list.add(row(
                     text(entry.type().substring(0, 1).toUpperCase(), " ", entry.name())
                 ));
