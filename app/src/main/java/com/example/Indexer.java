@@ -123,7 +123,7 @@ public class Indexer {
         for (Entry entry : entries) {
             if (id.equals(entry.id())) {
                 return new Entry(
-                    entry.location(), entry.type(), entry.id(), entry.anchor(), entry.name(),
+                    entry.location(), entry.linenum(), entry.type(), entry.id(), entry.anchor(), entry.name(),
                     entry.parent(), entry.keywords(), entry.signature(), entry.definition()
                 );
             }
