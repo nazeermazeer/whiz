@@ -109,7 +109,7 @@ public final class Main extends ToolkitApp {
 
     private ActionableMarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
-        return viewer.registerElementActions(new ActionableMarkupTextAreaElement(content));
+        return viewer.registerElementActions(new ActionableMarkupTextAreaElement(content), document);
     }            
 
     private Element createSearchbarPanel(TextInputState state) {
@@ -134,7 +134,7 @@ public final class Main extends ToolkitApp {
 
                         page = new Page(file);
 
-                        browser = viewer.registerElementActions(browser);
+                        browser = viewer.registerElementActions(browser, page.styleddoc);
                         browser.markup(page.getContent());
                         browser.state().scrollToLine(result.linenum());
                         sidebar = createSidebarPanel();

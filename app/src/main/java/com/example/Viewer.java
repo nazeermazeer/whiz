@@ -146,11 +146,6 @@ public final class Viewer {
         newdoc.body().empty();
         newdoc.body().appendChild(section.clone());
 
-        for (Element element : newdoc.body().getAllElements()) {
-            for (TextNode textNode : element.textNodes()) {
-                textNode.text(textNode.getWholeText().replace("¶", ""));
-            }
-        }
 
         // escape all of the [ contained in the doc
         Elements openings = newdoc.select("*:containsOwn([)");
@@ -188,9 +183,9 @@ public final class Viewer {
         return doc.title();
     }
 
-    public ActionableMarkupTextAreaElement registerElementActions(ActionableMarkupTextAreaElement element) {
+    public ActionableMarkupTextAreaElement registerElementActions(ActionableMarkupTextAreaElement element, Document document) {
         Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
-        Matcher matcher = pattern.matcher(getStylizedDocument().body().wholeText());
+        Matcher matcher = pattern.matcher(document.body().wholeText());
 
         while (matcher.find()) {
             String id = matcher.group(1);
@@ -198,10 +193,10 @@ public final class Viewer {
                 int line;
                 try {
                     line = Viewer.getLine(
-                        doc.body().wholeText(),
-                        doc.getElementById(id.replaceFirst("^#", "")).text()
+                        document.body().wholeText(),
+                        document.getElementById(id.replaceFirst("^#", "")).text()
                     );
-                    logger.info("redirected user to link element \"{}\"", doc.getElementById(id.replaceFirst("^#", "")).text());
+                    logger.info("redirected user to link element \"{}\"", document.getElementById(id.replaceFirst("^#", "")).text());
                 } catch (NullPointerException err) {
                     logger.error("redirection to link element \"{}\" failed:", id, err);
                     line = 0;
