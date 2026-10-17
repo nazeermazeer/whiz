@@ -146,11 +146,11 @@ public final class Viewer {
         newdoc.body().empty();
         newdoc.body().appendChild(section.clone());
 
-        // for (Element element : newdoc.body().getAllElements()) {
-        //     for (TextNode textNode : element.textNodes()) {
-        //         textNode.text(textNode.getWholeText().replace("¶", ""));
-        //     }
-        // }
+        for (Element element : newdoc.body().getAllElements()) {
+            for (TextNode textNode : element.textNodes()) {
+                textNode.text(textNode.getWholeText().replace("¶", ""));
+            }
+        }
 
         // escape all of the [ contained in the doc
         Elements openings = newdoc.select("*:containsOwn([)");
@@ -174,12 +174,12 @@ public final class Viewer {
             }
         });
 
-        // // render tables in doc as plaintext
-        // Elements tables = newdoc.select("table");
-        // for (Element table : tables) {
-        //     String renderedTable = getTableText(table);
-        //     table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
-        // }
+        // render tables in doc as plaintext
+        Elements tables = newdoc.select("table");
+        for (Element table : tables) {
+            String renderedTable = getTableText(table);
+            table.replaceWith(new org.jsoup.nodes.TextNode(renderedTable));
+        }
 
         return newdoc.clone();
     }

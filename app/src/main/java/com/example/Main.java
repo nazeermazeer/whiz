@@ -48,9 +48,9 @@ import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
 public final class Main extends ToolkitApp {
-    private Parser parser;
     private Indexer indexer;
     private Viewer viewer;
+    private Parser parser;
     private Commands commands;
 
     private ListElement<?> sidebar;
@@ -65,10 +65,10 @@ public final class Main extends ToolkitApp {
     private static Path appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
 
-    public Main(Parser newparser, Indexer newindexer, Viewer newviewer, Commands newcommands) {
-        parser = newparser;
+    public Main(Indexer newindexer, Viewer newviewer, Parser newparser, Commands newcommands) {
         indexer = newindexer;
         viewer = newviewer;
+        parser = newparser;
         commands = newcommands;
 
         try {
@@ -353,7 +353,7 @@ public final class Main extends ToolkitApp {
         Statistics mystatistics = new Statistics();
         Commands mycommands = new Commands(mystatistics);
 
-        Main main = new Main(myparser, myindexer, myviewer, mycommands);
+        Main main = new Main(myindexer, myviewer, myparser, mycommands);
         main.run();
     }
 
