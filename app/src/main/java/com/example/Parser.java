@@ -23,9 +23,17 @@ public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
 
     public record Entry(
-        String file, int linenum, String type, String id, String anchor, 
-        String parent, String[] keywords, List<String> signature, String definition
-    ) {}
+        String location, int linenum, String type, String id, String anchor, 
+        String name, String parent, String[] keywords, List<String> signature, String definition
+    ) {
+        // entry for slash commands
+        public Entry(String name, String description) {
+            this(
+                "whiz", 0, "slash command", "whiz:" + name, null, name,
+                null, null, List.of(name), description
+            );
+        }
+    }
     
     private Viewer viewer;
 
@@ -87,6 +95,19 @@ public class Parser {
 
     }
 
+    private String getName(String anchor) {
+        String name;
+        try {
+            name = anchor.substring(anchor.indexOf(".") + 1);
+        } catch (StringIndexOutOfBoundsException err) {
+            // no parent exists for this element
+            name = anchor;
+        }
+
+        return name;
+
+    }
+
     private String[] gatherKeywords(Boolean parentExists, String anchor) {
         String[] keywords;
         if (parentExists) {
@@ -136,11 +157,12 @@ public class Parser {
                 List<String> terms = parseSignatures(dl);
                 String def = parseDefinition(dl);
                 String parent = getParent(anchor);
+                String name = getName(anchor);
                 String[] keywords = gatherKeywords(parent != "", anchor);
 
                 if (!anchor.equals("") && !type.equals("")) {
                     entries.add(
-                        new Entry(file.getName(), line, type, ("python:" + anchor), anchor, parent, keywords, terms, def)
+                        new Entry(file.getName(), line, type, ("python:" + anchor), anchor, name, parent, keywords, terms, def)
                     );
                 }
             }
