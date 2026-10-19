@@ -18,7 +18,7 @@ public class ViewerTest {
                               + "\n" + "│This is a table data cell                                                     │"
                               + "\n" + "└──────────────────────────────────────────────────────────────────────────────┘";
     @Test
-    public void testGetDocumentTitle_ReturnsValidOutput() {
+    public void testGetDocumentTitle_ReturnsValidOutput() throws IOException {
         File html = new File("src/test/java/sample.html");
         Viewer viewer = new Viewer();
         viewer.loadDocument(html);
@@ -44,7 +44,7 @@ public class ViewerTest {
     }
 
     @Test
-    public void testGetRawDocument_RemovesJunk() {
+    public void testGetRawDocument_RemovesJunk() throws IOException {
         File html = new File("src/test/java/sample.html");
         Viewer viewer = new Viewer();
         viewer.loadDocument(html);
@@ -56,7 +56,7 @@ public class ViewerTest {
     }
 
     @Test
-    public void testGetRawDocument_EscapesOpeningBrackets() {
+    public void testGetRawDocument_EscapesOpeningBrackets() throws IOException {
         File html = new File("src/test/java/sample.html");
         Viewer viewer = new Viewer();
         viewer.loadDocument(html);
@@ -67,7 +67,7 @@ public class ViewerTest {
     }
 
     @Test
-    public void testGetRawDocument_EscapesClosingBrackets() {
+    public void testGetRawDocument_EscapesClosingBrackets() throws IOException {
         File html = new File("src/test/java/sample.html");
         Viewer viewer = new Viewer();
         viewer.loadDocument(html);
@@ -78,7 +78,7 @@ public class ViewerTest {
     }
 
     @Test
-    public void testGetRawDocument_RendersTable() {
+    public void testGetRawDocument_RendersTable() throws IOException {
         File html = new File("src/test/java/sample.html");
         Viewer viewer = new Viewer();
         viewer.loadDocument(html);

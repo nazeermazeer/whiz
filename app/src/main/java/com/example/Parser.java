@@ -136,25 +136,27 @@ public class Parser {
         File folder = Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library").toFile();
         File[] files = folder.listFiles();
 
-        for (File file : files) {
-            viewer.loadDocument(file);
-            Document doc = viewer.getRawDocument();
-            Elements dls = doc.select("dl");
-            for (Element dl : dls) {
-                int line = getLineNumber(doc, dl);
+        if (folder.exists()) {
+            for (File file : files) {
+                viewer.loadDocument(file);
+                Document doc = viewer.getRawDocument();
+                Elements dls = doc.select("dl");
+                for (Element dl : dls) {
+                    int line = getLineNumber(doc, dl);
 
-                String type = parseType(dl);
-                String anchor = parseAnchor(dl);
-                List<String> terms = parseSignatures(dl);
-                String def = parseDefinition(dl);
-                String parent = getParent(anchor);
-                String name = getName(anchor);
-                String[] keywords = gatherKeywords(parent != "", anchor);
+                    String type = parseType(dl);
+                    String anchor = parseAnchor(dl);
+                    List<String> terms = parseSignatures(dl);
+                    String def = parseDefinition(dl);
+                    String parent = getParent(anchor);
+                    String name = getName(anchor);
+                    String[] keywords = gatherKeywords(parent != "", anchor);
 
-                if (!anchor.equals("") && !type.equals("")) {
-                    entries.add(
-                        new Entry(file.getName(), line, type, ("python:" + anchor), anchor, name, parent, keywords, terms, def)
-                    );
+                    if (!anchor.equals("") && !type.equals("")) {
+                        entries.add(
+                            new Entry(file.getName(), line, type, ("python:" + anchor), anchor, name, parent, keywords, terms, def)
+                        );
+                    }
                 }
             }
         }

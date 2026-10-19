@@ -65,13 +65,13 @@ public final class Viewer {
         return line;
     }
 
-    public void loadDocument(File html) {
+    public void loadDocument(File html) throws IOException{
         try {
             doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
             doc.outputSettings().prettyPrint(false);
         } catch (IOException err) {
             logger.error("failed to load document {}", html, err);
-            throw new RuntimeException(err);
+            throw new IOException(err);
         }        
     }
 

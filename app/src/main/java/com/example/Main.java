@@ -76,7 +76,15 @@ public final class Main extends ToolkitApp {
         parser = newparser;
         commands = newcommands;
 
-        page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
+        try {
+            page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
+        } catch (IOException err) {
+            try {
+                page = new Page(Path.of(Main.getAppDirectory(), "nofile.html").toFile());
+            } catch (IOException e) {
+                throw new RuntimeException();
+            }
+        }
 
         try {
             parser.parseFiles();
@@ -108,7 +116,7 @@ public final class Main extends ToolkitApp {
         public final Document rawdoc;
         public final Document styleddoc;
 
-        public Page(File file) {
+        public Page(File file) throws IOException {
             this.file = file;
 
             viewer.loadDocument(file);
@@ -371,7 +379,12 @@ public final class Main extends ToolkitApp {
                     File file = Path.of(
                         Main.getAppDirectory(), "python-3.14-docs-html", "library", document
                     ).toFile();
-                    page = new Page(file);
+
+                    try {
+                        page = new Page(file);
+                    } catch (IOException err) {
+                        throw new UncheckedIOException(err);
+                    }
 
                     browser = registerElementActions(browser);
                     browser.markup(page.getContent());
