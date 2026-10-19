@@ -26,7 +26,8 @@ public class Commands {
 
     private static final List<SlashCommand> commands = List.of(
         new SlashCommand("/help", "get help"),
-        new SlashCommand("/stats", "get stats")
+        new SlashCommand("/stats", "get stats"),
+        new SlashCommand("/download", "install python documentation")
     );
 
     public final List<SlashCommand> searchCommands(String search) {
@@ -53,6 +54,10 @@ public class Commands {
 
         if (command.equals("/stats")) {
             return new ActionableMarkupTextAreaElement(getStatisticsPanelContents(stats.getCreationDate(), stats.getTotalSearches(), stats.getDocumentSearches()));
+        }
+
+        if (command.equals("/download")) {
+            return new ActionableMarkupTextAreaElement("downloading... i think....");
         }
         return null;
     }
