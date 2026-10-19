@@ -9,11 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,12 +21,10 @@ import org.jsoup.nodes.TextNode;
 
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment;
-import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
 
 
 public final class Viewer {
     public record Style(String color, String bgcolor, String display) { }
-    private static final Map<String, Runnable> ACTIONS = new HashMap<>();
     private Document doc;
 
     private static final Logger logger = LogManager.getLogger(Viewer.class);
@@ -78,9 +72,7 @@ public final class Viewer {
         } catch (IOException err) {
             logger.error("failed to load document {}", html, err);
             throw new RuntimeException(err);
-        }
-        logger.info("loaded document '{}'", html.getName());
-        
+        }        
     }
 
     private String getTableText(Element table) {
@@ -186,31 +178,7 @@ public final class Viewer {
         return doc.title();
     }
 
-    public ActionableMarkupTextAreaElement registerElementActions(ActionableMarkupTextAreaElement element, Document document) {
-        Pattern pattern = Pattern.compile("\\[action=([^\\]]+)\\]");
-        Matcher matcher = pattern.matcher(document.body().wholeText());
-
-        while (matcher.find()) {
-            String id = matcher.group(1);
-            ACTIONS.put(id, () -> {
-                int line;
-                try {
-                    line = Viewer.getLine(
-                        document.body().wholeText(),
-                        document.getElementById(id.replaceFirst("^#", "")).text()
-                    );
-                    logger.info("redirected user to link element \"{}\"", document.getElementById(id.replaceFirst("^#", "")).text());
-                } catch (NullPointerException err) {
-                    logger.error("redirection to link element \"{}\" failed:", id, err);
-                    line = 0;
-                }
-                element.state().scrollToLine(line);
-            });
-        }
-
-        ACTIONS.forEach(element::action);
-        return element;
-    }
+    
 
     public Document getStylizedDocument() {        
         Document newdoc = getRawDocument().clone();

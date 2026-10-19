@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 
 import org.jsoup.select.Elements;
 
@@ -79,7 +80,7 @@ public class Parser {
     private String getParent(String anchor) {
         String parent;
         try {
-            parent = anchor.substring(0, anchor.indexOf("."));
+            parent = anchor.substring(0, anchor.lastIndexOf("."));
         } catch (StringIndexOutOfBoundsException err) {
             // no parent exists for this element
             parent = "";
@@ -92,7 +93,7 @@ public class Parser {
     private String getName(String anchor) {
         String name;
         try {
-            name = anchor.substring(anchor.indexOf(".") + 1);
+            name = anchor.substring(anchor.lastIndexOf(".") + 1);
         } catch (StringIndexOutOfBoundsException err) {
             // no parent exists for this element
             name = anchor;
@@ -132,11 +133,8 @@ public class Parser {
         List<Entry> entries = new ArrayList<>();
         logger.info("starting documentation parse");
 
-        File[] files = {
-            new File(Main.getAppDirectory(), "functions.html"),
-            new File(Main.getAppDirectory(), "stdtypes.html"),
-            new File(Main.getAppDirectory(), "constants.html")
-        };
+        File folder = Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library").toFile();
+        File[] files = folder.listFiles();
 
         for (File file : files) {
             viewer.loadDocument(file);

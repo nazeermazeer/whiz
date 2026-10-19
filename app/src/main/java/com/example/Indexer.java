@@ -97,7 +97,7 @@ public class Indexer {
                     doc.add(new TextField("signature", signature, Field.Store.YES));
                 }
 
-                doc.add(new StringField("definition", def.definition(), Field.Store.YES));
+                doc.add(new TextField("definition", def.definition(), Field.Store.YES));
                 writer.addDocument(doc);
             }
             writer.commit();
@@ -116,7 +116,7 @@ public class Indexer {
         return entries;
     }
 
-    private Entry getEntryFromID(List<Entry> entries, String id) {
+    public Entry getEntryFromID(List<Entry> entries, String id) {
         for (Entry entry : entries) {
             if (id.equals(entry.id())) {
                 return new Entry(
