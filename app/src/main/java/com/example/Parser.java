@@ -1,6 +1,5 @@
 package com.example;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -14,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,9 +23,28 @@ public class Parser {
     private static final Logger logger = LogManager.getLogger(Parser.class);
 
     public record Entry(
-        String location, String type, String id, String anchor, String parent, 
-        String[] keywords, List<String> signature, String definition
-    ) {}
+        String location, int linenum, String type, String id, String anchor, 
+        String name, String parent, String[] keywords, List<String> signature, String definition
+    ) {
+        // entry for slash commands
+        public Entry(String name, String description) {
+            this(
+                "whiz", 0, "slash command", "whiz:" + name, null, name,
+                null, null, List.of(name), description
+            );
+        }
+    }
+    
+    private Viewer viewer;
+
+    public Parser(Viewer viewer) {
+        this.viewer = viewer;
+    }
+
+    private int getLineNumber(Document doc, Element entry) {
+        int line = Viewer.getLine(doc.body().wholeText(), entry.wholeText());
+        return line;
+    }
 
     private String parseType(Element entry) {
         if (entry.attr("class").equals("py function")) {
@@ -70,6 +89,19 @@ public class Parser {
 
     }
 
+    private String getName(String anchor) {
+        String name;
+        try {
+            name = anchor.substring(anchor.indexOf(".") + 1);
+        } catch (StringIndexOutOfBoundsException err) {
+            // no parent exists for this element
+            name = anchor;
+        }
+
+        return name;
+
+    }
+
     private String[] gatherKeywords(Boolean parentExists, String anchor) {
         String[] keywords;
         if (parentExists) {
@@ -107,23 +139,26 @@ public class Parser {
         };
 
         for (File file : files) {
-                Document doc = Jsoup.parse(file, "UTF-8", "https://docs.python.org/3/");
-                Elements dls = doc.select("dl");
-                logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
-                for (Element dl : dls) {
-                    String type = parseType(dl);
-                    String anchor = parseAnchor(dl);
-                    List<String> terms = parseSignatures(dl);
-                    String def = parseDefinition(dl);
-                    String parent = getParent(anchor);
-                    String[] keywords = gatherKeywords(parent != "", anchor);
+            viewer.loadDocument(file);
+            Document doc = viewer.getRawDocument();
+            Elements dls = doc.select("dl");
+            for (Element dl : dls) {
+                int line = getLineNumber(doc, dl);
 
-                    if (!anchor.equals("") && !type.equals("")) {
-                        entries.add(
-                            new Entry(file.getName(), type, ("python:" + anchor), anchor, parent, keywords, terms, def)
-                        );
-                    }
+                String type = parseType(dl);
+                String anchor = parseAnchor(dl);
+                List<String> terms = parseSignatures(dl);
+                String def = parseDefinition(dl);
+                String parent = getParent(anchor);
+                String name = getName(anchor);
+                String[] keywords = gatherKeywords(parent != "", anchor);
+
+                if (!anchor.equals("") && !type.equals("")) {
+                    entries.add(
+                        new Entry(file.getName(), line, type, ("python:" + anchor), anchor, name, parent, keywords, terms, def)
+                    );
                 }
+            }
         }
 
         File outputfile = new File(Main.getAppDirectory(), "entries.json");
