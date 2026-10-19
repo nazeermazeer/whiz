@@ -116,7 +116,7 @@ public class Indexer {
         return entries;
     }
 
-    private Entry getEntryFromID(List<Entry> entries, String id) {
+    public Entry getEntryFromID(List<Entry> entries, String id) {
         for (Entry entry : entries) {
             if (id.equals(entry.id())) {
                 return new Entry(

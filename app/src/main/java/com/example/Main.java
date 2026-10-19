@@ -368,15 +368,14 @@ public final class Main extends ToolkitApp {
                     }
                 }
                 try {
-                    org.jsoup.nodes.Element target = page.rawdoc.getElementById(id.replaceFirst("^.*?#", ""));
-                    line = Viewer.getLine(
-                        page.rawdoc.body().wholeText(),
-                        target.text()
-                    );
-                    logger.info("redirected user to link element \"{}\"", target.text());
+                    Entry selected = indexer.getEntryFromID(indexer.readJSON(), "python:" + id.replaceFirst("^.*?#", ""));
+                    line = selected.linenum();
+                    logger.info("redirected user to link element \"{}\"", selected.id());
                 } catch (NullPointerException err) {
                     logger.error("redirection to link element \"{}\" failed:", id, err);
                     line = 0;
+                } catch (IOException err) {
+                    throw new UncheckedIOException(err);
                 }
                 element.state().scrollToLine(line);
             });
