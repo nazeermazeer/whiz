@@ -98,7 +98,6 @@ public final class Colorizer {
     public static ColorOutput getColorOutput(Document doc) throws Exception {
         List<Rule> rules = loadColorRules(doc);
         Map<Element, String> colors = new IdentityHashMap<>();
-        logger.debug("loaded {} color rules", rules.size());
         return new ColorOutput(rules, colors);
     }
 
@@ -163,7 +162,6 @@ public final class Colorizer {
     }
 
     private static String readStylesheet(String location) throws IOException {
-        logger.debug("loading stylesheet {}", location);
         if (location.startsWith("http://") || location.startsWith("https://")) {
             // Fetch remote CSS as text instead of parsing it as HTML.
             return Jsoup.connect(location)

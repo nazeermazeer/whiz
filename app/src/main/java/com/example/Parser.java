@@ -142,7 +142,6 @@ public class Parser {
             viewer.loadDocument(file);
             Document doc = viewer.getRawDocument();
             Elements dls = doc.select("dl");
-            logger.debug("parsing {} documentation blocks from {}", dls.size(), file);
             for (Element dl : dls) {
                 int line = getLineNumber(doc, dl);
 

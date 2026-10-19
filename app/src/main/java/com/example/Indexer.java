@@ -103,8 +103,6 @@ public class Indexer {
             writer.commit();
         }
 
-        logger.debug("indexed {} definitions", entries.size());
-
         return new IndexResult(directory, analyzer);
     }
 
@@ -115,7 +113,6 @@ public class Indexer {
                 Path.of(Main.getAppDirectory(), "entries.json").toFile(),
                 new TypeReference<List<Entry>>() { }
         );
-        logger.debug("read entries.json successfully");
         return entries;
     }
 
@@ -145,7 +142,6 @@ public class Indexer {
             query = parser.parse(search);
         } catch (ParseException err) {
             query = parser.parse(MultiFieldQueryParser.escape(search));
-            logger.debug("fallback to escaped search for query '{}'", search);
         }
 
         BooleanQuery.Builder querybuilder = new BooleanQuery.Builder();
@@ -161,7 +157,6 @@ public class Indexer {
         );
 
         TopDocs results = searcher.search(querybuilder.build(), numresults);
-        logger.debug("search '{}' returned {}", search, results.totalHits);
         StoredFields storedFields = reader.storedFields();
 
         for (ScoreDoc hit : results.scoreDocs) {
