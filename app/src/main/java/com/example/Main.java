@@ -368,11 +368,12 @@ public final class Main extends ToolkitApp {
                     }
                 }
                 try {
+                    org.jsoup.nodes.Element target = page.rawdoc.getElementById(id.replaceFirst("^.*?#", ""));
                     line = Viewer.getLine(
-                        viewer.getStylizedDocument().body().wholeText(),
-                        viewer.getStylizedDocument().getElementById(id.replaceFirst("^#", "")).text()
+                        page.rawdoc.body().wholeText(),
+                        target.text()
                     );
-                    logger.info("redirected user to link element \"{}\"", viewer.getStylizedDocument().getElementById(id.replaceFirst("^#", "")).text());
+                    logger.info("redirected user to link element \"{}\"", target.text());
                 } catch (NullPointerException err) {
                     logger.error("redirection to link element \"{}\" failed:", id, err);
                     line = 0;
