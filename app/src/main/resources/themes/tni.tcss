@@ -1,0 +1,58 @@
+$title: #ff0000;
+$list-items: #0000ff;
+$border-color: #ff8000;
+$selected: #00ff00;
+$content: #ffff00;
+$placeholder: #ff80ff;
+
+#title {
+    color: $title;
+    text-style: bold;
+    text-style: italic;
+}
+
+#sidebar {
+    border-type: rounded;
+    border-color: $border-color;
+    color: $list-items;
+    text-style: dim;
+}
+
+#sidebar ListElement-item:selected {  
+    color: $selected;
+    text-style: bold;
+}
+
+#browser {
+    color: $content;
+    text-style: reversed;
+}
+
+#suggestions {
+    border-type: rounded;
+    border-color: $border-color;
+    color: $list-items;
+}
+
+#suggestions ListElement-item:selected {
+    color: $selected;
+    text-style: bold;
+}
+
+#searchbar {
+    border-type: rounded;
+    border-color: $border-color;
+    color: $other-text;
+    text-style: crossed-out;
+}
+
+TextInputElement-placeholder {
+    color: $placeholder;
+}
+
+.slashcommand-name {
+    text-style: bold;
+}
+.slashcommand-desc {
+    text-style: dim;
+}
