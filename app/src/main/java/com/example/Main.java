@@ -11,6 +11,7 @@ import static dev.tamboui.toolkit.Toolkit.textInput;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,11 +80,7 @@ public final class Main extends ToolkitApp {
         try {
             page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
         } catch (IOException err) {
-            try {
-                page = new Page(Path.of(Main.getAppDirectory(), "nofile.html").toFile());
-            } catch (IOException e) {
-                throw new RuntimeException();
-            }
+            page = new Page(getClass().getResourceAsStream("nofile.html"));
         }
 
         try {
@@ -120,6 +117,15 @@ public final class Main extends ToolkitApp {
             this.file = file;
 
             viewer.loadDocument(file);
+            this.title = viewer.getDocumentTitle();
+            this.rawdoc = viewer.getRawDocument();
+            this.styleddoc = viewer.getStylizedDocument();
+        }
+
+        public Page(InputStream stream) {
+            this.file = null;
+
+            viewer.loadDocument(stream);
             this.title = viewer.getDocumentTitle();
             this.rawdoc = viewer.getRawDocument();
             this.styleddoc = viewer.getStylizedDocument();

@@ -65,13 +65,23 @@ public final class Viewer {
         return line;
     }
 
-    public void loadDocument(File html) throws IOException{
+    public void loadDocument(File html) throws IOException {
         try {
             doc = Jsoup.parse(html, "UTF-8", html.toURI().toString());
             doc.outputSettings().prettyPrint(false);
         } catch (IOException err) {
             logger.error("failed to load document {}", html, err);
             throw new IOException(err);
+        }        
+    }
+
+    public void loadDocument(InputStream html) {
+        try {
+            doc = Jsoup.parse(html, "UTF-8", "");
+            doc.outputSettings().prettyPrint(false);
+        } catch (IOException err) {
+            logger.error("failed to load resource {}", html, err);
+            throw new RuntimeException(err);
         }        
     }
 
