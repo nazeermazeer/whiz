@@ -94,7 +94,7 @@ public final class Main extends ToolkitApp {
             throw new UncheckedIOException(err);
         }
 
-        style.setActiveStylesheet("thats not it");
+        style.setActiveStylesheet("original");
     }
 
     private final class Page {
