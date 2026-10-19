@@ -80,7 +80,7 @@ public final class Main extends ToolkitApp {
         try {
             page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
         } catch (IOException err) {
-            page = new Page(getClass().getResourceAsStream("nofile.html"));
+            page = new Page(getClass().getResourceAsStream("/nofile.html"));
         }
 
         try {
