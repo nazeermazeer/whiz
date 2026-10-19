@@ -48,8 +48,6 @@ public class Statistics {
         }
         searcheddocs.put(doc, searches);
         stats.setDocumentSearches(searcheddocs);
-        logger.debug("logged search for {} (now {})", doc, searches);
-
     }
 
     public String getCreationDate() {

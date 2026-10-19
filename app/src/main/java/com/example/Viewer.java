@@ -131,8 +131,6 @@ public final class Viewer {
     }
 
     public Document getRawDocument() {
-        logger.debug("building raw document view for '{}'", doc.title());
-
         Document newdoc = doc.clone(); 
         Element section = doc.selectFirst("section");
         newdoc.body().empty();
@@ -182,9 +180,7 @@ public final class Viewer {
 
     
 
-    public Document getStylizedDocument() {
-        logger.debug("building stylized document view for '{}'", doc.title());
-        
+    public Document getStylizedDocument() {        
         Document newdoc = getRawDocument().clone();
 
         // italicize all italicized text elements

@@ -200,7 +200,7 @@ public final class Main extends ToolkitApp {
             int line = entries.get(list.selected()).linenum();
 
             browser.state().scrollToLine(line);
-            logger.info("redirected user to sidebar item for '{}'", line);
+            logger.info("redirected user to sidebar item for '{}'", entries.get(list.selected()).anchor());
 
             return EventResult.HANDLED;
         });
