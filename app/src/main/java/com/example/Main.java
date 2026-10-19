@@ -32,7 +32,7 @@ import com.example.Commands.Commands;
 import com.example.Commands.Statistics;
 import com.example.Commands.Commands.SlashCommand;
 import com.example.Parser.Entry;
-import dev.tamboui.style.Color;
+import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
@@ -64,6 +64,7 @@ public final class Main extends ToolkitApp {
     private Page page;
     private String query = "";
     private TextInputState searchbarstate = new TextInputState();
+    private final StyleEngine style;
 
     private static Path appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
@@ -89,6 +90,17 @@ public final class Main extends ToolkitApp {
         suggestions = createSuggestionsPanel("");
         browser = createBrowserPanel(page.styleddoc);
         searchbar = createSearchbarPanel(searchbarstate);
+
+        style = StyleEngine.create();
+        try {
+            style.loadStylesheet("original", "themes/original.tcss");
+            style.loadStylesheet("red", "themes/red.tcss");
+            style.loadStylesheet("thats not it", "themes/tni.tcss");
+        } catch (IOException err) {
+            throw new UncheckedIOException(err);
+        }
+
+        style.setActiveStylesheet("original");
     }
 
     private final class Page {
@@ -115,12 +127,12 @@ public final class Main extends ToolkitApp {
 
     private ActionableMarkupTextAreaElement createBrowserPanel(Document document) {
         String content = document.body().wholeText();
-        return registerElementActions(new ActionableMarkupTextAreaElement(content));
+        return registerElementActions(new ActionableMarkupTextAreaElement(content))
+            .id("browser");
     }            
 
     private Element createSearchbarPanel(TextInputState state) {
         return textInput(state)
-            .id("searchbar")
             .placeholder(Viewer.getRubbishText() + "...")
             .onSubmit(() -> {
                 String match = "";
@@ -162,7 +174,6 @@ public final class Main extends ToolkitApp {
 
     private ListElement<?> createSidebarPanel(String name) throws IOException {
         ListElement<?> list = list()
-            .highlightColor(Color.CYAN)
             .autoScroll();
 
         List<Entry> entries = new ArrayList<>();
@@ -221,7 +232,13 @@ public final class Main extends ToolkitApp {
             List<SlashCommand> slashcommands = commands.searchCommands(query);
             resultCount = slashcommands.size();
             for (SlashCommand command : slashcommands) {
-                newsuggestions.add(row(text(command.name()).bold(), text(" " + command.description()).dim()));
+                newsuggestions.add(row(
+                    text(command.name())
+                        .addClass("slashcommand-name"),
+                    text(" " + command.description())
+                        .addClass("slashcommand-desc")
+                ));
+
                 suggestionResults.add(new Entry(command.name(), command.description()));
             }
         } else {
@@ -263,7 +280,6 @@ public final class Main extends ToolkitApp {
 
 
         newsuggestions
-            .highlightColor(Color.CYAN)
             .scrollbar(ScrollBarPolicy.AS_NEEDED)
             .autoScroll()
             .selectLast(resultCount);
@@ -414,25 +430,31 @@ public final class Main extends ToolkitApp {
         }
 
         return panel(
-            page.title,
+            text(page.title)
+                .id("title"),
             row(
                 panel(sidebar)
-                    .focusable()
-                    .rounded(),
+                    .id("sidebar")
+                    .focusable(),
                 spacer(1),
                 column(
                     spacer(1),
                     browser
                         .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                        .borderType(BorderType.NONE)
                         .focusable()
                         .wrapWord(),
-                    renderSuggestionsPanel(suggestions.height(), panel(suggestions.element()).rounded()),
+                    renderSuggestionsPanel(suggestions.height(), panel(suggestions.element())
+                        .id("suggestions")),
                     panel(searchbar)
-                        .rounded()
+                        .id("searchbar")
                 ).fill()
             )
         ).borderType(BorderType.NONE).fill();
+    }
+
+    @Override
+    protected void onStart() {
+        runner().styleEngine(style);
     }
 
     @Override

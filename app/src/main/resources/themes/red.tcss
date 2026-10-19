@@ -1,0 +1,54 @@
+$title: #da1e37;
+$list-items: #6e1423;
+$border-color: #a11d33;
+$selected: #ef586f;
+$content: #baacb8;
+$placeholder: #370617;
+
+#title {
+    color: $title;
+    text-style: bold;
+}
+
+#sidebar {
+    border-type: rounded;
+    border-color: $border-color;
+    color: $list-items;
+}
+
+#sidebar ListElement-item:selected {  
+    color: $selected;
+    text-style: bold;
+}
+
+#browser {
+    color: $content;
+}
+
+#suggestions {
+    border-type: rounded;
+    border-color: $border-color;
+    color: $list-items;
+}
+
+#suggestions ListElement-item:selected {
+    color: $selected;
+    text-style: bold;
+}
+
+#searchbar {
+    border-type: rounded;
+    border-color: $border-color;
+    color: $other-text;
+}
+
+TextInputElement-placeholder {
+    color: $placeholder;
+}
+
+.slashcommand-name {
+    text-style: bold;
+}
+.slashcommand-desc {
+    text-style: dim;
+}
