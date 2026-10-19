@@ -14,7 +14,7 @@
 
         <RollingFile name="DebugFile" fileName="logs/debug.log" 
                      filePattern="logs/debug-%d{yyyy-MM-dd}-%i.log.gz">
-            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            <ThresholdFilter level="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %m%n"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="50 MB"/>
@@ -26,7 +26,7 @@
     </Appenders>
 
     <Loggers>
-        <Root level="DEBUG">
+        <Root level="TRACE">
             <AppenderRef ref="GeneralFile"/>
             <AppenderRef ref="DebugFile"/>
         </Root>
