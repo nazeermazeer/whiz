@@ -128,6 +128,18 @@ public class Parser {
         return terms;
     }
 
+    private void writeEntries(List<Entry> entries) {
+        File outputfile = new File(Main.getAppDirectory(), "entries.json");
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, entries);
+            logger.info("wrote {} definitions to {}", entries.size(), outputfile);
+        } catch (IOException err) {
+            logger.error("failed to write parsed definitions", err);
+            throw new UncheckedIOException(err);
+        }
+    }  
+
 
     public void parseFiles() throws IOException {
         List<Entry> entries = new ArrayList<>();
@@ -159,14 +171,6 @@ public class Parser {
             }
         }
 
-        File outputfile = new File(Main.getAppDirectory(), "entries.json");
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(outputfile, entries);
-            logger.info("wrote {} definitions to {}", entries.size(), outputfile);
-        } catch (IOException err) {
-            logger.error("failed to write parsed definitions", err);
-            throw new UncheckedIOException(err);
-        }
-    }  
+        writeEntries(entries);
+    }
 }
