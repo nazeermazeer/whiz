@@ -4,12 +4,7 @@ package com.example.Commands;
 import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -66,18 +61,10 @@ public class Commands {
 
         if (command.equals("/download")) {
             Path path = Path.of(Main.getAppDirectory(), "unzipped.html");
-            downloadFile("https://docs.python.org/3/", path);
+            Downloader.downloadFile("https://docs.python.org/3/", path);
             return new ActionableMarkupTextAreaElement("downloading... i think....");
         }
         return null;
-    }
-
-    public final void downloadFile(String uri, Path path) {
-        try (InputStream in = URI.create(uri).toURL().openStream()) {
-            Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException err) {
-            throw new RuntimeException(err);
-        }
     }
 
     private static String getStatisticsPanelContents(String creationDate, int totsearches, Map<String, Integer> docsearches) {
