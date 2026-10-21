@@ -6,12 +6,17 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Downloader {
+    private static final Logger logger = LogManager.getLogger(Downloader.class);
+
     public static final void downloadFile(String uri, Path path) {
         try {
             Document doc = Jsoup.connect(uri)
@@ -22,6 +27,8 @@ public class Downloader {
             String content = doc.outerHtml();
 
             Files.writeString(path, content);
+        } catch (HttpStatusException err) {
+            logger.warn("{} error when downloading html file at url {}", err.getStatusCode(), err.getUrl(), err);
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
