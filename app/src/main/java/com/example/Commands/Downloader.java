@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,9 +21,10 @@ public class Downloader {
     public static final void downloadFile(String uri, Path path) {
         try {
             Document doc = Jsoup.connect(uri)
-                                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                                .timeout(10000)
-                                .get();
+                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                .referrer("https://google.com")
+                .timeout(10000)
+                .get();
 
             String content = doc.outerHtml();
 
@@ -45,7 +47,10 @@ public class Downloader {
             Elements elements = doc.select("a[href]");
             for (Element element : elements) {
                 String absUrl = element.absUrl("href");
-                downloadFile(absUrl, path);
+                
+                String location = doc.location(); 
+                String name = Paths.get(location).getFileName().toString();
+                downloadFile(absUrl, path.resolve(name));
             }
         } catch (IOException err) {
             throw new RuntimeException();
