@@ -5,12 +5,21 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 public class Downloader {
     public static final void downloadFile(String uri, Path path) {
-        try (InputStream in = URI.create(uri).toURL().openStream()) {
-            Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+        try {
+            Document doc = Jsoup.connect(uri)
+                                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                                .timeout(10000)
+                                .get();
+
+            String content = doc.outerHtml();
+
+            Files.writeString(path, content);
         } catch (IOException err) {
             throw new RuntimeException(err);
         }
