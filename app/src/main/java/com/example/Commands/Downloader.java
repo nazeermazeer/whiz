@@ -27,17 +27,18 @@ public class Downloader {
         }
     }
 
-    public static final void getURLS(String url) {
+    public static final void getURLS(String url, Path path) {
         try {
             Document doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                .referrer("https://google.com")
                 .timeout(10000)
                 .get();
 
             Elements elements = doc.select("a[href]");
             for (Element element : elements) {
                 String absUrl = element.absUrl("href");
-                downloadFile(absUrl, null);
+                downloadFile(absUrl, path);
             }
         } catch (IOException err) {
             throw new RuntimeException();

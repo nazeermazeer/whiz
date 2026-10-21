@@ -61,7 +61,7 @@ public class Commands {
 
         if (command.equals("/download")) {
             Path path = Path.of(Main.getAppDirectory(), "unzipped.html");
-            Downloader.downloadFile("https://docs.python.org/3/", path);
+            Downloader.getURLS("https://docs.python.org/3/", path);
             return new ActionableMarkupTextAreaElement("downloading... i think....");
         }
         return null;
