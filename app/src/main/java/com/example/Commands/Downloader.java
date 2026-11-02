@@ -6,6 +6,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +21,7 @@ import org.jsoup.select.Elements;
 public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
 
-    public static final void downloadFile(String uri, Path path, Connection session) {
+    public static final void downloadFile(String uri, Path path, Connection session) throws IOException {
         try {
             Document doc = session.newRequest(uri).get();
 
@@ -28,41 +30,61 @@ public class Downloader {
             Files.writeString(path, content);
         } catch (HttpStatusException err) {
             logger.warn("{} error when downloading html file at url {}", err.getStatusCode(), err.getUrl(), err);
-        } catch (IOException err) {
-            throw new RuntimeException(err);
         }
     }
 
-    public static final void getURLS(String url, Path path) throws IOException {
-        Connection session = Jsoup.newSession()
-            .timeout(45 * 1000)
-            .maxBodySize(0);
-
+    public static final List<String> getURLS(String url, Path path, Connection session) throws IOException {
         Document doc = session.newRequest(url).get();
+
+        List<String> urls = new ArrayList<>();
 
         Elements elements = doc.select("a");
         for (Element element : elements) {
             String linkedurl = element.attr("abs:href");
-            
-            String name = Paths.get(linkedurl).getFileName().toString();
-
-            downloadFile(linkedurl, path.resolve(name), session);
+            urls.add(linkedurl);
         }
+
+        return urls;
     }
 
     public static final void downloadWebsite(String url, Path path) {
+        Connection session = Jsoup.newSession()
+            .timeout(45 * 1000)
+            .maxBodySize(0);
+
+        List<String> urls = new ArrayList<>();
+
         try {
-            getURLS(url, path);
+            urls = getURLS(url, path, session);
         } catch (IOException e) {
             int retrycount = 0;
-            logger.warn("retrying first download", e);
+            logger.warn("retrying first retrival of website urls", e);
             try {
-                getURLS(url, path);
+                urls = getURLS(url, path, session);
             } catch (IOException err) {
                 retrycount++;
-                logger.warn("retrying download... total retry count: {}", err);
+                logger.warn("retrying website url retrieval... total retry count: {}", retrycount, err);
                 if (retrycount >= 3) {
                     throw new RuntimeException(err);
+                }
+            }
+        }
+
+        for (String websiteurl : urls) {
+            String name = Paths.get(websiteurl).getFileName().toString();
+            try {
+                downloadFile(websiteurl, path.resolve(name), session);
+            } catch (IOException e) {
+                int retrycount = 0;
+                logger.warn("retrying initial download of website url {}", websiteurl, e);
+                try {
+                    downloadFile(websiteurl, path.resolve(name), session);
+                } catch (IOException err) {
+                    retrycount++;
+                    logger.warn("retrying download of website... total retry count: {}", retrycount, err);
+                    if (retrycount >= 3) {
+                        throw new RuntimeException(err);
+                    }
                 }
             }
         }
