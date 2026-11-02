@@ -42,6 +42,12 @@ public class Downloader {
         for (Element element : elements) {
             String linkedurl = element.attr("abs:href");
             urls.add(linkedurl);
+
+            if (linkedurl.contains("python")) {
+                for (String recursiveurl : getURLS(url, path, session)) {
+                    urls.add(recursiveurl);
+                }
+            }
         }
 
         return urls;
