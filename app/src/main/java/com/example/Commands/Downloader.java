@@ -55,10 +55,12 @@ public class Downloader {
             getURLS(url, path);
         } catch (IOException e) {
             int retrycount = 0;
+            logger.warn("retrying first download", e);
             try {
                 getURLS(url, path);
             } catch (IOException err) {
                 retrycount++;
+                logger.warn("retrying download... total retry count: {}", err);
                 if (retrycount >= 3) {
                     throw new RuntimeException(err);
                 }
