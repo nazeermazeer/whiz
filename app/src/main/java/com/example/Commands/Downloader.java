@@ -33,18 +33,21 @@ public class Downloader {
         }
     }
 
-    public static final List<String> getURLS(String url, Path path, Connection session) throws IOException {
+    public static final List<String> getURLS(String url, Path path, Connection session, List<String> urls) throws IOException {
         Document doc = session.newRequest(url).get();
-
-        List<String> urls = new ArrayList<>();
 
         Elements elements = doc.select("a");
         for (Element element : elements) {
             String linkedurl = element.attr("abs:href");
+            if (urls.contains(linkedurl)) {
+                continue;
+            }
+
+            System.out.println(linkedurl);
             urls.add(linkedurl);
 
             if (linkedurl.contains("docs.python.org")) {
-                for (String recursiveurl : getURLS(url, path, session)) {
+                for (String recursiveurl : getURLS(linkedurl, path, session, urls)) {
                     urls.add(recursiveurl);
                 }
             }
@@ -61,12 +64,12 @@ public class Downloader {
         List<String> urls = new ArrayList<>();
 
         try {
-            urls = getURLS(url, path, session);
+            urls = getURLS(url, path, session, urls);
         } catch (IOException e) {
             int retrycount = 0;
             logger.warn("retrying first retrival of website urls", e);
             try {
-                urls = getURLS(url, path, session);
+                urls = getURLS(url, path, session, urls);
             } catch (IOException err) {
                 retrycount++;
                 logger.warn("retrying website url retrieval... total retry count: {}", retrycount, err);
