@@ -43,7 +43,7 @@ public class Downloader {
             String linkedurl = element.attr("abs:href");
             urls.add(linkedurl);
 
-            if (linkedurl.contains("python")) {
+            if (linkedurl.contains("docs.python.org")) {
                 for (String recursiveurl : getURLS(url, path, session)) {
                     urls.add(recursiveurl);
                 }
