@@ -3,6 +3,7 @@ package com.example.Commands;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,7 +39,19 @@ public class Downloader {
 
         Elements elements = doc.select("a");
         for (Element element : elements) {
-            String linkedurl = element.attr("abs:href");
+            String abshref = element.attr("abs:href");
+            String linkedurl;
+
+            try {
+                URI uri = new URI(abshref);
+                linkedurl = new URI(
+                    uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(), null
+                ).toString();
+            } catch (URISyntaxException err) {
+                logger.warn("falling back to unstripped url for link {}", abshref, err);
+                linkedurl = abshref;
+            }
+
             if (urls.contains(linkedurl)) {
                 continue;
             }
