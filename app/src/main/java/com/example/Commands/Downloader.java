@@ -36,7 +36,7 @@ public class Downloader {
         }
     }
 
-    public static final List<String> getURLS(String url, Path path, Connection session, List<String> urls) throws IOException {
+    public static final List<String> downloadURLS(String url, Path path, Connection session, List<String> urls) throws IOException {
         Document doc = session.newRequest(url).get();
 
         Elements elements = doc.select("a");
@@ -62,7 +62,10 @@ public class Downloader {
             urls.add(linkedurl);
 
             if (linkedurl.contains("docs.python.org")) {
-                getURLS(linkedurl, path, session, urls);
+                String name = Paths.get(linkedurl).getFileName().toString();
+                downloadFile(linkedurl, path.resolve(name), session);
+
+                downloadURLS(linkedurl, path, session, urls);
             }
         }
 
@@ -76,22 +79,6 @@ public class Downloader {
 
         List<String> urls = new ArrayList<>();
 
-        try {
-            urls = getURLS(url, path, session, urls);
-        } catch (IOException e) {
-            int retrycount = 0;
-            logger.warn("retrying first retrival of website urls", e);
-            try {
-                urls = getURLS(url, path, session, urls);
-            } catch (IOException err) {
-                retrycount++;
-                logger.warn("retrying website url retrieval... total retry count: {}", retrycount, err);
-                if (retrycount >= 3) {
-                    throw new RuntimeException(err);
-                }
-            }
-        }
-
         Path root = Path.of(Main.getAppDirectory(), "python");
         try {
             Files.createDirectories(root);
@@ -99,21 +86,18 @@ public class Downloader {
             throw new RuntimeException(err);
         }
 
-        for (String websiteurl : urls) {
-            String name = Paths.get(websiteurl).getFileName().toString();
+        try {
+            urls = downloadURLS(url, path, session, urls);
+        } catch (IOException e) {
+            int retrycount = 0;
+            logger.warn("retrying first retrival of website urls", e);
             try {
-                downloadFile(websiteurl, path.resolve(name), session);
-            } catch (IOException e) {
-                int retrycount = 0;
-                logger.warn("retrying initial download of website url {}", websiteurl, e);
-                try {
-                    downloadFile(websiteurl, path.resolve(name), session);
-                } catch (IOException err) {
-                    retrycount++;
-                    logger.warn("retrying download of website... total retry count: {}", retrycount, err);
-                    if (retrycount >= 3) {
-                        throw new RuntimeException(err);
-                    }
+                urls = downloadURLS(url, path, session, urls);
+            } catch (IOException err) {
+                retrycount++;
+                logger.warn("retrying website url retrieval... total retry count: {}", retrycount, err);
+                if (retrycount >= 3) {
+                    throw new RuntimeException(err);
                 }
             }
         }
