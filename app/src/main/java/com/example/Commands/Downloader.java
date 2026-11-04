@@ -19,6 +19,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.example.Main;
+
 public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
 
@@ -88,6 +90,13 @@ public class Downloader {
                     throw new RuntimeException(err);
                 }
             }
+        }
+
+        Path root = Path.of(Main.getAppDirectory(), "python");
+        try {
+            Files.createDirectories(root);
+        } catch (IOException err) {
+            throw new RuntimeException(err);
         }
 
         for (String websiteurl : urls) {
