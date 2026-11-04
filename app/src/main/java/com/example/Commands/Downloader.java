@@ -36,7 +36,7 @@ public class Downloader {
         }
     }
 
-    public static final List<String> downloadURLS(String url, Path path, Connection session, List<String> urls) throws IOException {
+    public static final List<String> downloadURLS(String url, String root, Path path, Connection session, List<String> urls) throws IOException {
         Document doc = session.newRequest(url).get();
 
         Elements elements = doc.select("a");
@@ -61,11 +61,11 @@ public class Downloader {
             System.out.println(linkedurl);
             urls.add(linkedurl);
 
-            if (linkedurl.contains("docs.python.org")) {
+            if (linkedurl.contains(root)) {
                 String name = Paths.get(linkedurl).getFileName().toString();
                 downloadFile(linkedurl, path.resolve(name), session);
 
-                downloadURLS(linkedurl, path, session, urls);
+                downloadURLS(linkedurl, root, path, session, urls);
             }
         }
 
@@ -87,12 +87,12 @@ public class Downloader {
         }
 
         try {
-            urls = downloadURLS(url, path, session, urls);
+            urls = downloadURLS(url, url, path, session, urls);
         } catch (IOException e) {
             int retrycount = 0;
             logger.warn("retrying first retrival of website urls", e);
             try {
-                urls = downloadURLS(url, path, session, urls);
+                urls = downloadURLS(url, url, path, session, urls);
             } catch (IOException err) {
                 retrycount++;
                 logger.warn("retrying website url retrieval... total retry count: {}", retrycount, err);
