@@ -60,9 +60,7 @@ public class Downloader {
             urls.add(linkedurl);
 
             if (linkedurl.contains("docs.python.org")) {
-                for (String recursiveurl : getURLS(linkedurl, path, session, urls)) {
-                    urls.add(recursiveurl);
-                }
+                getURLS(linkedurl, path, session, urls);
             }
         }
 
