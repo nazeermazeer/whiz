@@ -42,17 +42,22 @@ public class Downloader {
         Elements elements = doc.select("a");
         for (Element element : elements) {
             String abshref = element.attr("abs:href");
-            String linkedurl;
+            String linkedurl, uripath;
 
             try {
                 URI uri = new URI(abshref);
+                uripath = uri.getPath();
+
                 linkedurl = new URI(
-                    uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(), null
+                    uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uripath, uri.getQuery(), null
                 ).toString();
             } catch (URISyntaxException err) {
                 logger.warn("falling back to unstripped url for link {}", abshref, err);
                 linkedurl = abshref;
+                uripath = "";
             }
+
+            uripath = uripath.replace("/3.14/", "");
 
             if (urls.contains(linkedurl)) {
                 continue;
@@ -63,7 +68,7 @@ public class Downloader {
 
             if (linkedurl.contains(root)) {
                 String name = Paths.get(linkedurl).getFileName().toString();
-                downloadFile(linkedurl, path.resolve(name), session);
+                downloadFile(linkedurl, path.resolve(uripath), session);
 
                 downloadURLS(linkedurl, root, path, session, urls);
             }
