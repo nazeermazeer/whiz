@@ -319,6 +319,11 @@ public final class Main extends ToolkitApp {
     private ActionableMarkupTextAreaElement renderBrowserPanel(String panel) {
         if (panel.isBlank()) {
             return browser;
+        } else if (panel.equals("/download")) {
+            browser.markup(commands.getContentsFromPanel("/download"));
+            return browser
+                .showLineNumbers(true)
+                .scrollToLine(9999999);
         } else {
             browser.markup(commands.getContentsFromPanel(panel));
             return browser;
