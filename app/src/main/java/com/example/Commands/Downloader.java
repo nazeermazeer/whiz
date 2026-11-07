@@ -24,8 +24,13 @@ import com.example.Main;
 public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
     private String status = "";
-    private int items = 0;
     private boolean stop = false;
+
+    private int success = 0;
+    private int snooze = 0;
+    private int ignored = 0;
+    private int comprehend = 0;
+
 
     public final void downloadFile(String uri, Path path, Connection session) throws IOException {
         if (stop) {
@@ -45,6 +50,10 @@ public class Downloader {
             Files.writeString(path, content);
         } catch (HttpStatusException err) {
             logger.warn("{} error when downloading html file at url {}", err.getStatusCode(), err.getUrl(), err);
+            status += 
+                "[red][italic]ignoring a url located [blue][link=" + err.getUrl() + 
+                "]here[/blue][/link] as it returned a status code of " + err.getStatusCode() + " " + err.getMessage();
+            ignored++;
         }
     }
 
@@ -81,7 +90,7 @@ public class Downloader {
 
             status += "imagining '" + uripath + "', which is located [blue][link=" + linkedurl + "]here[/link][/blue]\n";
             urls.add(linkedurl);
-            items++;
+            success++;
 
             if (linkedurl.contains(root)) {
                 downloadFile(linkedurl, path.resolve(uripath), session);
@@ -91,6 +100,7 @@ public class Downloader {
         }
 
         status += "[green][bold]comprehending a url located [blue][link=" + url + "]here[/blue][/link], which has " +  elements.size() + " urls[/green][/bold]\n";
+        comprehend++;
         return urls;
     }
 
@@ -113,26 +123,26 @@ public class Downloader {
         } catch (IOException e) {
             int retrycount = 0;
             logger.warn("retrying first retrival of website urls", e);
-            status += "[yellow][bold]snoozin' (attempt " + retrycount + "/3)[/yellow][/bold]";
+            status += "[yellow][bold]snoozin' (attempt " + retrycount + "/3)[/yellow][/bold]\n";
+            snooze++;
             try {
                 urls = downloadURLS(url, url, path, session, urls);
             } catch (IOException err) {
                 retrycount++;
                 logger.warn("retrying website url retrieval... total retry count: {}", retrycount, err);
-                status += "[yellow][bold]snoozin' (attempt " + retrycount + "/3)[/yellow][/bold]";
+                status += "[yellow][bold]snoozin' (attempt " + retrycount + "/3)[/yellow][/bold]\n";
+                snooze++;
                 if (retrycount >= 3) {
                     throw new RuntimeException(err);
                 }
             }
         }
+
+        status += success + " " + snooze + " " + ignored + " " + comprehend;
     }
 
     public final String getStatus() {
         return status;
-    }
-
-    public final int getTotalItemCount() {
-        return items;
     }
 
     public final void stopDownloads() {

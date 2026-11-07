@@ -73,7 +73,7 @@ public class Commands {
             }
 
 
-            return new ActionableMarkupTextAreaElement(downloader.getStatus()).scrollToLine(downloader.getTotalItemCount());
+            return new ActionableMarkupTextAreaElement(downloader.getStatus());
         }
         return null;
     }
