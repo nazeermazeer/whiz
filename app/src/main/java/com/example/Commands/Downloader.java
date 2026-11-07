@@ -28,6 +28,11 @@ public class Downloader {
         try {
             Document doc = session.newRequest(uri).get();
 
+            Path parent = path.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+
             String content = doc.outerHtml();
 
             Files.writeString(path, content);
