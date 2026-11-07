@@ -23,6 +23,7 @@ import com.example.Main;
 
 public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
+    private String status = "";
     private boolean stop = false;
 
     public final void downloadFile(String uri, Path path, Connection session) throws IOException {
@@ -77,6 +78,7 @@ public class Downloader {
                 continue;
             }
 
+            status += linkedurl;
             urls.add(linkedurl);
 
             if (linkedurl.contains(root)) {
@@ -118,6 +120,10 @@ public class Downloader {
                 }
             }
         }
+    }
+
+    public final String getStatus() {
+        return status;
     }
 
     public final void stopDownloads() {

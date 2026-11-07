@@ -73,7 +73,7 @@ public class Commands {
             }
 
 
-            return new ActionableMarkupTextAreaElement("downloading... i think....");
+            return new ActionableMarkupTextAreaElement(downloader.getStatus());
         }
         return null;
     }
