@@ -23,8 +23,13 @@ import com.example.Main;
 
 public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
+    private boolean stop = false;
 
     public final void downloadFile(String uri, Path path, Connection session) throws IOException {
+        if (stop) {
+            return;
+        }
+
         try {
             Document doc = session.newRequest(uri).get();
 
@@ -46,6 +51,10 @@ public class Downloader {
 
         Elements elements = doc.select("a");
         for (Element element : elements) {
+            if (stop) {
+                return urls;
+            }
+
             String abshref = element.attr("abs:href");
             String linkedurl, uripath;
 
@@ -109,5 +118,9 @@ public class Downloader {
                 }
             }
         }
+    }
+
+    public final void stopDownloads() {
+        stop = true;
     }
 }

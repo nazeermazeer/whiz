@@ -500,6 +500,8 @@ public final class Main extends ToolkitApp {
     @Override
     protected void onStop() {
         logger.info("application stopped");
+        commands.cleanup();
+        
         try {
             commands.saveStatistics();
         } catch (IOException err) {

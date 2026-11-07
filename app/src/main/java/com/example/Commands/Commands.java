@@ -126,4 +126,8 @@ public class Commands {
     public final void saveStatistics() throws IOException {
         stats.writeStatistics();
     }
+
+    public final void cleanup() {
+        downloader.stopDownloads();
+    }
 }
