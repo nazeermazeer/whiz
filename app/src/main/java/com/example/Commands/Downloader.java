@@ -68,11 +68,9 @@ public class Downloader {
                 continue;
             }
 
-            System.out.println(linkedurl);
             urls.add(linkedurl);
 
             if (linkedurl.contains(root)) {
-                String name = Paths.get(linkedurl).getFileName().toString();
                 downloadFile(linkedurl, path.resolve(uripath), session);
 
                 downloadURLS(linkedurl, root, path, session, urls);
