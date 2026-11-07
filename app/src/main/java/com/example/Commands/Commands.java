@@ -61,7 +61,13 @@ public class Commands {
 
         if (command.equals("/download")) {
             Path path = Path.of(Main.getAppDirectory(), "python");
-            Downloader.downloadWebsite("https://docs.python.org/3.14/", path);
+
+            Runnable task = () -> {
+                Downloader.downloadWebsite("https://docs.python.org/3.14/", path);
+            };
+            Thread thread = new Thread(task);
+            thread.start();
+
             return new ActionableMarkupTextAreaElement("downloading... i think....");
         }
         return null;

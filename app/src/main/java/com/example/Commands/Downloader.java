@@ -68,6 +68,7 @@ public class Downloader {
                 continue;
             }
 
+            System.out.println(linkedurl);
             urls.add(linkedurl);
 
             if (linkedurl.contains(root)) {
