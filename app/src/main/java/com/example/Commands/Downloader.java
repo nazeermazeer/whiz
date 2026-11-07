@@ -24,6 +24,7 @@ import com.example.Main;
 public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
     private String status = "";
+    private int items = 0;
     private boolean stop = false;
 
     public final void downloadFile(String uri, Path path, Connection session) throws IOException {
@@ -78,8 +79,9 @@ public class Downloader {
                 continue;
             }
 
-            status += linkedurl;
+            status += "imagining '" + uripath + "' located at " + linkedurl + "\n";
             urls.add(linkedurl);
+            items++;
 
             if (linkedurl.contains(root)) {
                 downloadFile(linkedurl, path.resolve(uripath), session);
@@ -124,6 +126,10 @@ public class Downloader {
 
     public final String getStatus() {
         return status;
+    }
+
+    public final int getTotalItemCount() {
+        return items;
     }
 
     public final void stopDownloads() {

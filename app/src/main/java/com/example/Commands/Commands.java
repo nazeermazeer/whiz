@@ -73,8 +73,16 @@ public class Commands {
             }
 
 
-            return new ActionableMarkupTextAreaElement(downloader.getStatus());
+            return new ActionableMarkupTextAreaElement(downloader.getStatus()).scrollToLine(downloader.getTotalItemCount());
         }
+        return null;
+    }
+
+    public final String getContentsFromPanel(String command) {
+        if (command.equals("/download")) {
+            return downloader.getStatus();
+        }
+
         return null;
     }
 

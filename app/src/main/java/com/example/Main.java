@@ -160,6 +160,7 @@ public final class Main extends ToolkitApp {
                     match = result.signature().get(0);
                     if (match.startsWith("/")) {
                         slashcommandpanel = match;
+                        browser = commands.getPanelFromCommand(slashcommandpanel);
 
                         logger.info("redirected user to '{}' panel", match);
                     } else {
@@ -319,7 +320,8 @@ public final class Main extends ToolkitApp {
         if (panel.isBlank()) {
             return browser;
         } else {
-            return commands.getPanelFromCommand(panel);
+            browser.markup(commands.getContentsFromPanel(panel));
+            return browser;
         }
     }
 
@@ -501,7 +503,7 @@ public final class Main extends ToolkitApp {
     protected void onStop() {
         logger.info("application stopped");
         commands.cleanup();
-        
+
         try {
             commands.saveStatistics();
         } catch (IOException err) {
