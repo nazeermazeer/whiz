@@ -64,6 +64,7 @@ public final class Main extends ToolkitApp {
 
     private Page page;
     private String query = "";
+    private String slashcommandpanel = "";
     private TextInputState searchbarstate = new TextInputState();
     private final StyleEngine style;
 
@@ -157,7 +158,7 @@ public final class Main extends ToolkitApp {
                     Entry result = suggestions.results().get(selected);
                     match = result.signature().get(0);
                     if (match.startsWith("/")) {
-                        browser = commands.getPanelFromCommand(match);
+                        slashcommandpanel = match;
 
                         logger.info("redirected user to '{}' panel", match);
                     } else {
@@ -313,6 +314,14 @@ public final class Main extends ToolkitApp {
 
     }
 
+    private ActionableMarkupTextAreaElement renderBrowserPanel(String panel) {
+        if (panel.isBlank()) {
+            return browser;
+        } else {
+            return commands.getPanelFromCommand(panel);
+        }
+    }
+
 
     private Element renderSuggestionsPanel(int height, Element panel) {
         return new Element() {
@@ -457,7 +466,7 @@ public final class Main extends ToolkitApp {
                 spacer(1),
                 column(
                     spacer(1),
-                    browser
+                    renderBrowserPanel(slashcommandpanel)
                         .scrollbar(ScrollBarPolicy.AS_NEEDED)
                         .focusable()
                         .wrapWord(),
