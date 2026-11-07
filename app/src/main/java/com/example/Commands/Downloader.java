@@ -24,7 +24,7 @@ import com.example.Main;
 public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
 
-    public static final void downloadFile(String uri, Path path, Connection session) throws IOException {
+    public final void downloadFile(String uri, Path path, Connection session) throws IOException {
         try {
             Document doc = session.newRequest(uri).get();
 
@@ -41,7 +41,7 @@ public class Downloader {
         }
     }
 
-    public static final List<String> downloadURLS(String url, String root, Path path, Connection session, List<String> urls) throws IOException {
+    public final List<String> downloadURLS(String url, String root, Path path, Connection session, List<String> urls) throws IOException {
         Document doc = session.newRequest(url).get();
 
         Elements elements = doc.select("a");
@@ -80,7 +80,7 @@ public class Downloader {
         return urls;
     }
 
-    public static final void downloadWebsite(String url, Path path) {
+    public final void downloadWebsite(String url, Path path) {
         Connection session = Jsoup.newSession()
             .timeout(45 * 1000)
             .maxBodySize(0);

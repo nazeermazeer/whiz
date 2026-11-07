@@ -17,9 +17,12 @@ import com.example.Main;
 public class Commands {
     public record SlashCommand(String name, String description) {}
     private Statistics stats;
+    private Downloader downloader;
 
-    public Commands(Statistics newstats) {
+    public Commands(Statistics newstats, Downloader newdownloader) {
         this.stats = newstats;
+        this.downloader = newdownloader;
+
         try {
             stats.loadStatistics();
         } catch (IOException err) {
@@ -63,7 +66,7 @@ public class Commands {
             Path path = Path.of(Main.getAppDirectory(), "python");
 
             Runnable task = () -> {
-                Downloader.downloadWebsite("https://docs.python.org/3.14/", path);
+                downloader.downloadWebsite("https://docs.python.org/3.14/", path);
             };
             Thread thread = new Thread(task);
             thread.start();

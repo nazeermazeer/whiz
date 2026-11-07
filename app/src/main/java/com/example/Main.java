@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 
 import com.example.Commands.Commands;
+import com.example.Commands.Downloader;
 import com.example.Commands.Statistics;
 import com.example.Commands.Commands.SlashCommand;
 import com.example.Parser.Entry;
@@ -442,7 +443,8 @@ public final class Main extends ToolkitApp {
         Parser myparser = new Parser(myviewer);
 
         Statistics mystatistics = new Statistics();
-        Commands mycommands = new Commands(mystatistics);
+        Downloader mydownloader = new Downloader();
+        Commands mycommands = new Commands(mystatistics, mydownloader);
 
         Main main = new Main(myindexer, myviewer, myparser, mycommands);
         main.run();
