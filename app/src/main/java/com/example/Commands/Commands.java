@@ -19,6 +19,11 @@ public class Commands {
     private Statistics stats;
     private Downloader downloader;
 
+    private final Runnable downloadtask = () -> {
+        downloader.downloadWebsite("https://docs.python.org/3.14/", Path.of(Main.getAppDirectory(), "python"));
+    };
+    private final Thread downloadthread = new Thread(downloadtask);
+
     public Commands(Statistics newstats, Downloader newdownloader) {
         this.stats = newstats;
         this.downloader = newdownloader;
@@ -63,13 +68,10 @@ public class Commands {
         }
 
         if (command.equals("/download")) {
-            Path path = Path.of(Main.getAppDirectory(), "python");
+            if (downloadthread.isAlive()) {
+                downloadthread.start();
+            }
 
-            Runnable task = () -> {
-                downloader.downloadWebsite("https://docs.python.org/3.14/", path);
-            };
-            Thread thread = new Thread(task);
-            thread.start();
 
             return new ActionableMarkupTextAreaElement("downloading... i think....");
         }
@@ -129,5 +131,6 @@ public class Commands {
 
     public final void cleanup() {
         downloader.stopDownloads();
+        downloadthread.interrupt();
     }
 }
