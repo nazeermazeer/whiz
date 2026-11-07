@@ -68,7 +68,7 @@ public class Commands {
         }
 
         if (command.equals("/download")) {
-            if (downloadthread.isAlive()) {
+            if (!downloadthread.isAlive()) {
                 downloadthread.start();
             }
 
