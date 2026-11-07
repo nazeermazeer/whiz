@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class Downloader {
     private String status = "";
     private boolean stop = false;
 
+    private LocalDateTime start = LocalDateTime.now();
     private int success = 0;
     private int snooze = 0;
     private int ignored = 0;
@@ -105,6 +107,8 @@ public class Downloader {
     }
 
     public final void downloadWebsite(String url, Path path) {
+        start = LocalDateTime.now();
+
         Connection session = Jsoup.newSession()
             .timeout(30 * 1000)
             .maxBodySize(0);
@@ -143,6 +147,10 @@ public class Downloader {
 
     public final String getStatus() {
         return status;
+    }
+
+    public final LocalDateTime getDownloadDateTime() {
+        return start;
     }
 
     public final void stopDownloads() {

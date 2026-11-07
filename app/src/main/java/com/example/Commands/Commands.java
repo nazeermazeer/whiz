@@ -137,6 +137,10 @@ public class Commands {
         stats.writeStatistics();
     }
 
+    public final LocalDateTime getDownloadDateTime() {
+        return downloader.getDownloadDateTime();
+    }
+
     public final void cleanup() {
         downloader.stopDownloads();
         downloadthread.interrupt();

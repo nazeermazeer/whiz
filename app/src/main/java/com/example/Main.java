@@ -16,6 +16,8 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -131,6 +133,20 @@ public final class Main extends ToolkitApp {
             this.title = viewer.getDocumentTitle();
             this.rawdoc = viewer.getRawDocument();
             this.styleddoc = viewer.getStylizedDocument();
+        }
+
+        public Page(LocalDateTime past) {
+            LocalDateTime now = LocalDateTime.now();
+            Duration duration = Duration.between(past, now);
+            long days = duration.toDays();
+            long hours = duration.toHoursPart();
+            long minutes = duration.toMinutesPart();
+            long seconds = duration.toSecondsPart();
+
+            this.file = null;
+            this.title = "Downloading - Elapsed " + days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+            this.rawdoc = null;
+            this.styleddoc = null;
         }
 
         public String getContent() {
@@ -321,6 +337,7 @@ public final class Main extends ToolkitApp {
             return browser;
         } else if (panel.equals("/download")) {
             browser.markup(commands.getContentsFromPanel("/download"));
+            page = new Page(commands.getDownloadDateTime());
             return browser
                 .showLineNumbers(true)
                 .scrollToLine(9999999);
