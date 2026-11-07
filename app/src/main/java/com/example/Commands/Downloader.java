@@ -79,7 +79,7 @@ public class Downloader {
                 continue;
             }
 
-            status += "imagining '" + uripath + "' located at " + linkedurl + "\n";
+            status += "imagining '" + uripath + "', which is located [blue][link=" + linkedurl + "]here[/link][/blue]\n";
             urls.add(linkedurl);
             items++;
 
@@ -90,12 +90,13 @@ public class Downloader {
             }
         }
 
+        status += "[green][bold]comprehending a url located [blue][link=" + url + "]here[/blue][/link], which has " +  elements.size() + " urls[/green][/bold]\n";
         return urls;
     }
 
     public final void downloadWebsite(String url, Path path) {
         Connection session = Jsoup.newSession()
-            .timeout(45 * 1000)
+            .timeout(30 * 1000)
             .maxBodySize(0);
 
         List<String> urls = new ArrayList<>();
@@ -112,11 +113,13 @@ public class Downloader {
         } catch (IOException e) {
             int retrycount = 0;
             logger.warn("retrying first retrival of website urls", e);
+            status += "[yellow][bold]snoozin' (attempt " + retrycount + "/3)[/yellow][/bold]";
             try {
                 urls = downloadURLS(url, url, path, session, urls);
             } catch (IOException err) {
                 retrycount++;
                 logger.warn("retrying website url retrieval... total retry count: {}", retrycount, err);
+                status += "[yellow][bold]snoozin' (attempt " + retrycount + "/3)[/yellow][/bold]";
                 if (retrycount >= 3) {
                     throw new RuntimeException(err);
                 }
