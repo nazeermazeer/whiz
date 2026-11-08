@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +143,20 @@ public class Downloader {
             }
         }
 
-        status += success + " " + snooze + " " + ignored + " " + comprehend;
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.between(start, now);
+        long days = duration.toDays();
+        long hours = duration.toHoursPart();
+        long minutes = duration.toMinutesPart();
+        long seconds = duration.toSecondsPart();
+
+        status += "[bold]download finished![/bold]\n\n\n";
+        status += "[bold]finished operation over the course of " + days + "d " + hours + "h " + minutes + "m " + seconds + "s[/bold]\n";
+        status += " - [blue][bold]imagined " + success + " files[/blue][/bold]\n";
+        status += " - [green][bold]comprehended " + comprehend + " urls[/green][/bold]\n";
+        status += " - [yellow][bold]snoozed " + snooze + " times[/yellow][/bold]\n";
+        status += " - [red][bold]ignored " + ignored + " entries[/red][/bold]\n";
+        status += "\n";
     }
 
     public final String getStatus() {
