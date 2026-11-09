@@ -82,7 +82,8 @@ public final class Main extends ToolkitApp {
         commands = newcommands;
 
         try {
-            page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
+            // page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
+            page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "builtins", "functions.html").toFile());
         } catch (IOException err) {
             page = new Page(getClass().getResourceAsStream("/nofile.html"));
         }

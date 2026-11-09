@@ -245,22 +245,22 @@ public final class Viewer {
             }
         }
 
-        // very very weird way to try to get color rendering in [] tags
-        try {
-            Colorizer.ColorOutput color = Colorizer.getColorOutput(newdoc);
+        // // very very weird way to try to get color rendering in [] tags
+        // try {
+        //     Colorizer.ColorOutput color = Colorizer.getColorOutput(newdoc);
 
-            Elements spans = newdoc.select("span");
-            for (Element span : spans) {
-                String rgb = Colorizer.resolveColor(
-                    span, color.rules(), color.colors()
-                );
-                span.before(new TextNode("[" + rgb + "]"));
-                span.after(new TextNode("[/" + rgb + "]"));
-                span.unwrap();
-            }
-        } catch (Exception err) {
-            throw new RuntimeException(err);
-        }
+        //     Elements spans = newdoc.select("span");
+        //     for (Element span : spans) {
+        //         String rgb = Colorizer.resolveColor(
+        //             span, color.rules(), color.colors()
+        //         );
+        //         span.before(new TextNode("[" + rgb + "]"));
+        //         span.after(new TextNode("[/" + rgb + "]"));
+        //         span.unwrap();
+        //     }
+        // } catch (Exception err) {
+        //     throw new RuntimeException(err);
+        // }
 
         return newdoc.clone();
     }
