@@ -56,6 +56,7 @@ import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.chart.Axis;
 import dev.tamboui.widgets.chart.Dataset;
+import dev.tamboui.widgets.chart.GraphType;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
@@ -351,7 +352,7 @@ public final class Main extends ToolkitApp {
             Dataset data = Dataset.builder()
                 .name("Data")
                 .data(new double[][] { {0, 0}, {1, 2}, {2, 1}, {3, 4}, {4, 3} })
-                .marker(Dataset.Marker.BRAILLE)
+                .graphType(GraphType.LINE)
                 .style(Style.EMPTY.fg(Color.CYAN))
                 .build();
 
