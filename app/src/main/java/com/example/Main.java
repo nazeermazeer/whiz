@@ -80,6 +80,7 @@ public final class Main extends ToolkitApp {
     private static Path appdir;
     private static final Logger logger = LogManager.getLogger(Main.class);
     private static final Map<String, Runnable> ACTIONS = new HashMap<>();
+    private static final boolean downloaded = false;
 
     public Main(Indexer newindexer, Viewer newviewer, Parser newparser, Commands newcommands) {
         indexer = newindexer;
@@ -88,8 +89,11 @@ public final class Main extends ToolkitApp {
         commands = newcommands;
 
         try {
-            // page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
-            page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "builtins", "functions.html").toFile());
+            if (downloaded) {
+                page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs", "builtins", "functions.html").toFile());
+            } else {
+                page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
+            }
         } catch (IOException err) {
             page = new Page(getClass().getResourceAsStream("/nofile.html"));
         }

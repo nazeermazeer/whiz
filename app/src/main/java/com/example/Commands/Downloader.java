@@ -116,7 +116,7 @@ public class Downloader {
 
         List<String> urls = new ArrayList<>();
 
-        Path root = Path.of(Main.getAppDirectory(), "python");
+        Path root = Path.of(Main.getAppDirectory(), "python-3.14-docs");
         try {
             Files.createDirectories(root);
         } catch (IOException err) {
