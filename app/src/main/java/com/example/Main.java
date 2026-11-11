@@ -1,6 +1,7 @@
 package com.example;
 
 
+import static dev.tamboui.toolkit.Toolkit.chart;
 import static dev.tamboui.toolkit.Toolkit.column;
 import static dev.tamboui.toolkit.Toolkit.list;
 import static dev.tamboui.toolkit.Toolkit.panel;
@@ -39,6 +40,8 @@ import com.example.Parser.Entry;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
@@ -51,6 +54,8 @@ import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.error.ErrorAction;
 import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.widgets.chart.Axis;
+import dev.tamboui.widgets.chart.Dataset;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextInputState;
 
@@ -333,18 +338,42 @@ public final class Main extends ToolkitApp {
 
     }
 
-    private ActionableMarkupTextAreaElement renderBrowserPanel(String panel) {
+    private Element renderBrowserPanel(String panel) {
         if (panel.isBlank()) {
             return browser;
         } else if (panel.equals("/download")) {
-            browser.markup(commands.getContentsFromPanel("/download"));
-            page = new Page(commands.getDownloadDateTime());
-            return browser
-                .showLineNumbers(true)
-                .scrollToLine(9999999);
+            // browser.markup(commands.getContentsFromPanel("/download"));
+            // page = new Page(commands.getDownloadDateTime());
+            // return browser
+            //     .showLineNumbers(true)
+            //     .scrollToLine(9999999);
+
+            Dataset data = Dataset.builder()
+                .name("Data")
+                .data(new double[][] { {0, 0}, {1, 2}, {2, 1}, {3, 4}, {4, 3} })
+                .marker(Dataset.Marker.BRAILLE)
+                .style(Style.EMPTY.fg(Color.CYAN))
+                .build();
+
+            return chart()
+                .datasets(data)
+                .xAxis(Axis.builder()
+                    .title("X Axis")
+                    .bounds(0, 5)
+                    .build())
+                .yAxis(Axis.builder()
+                    .title("Y Axis")
+                    .bounds(0, 5)
+                    .build())
+                .title("Line Chart")
+                .rounded()
+                .borderColor(Color.CYAN);
         } else {
             browser.markup(commands.getContentsFromPanel(panel));
-            return browser;
+            return browser
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
+                .focusable()
+                .wrapWord();
         }
     }
 
@@ -493,10 +522,7 @@ public final class Main extends ToolkitApp {
                 spacer(1),
                 column(
                     spacer(1),
-                    renderBrowserPanel(slashcommandpanel)
-                        .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                        .focusable()
-                        .wrapWord(),
+                    renderBrowserPanel(slashcommandpanel),
                     renderSuggestionsPanel(suggestions.height(), panel(suggestions.element())
                         .id("suggestions")),
                     panel(searchbar)
