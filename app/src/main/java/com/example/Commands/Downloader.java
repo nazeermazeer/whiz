@@ -112,7 +112,10 @@ public class Downloader {
 
         Connection session = Jsoup.newSession()
             .timeout(30 * 1000)
-            .maxBodySize(0);
+            .maxBodySize(0)
+            .onResponseProgress((processed, total, percent, response) -> {
+                System.out.println("percent: " + percent + ", processed: " + processed + "/" + total);
+            });
 
         List<String> urls = new ArrayList<>();
 
