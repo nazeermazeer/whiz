@@ -94,6 +94,7 @@ public final class Main extends ToolkitApp {
             } else {
                 page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
             }
+            throw new IOException();
         } catch (IOException err) {
             page = new Page(getClass().getResourceAsStream("/nofile.html"));
         }
@@ -222,7 +223,13 @@ public final class Main extends ToolkitApp {
         List<Entry> entries = new ArrayList<>();
         int index = 0;
         for (Entry entry : indexer.readJSON()) {
-            if (entry.location().equals(page.file.getName())) {
+            String filename;
+            try {
+                filename = page.file.getName();
+            } catch (NullPointerException err) {
+                filename = "no file found";
+            }
+            if (entry.location().equals(filename)) {
                 entries.add(entry);
                 list.add(row(
                     text(entry.type().substring(0, 1).toUpperCase(), " ", entry.name())
