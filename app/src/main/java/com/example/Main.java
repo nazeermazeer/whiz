@@ -94,7 +94,6 @@ public final class Main extends ToolkitApp {
             } else {
                 page = new Page(Path.of(Main.getAppDirectory(), "python-3.14-docs-html", "library", "functions.html").toFile());
             }
-            throw new IOException();
         } catch (IOException err) {
             page = new Page(getClass().getResourceAsStream("/nofile.html"));
         }
