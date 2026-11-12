@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +82,8 @@ public final class Main extends ToolkitApp {
     private static final Logger logger = LogManager.getLogger(Main.class);
     private static final Map<String, Runnable> ACTIONS = new HashMap<>();
     private static final boolean downloaded = false;
+
+    private static double[][] data = new double[][] { {0, 0} };
 
     public Main(Indexer newindexer, Viewer newviewer, Parser newparser, Commands newcommands) {
         indexer = newindexer;
@@ -359,15 +362,18 @@ public final class Main extends ToolkitApp {
             //     .showLineNumbers(true)
             //     .scrollToLine(9999999);
 
-            Dataset data = Dataset.builder()
+            data = Arrays.copyOf(data, data.length + 1);
+            data[data.length - 1] = new double[]{1, 2};
+
+            Dataset dataset = Dataset.builder()
                 .name("Data")
-                .data(new double[][] { {0, 0}, {1, 2}, {2, 1}, {3, 4}, {4, 3} })
+                .data(data)
                 .graphType(GraphType.LINE)
                 .style(Style.EMPTY.fg(Color.CYAN))
                 .build();
 
             return chart()
-                .datasets(data)
+                .datasets(dataset)
                 .xAxis(Axis.builder()
                     .title("X Axis")
                     .bounds(0, 5)
