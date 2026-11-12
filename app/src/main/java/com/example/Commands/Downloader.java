@@ -118,7 +118,9 @@ public class Downloader {
             .timeout(30 * 1000)
             .maxBodySize(0)
             .onResponseProgress((processed, total, percent, response) -> {
-                System.out.println("percent: " + percent + ", processed: " + processed + "/" + total);
+                int x = 0;
+                // System.out.println("percent: " + percent + ", processed: " + processed + "/" + total);
+                dataset.addPoint(x++, total);
             });
 
         List<String> urls = new ArrayList<>();
@@ -179,8 +181,6 @@ public class Downloader {
     }
 
     public final Dataset.Builder getDatasetBuilder() {
-        dataset.addPoint(1, 2);
-
         return dataset;
     }
 }

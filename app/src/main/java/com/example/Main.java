@@ -365,6 +365,12 @@ public final class Main extends ToolkitApp {
                 .style(Style.EMPTY.fg(Color.CYAN))
                 .build();
 
+            double max = 0;
+            double[][] data = dataset.data();
+            for (double[] entry : data) {
+                max = Math.max(max, entry[1]);
+            }
+
             return chart()
                 .datasets(dataset)
                 .xAxis(Axis.builder()
@@ -373,7 +379,8 @@ public final class Main extends ToolkitApp {
                     .build())
                 .yAxis(Axis.builder()
                     .title("Y Axis")
-                    .bounds(0, 5)
+                    .bounds(0, max)
+                    .labels("0%", "50%", "100%")
                     .build())
                 .title("Line Chart")
                 .rounded()
