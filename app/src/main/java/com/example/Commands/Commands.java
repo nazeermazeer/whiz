@@ -2,6 +2,7 @@ package com.example.Commands;
 
 
 import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
+import dev.tamboui.widgets.chart.Dataset;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -139,6 +140,10 @@ public class Commands {
 
     public final LocalDateTime getDownloadDateTime() {
         return downloader.getDownloadDateTime();
+    }
+
+    public final Dataset.Builder getDatasetBuilder() {
+        return downloader.getDatasetBuilder();
     }
 
     public final void cleanup() {

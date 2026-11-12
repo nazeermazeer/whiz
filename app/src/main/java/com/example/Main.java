@@ -83,8 +83,6 @@ public final class Main extends ToolkitApp {
     private static final Map<String, Runnable> ACTIONS = new HashMap<>();
     private static final boolean downloaded = false;
 
-    private static double[][] data = new double[][] { {0, 0} };
-
     public Main(Indexer newindexer, Viewer newviewer, Parser newparser, Commands newcommands) {
         indexer = newindexer;
         viewer = newviewer;
@@ -362,12 +360,7 @@ public final class Main extends ToolkitApp {
             //     .showLineNumbers(true)
             //     .scrollToLine(9999999);
 
-            data = Arrays.copyOf(data, data.length + 1);
-            data[data.length - 1] = new double[]{1, 2};
-
-            Dataset dataset = Dataset.builder()
-                .name("Data")
-                .data(data)
+            Dataset dataset = commands.getDatasetBuilder()
                 .graphType(GraphType.LINE)
                 .style(Style.EMPTY.fg(Color.CYAN))
                 .build();

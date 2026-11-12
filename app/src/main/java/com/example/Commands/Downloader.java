@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -23,6 +24,9 @@ import org.jsoup.select.Elements;
 
 import com.example.Main;
 
+import dev.tamboui.widgets.chart.Dataset;
+import dev.tamboui.widgets.chart.GraphType;
+
 public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
     private String status = "";
@@ -34,6 +38,7 @@ public class Downloader {
     private int ignored = 0;
     private int comprehend = 0;
 
+    private static double[][] data = new double[][] { {0, 0} };
 
     public final void downloadFile(String uri, Path path, Connection session) throws IOException {
         if (stop) {
@@ -172,5 +177,15 @@ public class Downloader {
 
     public final void stopDownloads() {
         stop = true;
+    }
+
+    public final Dataset.Builder getDatasetBuilder() {
+        data = Arrays.copyOf(data, data.length + 1);
+        data[data.length - 1] = new double[]{1, 2};
+
+        Dataset.Builder dataset = Dataset.builder()
+            .data(data);
+
+        return dataset;
     }
 }
