@@ -31,14 +31,13 @@ public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
     private String status = "";
     private boolean stop = false;
+    private Dataset.Builder dataset = Dataset.builder().addPoint(0, 0);
 
     private LocalDateTime start = LocalDateTime.now();
     private int success = 0;
     private int snooze = 0;
     private int ignored = 0;
     private int comprehend = 0;
-
-    private static double[][] data = new double[][] { {0, 0} };
 
     public final void downloadFile(String uri, Path path, Connection session) throws IOException {
         if (stop) {
@@ -180,11 +179,7 @@ public class Downloader {
     }
 
     public final Dataset.Builder getDatasetBuilder() {
-        data = Arrays.copyOf(data, data.length + 1);
-        data[data.length - 1] = new double[]{1, 2};
-
-        Dataset.Builder dataset = Dataset.builder()
-            .data(data);
+        dataset.addPoint(1, 2);
 
         return dataset;
     }
