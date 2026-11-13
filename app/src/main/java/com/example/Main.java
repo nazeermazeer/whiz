@@ -75,7 +75,7 @@ public final class Main extends ToolkitApp {
 
     private Page page;
     private String query = "";
-    private String slashcommandpanel = "";
+    private String panel = "";
     private TextInputState searchbarstate = new TextInputState();
     private final StyleEngine style;
 
@@ -188,8 +188,8 @@ public final class Main extends ToolkitApp {
                     Entry result = suggestions.results().get(selected);
                     match = result.signature().get(0);
                     if (match.startsWith("/")) {
-                        slashcommandpanel = match;
-                        browser = commands.getPanelFromCommand(slashcommandpanel);
+                        panel = match;
+                        browser = commands.getPanelFromCommand(panel);
 
                         logger.info("redirected user to '{}' panel", match);
                     } else {
@@ -352,16 +352,16 @@ public final class Main extends ToolkitApp {
 
     }
 
-    private Element renderBrowserPanel(String panel) {
-        if (panel.isBlank()) {
+    private Element renderBrowserPanel(String panelname) {
+        if (panelname.isBlank()) {
             return browser;
-        } else if (panel.equals("/download")) {
+        } else if (panelname.equals("/download")) {
             Downloader downloader = commands.getDownloader();
             ChartElement chart = downloader.getChartElement();
             chart.onKeyEvent(event -> {
                 if (event.isChar('c')) {
                     downloader.stopDownloads();
-                    slashcommandpanel = "";
+                    panel = "";
                     return EventResult.HANDLED;
                 }
                 return EventResult.UNHANDLED;
@@ -523,7 +523,7 @@ public final class Main extends ToolkitApp {
                 spacer(1),
                 column(
                     spacer(1),
-                    renderBrowserPanel(slashcommandpanel),
+                    renderBrowserPanel(panel),
                     renderSuggestionsPanel(suggestions.height(), panel(suggestions.element())
                         .id("suggestions")),
                     panel(searchbar)
