@@ -197,6 +197,7 @@ public final class Main extends ToolkitApp {
                         ).toFile();
 
                         page = new Page(file);
+                        Statistics stats = commands.getStatistics();
 
                         browser = registerElementActions(browser);
                         browser.markup(page.getContent());
@@ -204,8 +205,8 @@ public final class Main extends ToolkitApp {
 
                         sidebar = createSidebarPanel(result.name());
 
-                        commands.recordTotalSearch();
-                        commands.recordDocumentationSearch("python");
+                        stats.recordTotalSearch();
+                        stats.recordDocumentationSearch("python");
 
                         logger.info("redirected user to search result for \"{}\"", match);
                     }
@@ -354,12 +355,9 @@ public final class Main extends ToolkitApp {
         if (panel.isBlank()) {
             return browser;
         } else if (panel.equals("/download")) {
-            // browser.markup(commands.getContentsFromPanel("/download"));
-            page = new Page(commands.getDownloadDateTime());
-            // return browser
-            //     .showLineNumbers(true)
-            //     .scrollToLine(9999999);
-            return commands.getChartElement();
+            Downloader downloader = commands.getDownloader();
+            page = new Page(downloader.getDownloadDateTime());
+            return downloader.getChartElement();
         } else {
             browser.markup(commands.getContentsFromPanel(panel));
             return browser
@@ -546,7 +544,8 @@ public final class Main extends ToolkitApp {
         commands.cleanup();
 
         try {
-            commands.saveStatistics();
+            Statistics stats = commands.getStatistics();
+            stats.writeStatistics();
         } catch (IOException err) {
             logger.error("failed to save statistics", err);
         }

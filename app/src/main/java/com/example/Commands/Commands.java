@@ -127,28 +127,12 @@ public class Commands {
         return 0;
     }
 
-    public final void recordTotalSearch() {
-        stats.increaseTotalSearches();
+    public Statistics getStatistics() {
+        return stats;
     }
 
-    public final void recordDocumentationSearch(String doc) {
-        stats.increaseDocumentSearches(doc);
-    }
-
-    public final void saveStatistics() throws IOException {
-        stats.writeStatistics();
-    }
-
-    public final LocalDateTime getDownloadDateTime() {
-        return downloader.getDownloadDateTime();
-    }
-
-    public final Dataset.Builder getDatasetBuilder() {
-        return downloader.getDatasetBuilder();
-    }
-
-    public final ChartElement getChartElement() {
-        return downloader.getChartElement();
+    public Downloader getDownloader() {
+        return downloader;
     }
 
     public final void cleanup() {

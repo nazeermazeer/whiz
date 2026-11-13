@@ -33,12 +33,12 @@ public class Statistics {
         }
     }
 
-    public void increaseTotalSearches() {
+    public void recordTotalSearch() {
         int searches = this.stats.getTotalSearches();
         stats.setTotalSearches(searches + 1);
     }
 
-    public void increaseDocumentSearches(String doc) {
+    public void recordDocumentationSearch(String doc) {
         Map<String, Integer> searcheddocs = this.stats.getDocumentSearches();
         int searches;
         if (searcheddocs.get(doc) == null) {
