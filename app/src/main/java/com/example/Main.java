@@ -358,6 +358,8 @@ public final class Main extends ToolkitApp {
         } else if (panelname.equals("/download")) {
             Downloader downloader = commands.getDownloader();
             ChartElement chart = downloader.getChartElement();
+            page = new Page(downloader.getDownloadDateTime());
+
             chart.onKeyEvent(event -> {
                 if (event.isChar('c')) {
                     downloader.stopDownloads();
@@ -367,7 +369,6 @@ public final class Main extends ToolkitApp {
                 return EventResult.UNHANDLED;
             });
 
-            page = new Page(downloader.getDownloadDateTime());
             return chart;
         } else {
             browser.markup(commands.getContentsFromPanel(panel));

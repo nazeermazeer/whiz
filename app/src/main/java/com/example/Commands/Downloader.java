@@ -43,7 +43,7 @@ public class Downloader {
     private int snooze = 0;
     private int ignored = 0;
     private int comprehend = 0;
-    private int completion = 0;
+    private int x = 0;
 
     public final void downloadFile(String uri, Path path, Connection session) throws IOException {
         if (stop) {
@@ -128,9 +128,9 @@ public class Downloader {
                 // System.out.println("percent: " + percent + ", processed: " + processed + "/" + total);
                 double elapsed = (System.nanoTime() - nanotime) / 1_000_000_000.0;
                 double speedkb = elapsed / total / 1024.0;
-                completion++;
+                x++;
 
-                datasetbuilder.addPoint(completion, speedkb);
+                datasetbuilder.addPoint(x, speedkb);
             });
 
         List<String> urls = new ArrayList<>();
