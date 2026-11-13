@@ -371,11 +371,13 @@ public final class Main extends ToolkitApp {
                 max = Math.max(max, entry[1]);
             }
 
+            int length = dataset.data().length;
+
             return chart()
                 .datasets(dataset)
                 .xAxis(Axis.builder()
                     .title("X Axis")
-                    .bounds(0, 5)
+                    .bounds(Math.max(0, length - 500), length)
                     .build())
                 .yAxis(Axis.builder()
                     .title("Y Axis")
