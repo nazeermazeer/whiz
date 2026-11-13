@@ -380,7 +380,6 @@ public final class Main extends ToolkitApp {
                 .yAxis(Axis.builder()
                     .title("Y Axis")
                     .bounds(0, max)
-                    .labels("0%", "50%", "100%")
                     .build())
                 .title("Line Chart")
                 .rounded()

@@ -38,6 +38,7 @@ public class Downloader {
     private int snooze = 0;
     private int ignored = 0;
     private int comprehend = 0;
+    private int completion = 0;
 
     public final void downloadFile(String uri, Path path, Connection session) throws IOException {
         if (stop) {
@@ -113,14 +114,18 @@ public class Downloader {
 
     public final void downloadWebsite(String url, Path path) {
         start = LocalDateTime.now();
+        long nanotime = System.nanoTime();
 
         Connection session = Jsoup.newSession()
             .timeout(30 * 1000)
             .maxBodySize(0)
             .onResponseProgress((processed, total, percent, response) -> {
-                int x = 0;
                 // System.out.println("percent: " + percent + ", processed: " + processed + "/" + total);
-                dataset.addPoint(x++, total);
+                double elapsed = (System.nanoTime() - nanotime) / 1_000_000_000.0;
+                double speedkb = elapsed / total / 1024.0;
+                completion++;
+
+                dataset.addPoint(completion, speedkb);
             });
 
         List<String> urls = new ArrayList<>();
