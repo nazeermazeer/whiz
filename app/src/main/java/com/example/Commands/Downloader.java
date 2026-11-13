@@ -118,20 +118,24 @@ public class Downloader {
     }
 
     public final void downloadWebsite(String url, Path path) {
-        start = LocalDateTime.now();
         long nanotime = System.nanoTime();
 
         Connection session = Jsoup.newSession()
             .timeout(30 * 1000)
             .maxBodySize(0)
             .onResponseProgress((processed, total, percent, response) -> {
-                // System.out.println("percent: " + percent + ", processed: " + processed + "/" + total);
                 double elapsed = (System.nanoTime() - nanotime) / 1_000_000_000.0;
                 double speedkb = elapsed / total / 1024.0;
                 x++;
 
                 datasetbuilder.addPoint(x, speedkb);
             });
+            
+        useFallbackDownloader(url, path, session);
+    }
+
+    private final void useFallbackDownloader(String url, Path path, Connection session) {
+        start = LocalDateTime.now();
 
         List<String> urls = new ArrayList<>();
 
