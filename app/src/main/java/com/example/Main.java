@@ -50,6 +50,7 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
+import dev.tamboui.toolkit.elements.ChartElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.error.ErrorAction;
@@ -356,8 +357,18 @@ public final class Main extends ToolkitApp {
             return browser;
         } else if (panel.equals("/download")) {
             Downloader downloader = commands.getDownloader();
+            ChartElement chart = downloader.getChartElement();
+            chart.onKeyEvent(event -> {
+                if (event.isChar('c')) {
+                    downloader.stopDownloads();
+                    slashcommandpanel = "";
+                    return EventResult.HANDLED;
+                }
+                return EventResult.UNHANDLED;
+            });
+
             page = new Page(downloader.getDownloadDateTime());
-            return downloader.getChartElement();
+            return chart;
         } else {
             browser.markup(commands.getContentsFromPanel(panel));
             return browser
