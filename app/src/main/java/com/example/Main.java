@@ -355,7 +355,7 @@ public final class Main extends ToolkitApp {
             return browser;
         } else if (panel.equals("/download")) {
             // browser.markup(commands.getContentsFromPanel("/download"));
-            // page = new Page(commands.getDownloadDateTime());
+            page = new Page(commands.getDownloadDateTime());
             // return browser
             //     .showLineNumbers(true)
             //     .scrollToLine(9999999);
@@ -382,9 +382,7 @@ public final class Main extends ToolkitApp {
                 .yAxis(Axis.builder()
                     .title("Y Axis")
                     .bounds(0, max)
-                    .build())
-                .title("Line Chart")
-                .rounded();
+                    .build());
         } else {
             browser.markup(commands.getContentsFromPanel(panel));
             return browser
