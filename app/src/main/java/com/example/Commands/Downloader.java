@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -132,6 +133,18 @@ public class Downloader {
             });
             
         useFallbackDownloader(url, path, session);
+    }
+
+    private final void usePythonDownloader(String url, Path path, Connection session) throws IOException {
+        Connection.Response response = session.newRequest(url)
+            .ignoreContentType(true)
+            .maxBodySize(0)
+            .execute();
+
+        try (InputStream stream = response.bodyStream()) {
+            Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
+        }
+        
     }
 
     private final void useFallbackDownloader(String url, Path path, Connection session) {
