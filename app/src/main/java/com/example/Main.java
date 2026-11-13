@@ -384,8 +384,7 @@ public final class Main extends ToolkitApp {
                     .bounds(0, max)
                     .build())
                 .title("Line Chart")
-                .rounded()
-                .borderColor(Color.CYAN);
+                .rounded();
         } else {
             browser.markup(commands.getContentsFromPanel(panel));
             return browser
