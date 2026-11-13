@@ -359,28 +359,7 @@ public final class Main extends ToolkitApp {
             // return browser
             //     .showLineNumbers(true)
             //     .scrollToLine(9999999);
-
-            Dataset dataset = commands.getDatasetBuilder()
-                .graphType(GraphType.LINE)
-                .style(Style.EMPTY.fg(Color.CYAN))
-                .build();
-
-            double max = 0;
-            double[][] data = dataset.data();
-            for (double[] entry : data) {
-                max = Math.max(max, entry[1]);
-            }
-
-            int length = dataset.data().length;
-
-            return chart()
-                .datasets(dataset)
-                .xAxis(Axis.builder()
-                    .bounds(Math.max(0, length - 500), length)
-                    .build())
-                .yAxis(Axis.builder()
-                    .bounds(0, max)
-                    .build());
+            return commands.getChartElement();
         } else {
             browser.markup(commands.getContentsFromPanel(panel));
             return browser

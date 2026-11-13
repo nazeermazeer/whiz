@@ -2,6 +2,7 @@ package com.example.Commands;
 
 
 import dev.tamboui.toolkit.elements.ActionableMarkupTextAreaElement;
+import dev.tamboui.toolkit.elements.ChartElement;
 import dev.tamboui.widgets.chart.Dataset;
 
 import java.io.IOException;
@@ -144,6 +145,10 @@ public class Commands {
 
     public final Dataset.Builder getDatasetBuilder() {
         return downloader.getDatasetBuilder();
+    }
+
+    public final ChartElement getChartElement() {
+        return downloader.getChartElement();
     }
 
     public final void cleanup() {

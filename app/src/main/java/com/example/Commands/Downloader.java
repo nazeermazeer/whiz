@@ -24,14 +24,19 @@ import org.jsoup.select.Elements;
 
 import com.example.Main;
 
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+import dev.tamboui.toolkit.elements.ChartElement;
+import dev.tamboui.widgets.chart.Axis;
 import dev.tamboui.widgets.chart.Dataset;
 import dev.tamboui.widgets.chart.GraphType;
+import static dev.tamboui.toolkit.Toolkit.chart;
 
 public class Downloader {
     private static final Logger logger = LogManager.getLogger(Downloader.class);
     private String status = "";
     private boolean stop = false;
-    private Dataset.Builder dataset = Dataset.builder().addPoint(0, 0);
+    private Dataset.Builder datasetbuilder = Dataset.builder().addPoint(0, 0);
 
     private LocalDateTime start = LocalDateTime.now();
     private int success = 0;
@@ -125,7 +130,7 @@ public class Downloader {
                 double speedkb = elapsed / total / 1024.0;
                 completion++;
 
-                dataset.addPoint(completion, speedkb);
+                datasetbuilder.addPoint(completion, speedkb);
             });
 
         List<String> urls = new ArrayList<>();
@@ -186,6 +191,30 @@ public class Downloader {
     }
 
     public final Dataset.Builder getDatasetBuilder() {
-        return dataset;
+        return datasetbuilder;
+    }
+
+    public final ChartElement getChartElement() {
+        Dataset dataset = datasetbuilder
+            .graphType(GraphType.LINE)
+            .style(Style.EMPTY.fg(Color.CYAN))
+            .build();
+
+        double max = 0;
+        double[][] data = dataset.data();
+        for (double[] entry : data) {
+            max = Math.max(max, entry[1]);
+        }
+
+        int length = dataset.data().length;
+
+        return chart()
+            .datasets(dataset)
+            .xAxis(Axis.builder()
+                .bounds(Math.max(0, length - 500), length)
+                .build())
+            .yAxis(Axis.builder()
+                .bounds(0, max)
+                .build());
     }
 }
