@@ -376,11 +376,9 @@ public final class Main extends ToolkitApp {
             return chart()
                 .datasets(dataset)
                 .xAxis(Axis.builder()
-                    .title("X Axis")
                     .bounds(Math.max(0, length - 500), length)
                     .build())
                 .yAxis(Axis.builder()
-                    .title("Y Axis")
                     .bounds(0, max)
                     .build());
         } else {
